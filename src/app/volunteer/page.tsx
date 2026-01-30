@@ -197,25 +197,51 @@ export default function VolunteerDashboard() {
       setIsTracking(true);
       setLocationError(null);
 
-      const watchId = navigator.geolocation.watchPosition(
+      // First, get an immediate fresh location
+      console.log("🔍 [VOLUNTEER] Getting immediate fresh location...");
+      navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
+          const { latitude, longitude, accuracy } = position.coords;
+          console.log(`✅ [VOLUNTEER] Initial location: Lat=${latitude}, Lng=${longitude}, Accuracy=${accuracy}m`);
           setMyLocation({ lat: latitude, lng: longitude });
 
-          // Send location update to server only if authenticated and is volunteer
           if (shouldQuery) {
+            console.log(`🔄 [VOLUNTEER] Sending initial location to server`);
             updateLocation.mutate({ latitude, longitude });
           }
         },
         (error) => {
-          console.error("Location error:", error);
+          console.error("❌ [VOLUNTEER] Initial location error:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 30000,
+        }
+      );
+
+      // Then start continuous watching
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude, accuracy } = position.coords;
+          console.log(`📍 [VOLUNTEER] Location update: Lat=${latitude}, Lng=${longitude}, Accuracy=${accuracy}m`);
+          setMyLocation({ lat: latitude, lng: longitude });
+
+          // Send location update to server only if authenticated and is volunteer
+          if (shouldQuery) {
+            console.log(`🔄 [VOLUNTEER] Sending to server: Lat=${latitude}, Lng=${longitude}`);
+            updateLocation.mutate({ latitude, longitude });
+          }
+        },
+        (error) => {
+          console.error("❌ [VOLUNTEER] Location error:", error);
           setLocationError(error.message);
           setIsTracking(false);
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 10000, // 10 seconds
-          timeout: 15000,
+          maximumAge: 0, // Force fresh location, no cache
+          timeout: 30000, // Increased timeout for GPS lock
         }
       );
 
@@ -470,7 +496,11 @@ export default function VolunteerDashboard() {
                       setLocationError(null);
                     },
                     (error) => setLocationError(error.message),
-                    { enableHighAccuracy: true, timeout: 15000 }
+                    { 
+                      enableHighAccuracy: true, 
+                      timeout: 30000, // Increased timeout for GPS lock
+                      maximumAge: 0 // Force fresh location, no cache
+                    }
                   );
                 }
               }}
@@ -1142,12 +1172,14 @@ export default function VolunteerDashboard() {
                 {myLocation ? `${myLocation.lat.toFixed(4)}` : "—"}
               </p>
               <p className="text-sm text-blue-700">Latitude</p>
+              {myLocation && <p className="text-xs text-gray-500 mt-1">Full: {myLocation.lat}</p>}
             </div>
             <div className="rounded-lg bg-blue-50 p-4 text-center">
               <p className="text-2xl font-bold text-blue-600">
                 {myLocation ? `${myLocation.lng.toFixed(4)}` : "—"}
               </p>
               <p className="text-sm text-blue-700">Longitude</p>
+              {myLocation && <p className="text-xs text-gray-500 mt-1">Full: {myLocation.lng}</p>}
             </div>
           </div>
         </div>

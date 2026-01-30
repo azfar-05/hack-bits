@@ -93,8 +93,8 @@ export default function ProfilePage() {
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
+        timeout: 30000, // Increased timeout for GPS lock
+        maximumAge: 0, // Force fresh location, no cache
       }
     );
   };

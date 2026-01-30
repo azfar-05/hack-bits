@@ -30,12 +30,16 @@ export function ProfileCompletion({ onComplete }: ProfileCompletionProps) {
       return;
     }
 
+    console.log("🔍 Requesting location for profile...");
     setLocationStatus("loading");
     setLocationError(null);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
+        console.log("✅ Location obtained:", position.coords);
+        const { latitude, longitude, accuracy } = position.coords;
+        console.log(`Accuracy: ${accuracy} meters`);
+        
         setFormData(prev => ({ ...prev, latitude, longitude }));
         setLocationStatus("success");
 
@@ -57,13 +61,30 @@ export function ProfileCompletion({ onComplete }: ProfileCompletionProps) {
         }
       },
       (error) => {
+        console.error("❌ Geolocation error:", error);
         setLocationStatus("error");
-        setLocationError(error.message);
+        
+        let errorMessage = "";
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied. Please enable location access in your browser settings.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable. Please check your device's location services.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out. Please try again or check if you have clear sky view for GPS.";
+            break;
+          default:
+            errorMessage = error.message;
+        }
+        
+        setLocationError(errorMessage);
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
+        timeout: 30000, // Increased timeout for GPS lock
+        maximumAge: 0, // Force fresh location, no cache
       }
     );
   };

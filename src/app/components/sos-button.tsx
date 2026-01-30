@@ -17,28 +17,57 @@ function SosModal({ isOpen, onClose, onSendSos, isSending }: SosModalProps) {
   const [message, setMessage] = useState("");
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       // Get user location when modal opens
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-            setLocationError(null);
-          },
-          (error) => {
-            setLocationError("Could not get your location. Please ensure location services are enabled.");
-            console.error("Geolocation error:", error);
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-        );
-      } else {
+      if (!navigator.geolocation) {
         setLocationError("Geolocation is not supported by your browser.");
+        return;
       }
+
+      console.log("🔍 Starting geolocation request...");
+      setIsLoadingLocation(true);
+      setLocationError(null);
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("✅ Location obtained:", position.coords);
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setLocationError(null);
+          setIsLoadingLocation(false);
+        },
+        (error) => {
+          console.error("❌ Geolocation error:", error);
+          let errorMessage = "Could not get your location. ";
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage += "Location permission denied. Please enable location access in your browser settings.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage += "Location information unavailable. Please check your device's location services.";
+              break;
+            case error.TIMEOUT:
+              errorMessage += "Location request timed out. Please try again or check if you have clear sky view for GPS.";
+              break;
+            default:
+              errorMessage += "An unknown error occurred.";
+          }
+          
+          setLocationError(errorMessage);
+          setIsLoadingLocation(false);
+        },
+        { 
+          enableHighAccuracy: true, 
+          timeout: 30000, // Increased timeout for GPS lock
+          maximumAge: 0 // Force fresh location, no cache
+        }
+      );
     }
   }, [isOpen]);
 
@@ -68,9 +97,14 @@ function SosModal({ isOpen, onClose, onSendSos, isSending }: SosModalProps) {
         <div className="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
           <p className="text-sm text-red-700">
             <strong>Emergency alert sent!</strong> Help is being coordinated.
-            {location && (
-              <span className="block mt-1">
-                Location: {formatCoordinatesForDisplay(location.latitude, location.longitude).latitude}, {formatCoordinatesForDisplay(location.latitude, location.longitude).longitude}
+            {isLoadingLocation && (
+              <span className="block mt-1 text-blue-600">
+                🔍 Obtaining your precise location... (this may take up to 30 seconds for GPS)
+              </span>
+            )}
+            {location && !isLoadingLocation && (
+              <span className="block mt-1 text-green-600">
+                ✅ Location: {formatCoordinatesForDisplay(location.latitude, location.longitude).latitude}, {formatCoordinatesForDisplay(location.latitude, location.longitude).longitude}
               </span>
             )}
           </p>
@@ -79,6 +113,13 @@ function SosModal({ isOpen, onClose, onSendSos, isSending }: SosModalProps) {
         {locationError && (
           <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
             <p className="text-sm text-yellow-700">{locationError}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-2 text-xs text-blue-600 hover:underline"
+            >
+              Reload page and try again
+            </button>
           </div>
         )}
 
@@ -160,8 +201,8 @@ export function SosButton() {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000,
+          timeout: 30000, // Increased timeout for GPS lock
+          maximumAge: 0, // Force fresh location, no cache
         });
       });
 

@@ -30,6 +30,31 @@ export function isValidCoordinate(lat: number, lng: number): boolean {
 }
 
 /**
+ * Validates coordinates with accuracy check
+ */
+export function validateCoordinates(
+  lat: number,
+  lng: number,
+  accuracy?: number
+): { isValid: boolean; error?: string } {
+  if (!isValidCoordinate(lat, lng)) {
+    return {
+      isValid: false,
+      error: 'Coordinates are out of valid range (lat: -90 to 90, lng: -180 to 180)'
+    };
+  }
+
+  if (accuracy && accuracy > 10000) {
+    return {
+      isValid: false,
+      error: 'Location accuracy is too low (> 10km)'
+    };
+  }
+
+  return { isValid: true };
+}
+
+/**
  * Validates coordinate object
  */
 export function isValidCoordinateObject(coord: Coordinate): boolean {
@@ -53,6 +78,32 @@ export function formatCoordinates(
   return {
     latitude: formatCoordinate(coord.latitude, precision),
     longitude: formatCoordinate(coord.longitude, precision),
+  };
+}
+
+/**
+ * Formats coordinates for database storage (6 decimal places)
+ */
+export function formatCoordinatesForDatabase(
+  lat: number,
+  lng: number
+): { latitude: number; longitude: number } {
+  return {
+    latitude: formatCoordinate(lat, 6),
+    longitude: formatCoordinate(lng, 6),
+  };
+}
+
+/**
+ * Formats coordinates for display (4 decimal places)
+ */
+export function formatCoordinatesForDisplay(
+  lat: number,
+  lng: number
+): { latitude: string; longitude: string } {
+  return {
+    latitude: lat.toFixed(4),
+    longitude: lng.toFixed(4),
   };
 }
 

@@ -74,7 +74,11 @@ export default function UserDashboard() {
       (error) => {
         console.log("Could not get user location:", error.message);
       },
-      { enableHighAccuracy: true, maximumAge: 300000 }
+      { 
+        enableHighAccuracy: true, 
+        timeout: 30000, // Increased timeout for GPS lock
+        maximumAge: 0 // Force fresh location, no cache
+      }
     );
   }, []);
 
@@ -234,7 +238,11 @@ export default function UserDashboard() {
       (error) => {
         setActionMessage(`Location error: ${error.message}`);
       },
-      { enableHighAccuracy: true, maximumAge: 10000 },
+      { 
+        enableHighAccuracy: true, 
+        timeout: 30000, // Increased timeout for GPS lock
+        maximumAge: 0 // Force fresh location, no cache
+      },
     );
   };
 
