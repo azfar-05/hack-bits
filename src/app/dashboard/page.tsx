@@ -1,23 +1,19 @@
-import { redirect } from "next/navigation";
-import { auth } from "~/server/auth";
+"use client";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default async function DashboardPage() {
-  const session = await auth();
+export default function Dashboard() {
+  const { data } = useSession();
+  const router = useRouter();
 
-  if (!session?.user) {
-    redirect("/");
-  }
+  useEffect(() => {
+    if (!data) return;
 
-  // Redirect based on user role
-  const role = session.user.role;
+    if (data.user.role === "USER") router.push("/user");
+    if (data.user.role === "VOLUNTEER") router.push("/volunteer");
+    if (data.user.role === "AUTHORITY") router.push("/authority");
+  }, [data]);
 
-  switch (role) {
-    case "AUTHORITY":
-      redirect("/authority");
-    case "VOLUNTEER":
-      redirect("/volunteer");
-    case "USER":
-    default:
-      redirect("/user");
-  }
+  return null;
 }
