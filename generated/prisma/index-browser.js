@@ -194,6 +194,32 @@ exports.Prisma.SafetyConfirmationScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.RescueRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  volunteerId: 'volunteerId',
+  status: 'status',
+  message: 'message',
+  location: 'location',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  searchRadiusUsed: 'searchRadiusUsed',
+  escalatedAt: 'escalatedAt',
+  assignedAt: 'assignedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VolunteerProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  available: 'available',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -225,6 +251,14 @@ exports.EmergencyStatus = exports.$Enums.EmergencyStatus = {
   RESOLVED: 'RESOLVED'
 };
 
+exports.RescueStatus = exports.$Enums.RescueStatus = {
+  PENDING: 'PENDING',
+  ASSIGNED: 'ASSIGNED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  NO_VOLUNTEER: 'NO_VOLUNTEER'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
@@ -233,7 +267,9 @@ exports.Prisma.ModelName = {
   Alert: 'Alert',
   SafetyGuide: 'SafetyGuide',
   EmergencyRequest: 'EmergencyRequest',
-  SafetyConfirmation: 'SafetyConfirmation'
+  SafetyConfirmation: 'SafetyConfirmation',
+  RescueRequest: 'RescueRequest',
+  VolunteerProfile: 'VolunteerProfile'
 };
 
 /**

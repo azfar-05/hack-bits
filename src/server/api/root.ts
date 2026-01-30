@@ -1,6 +1,8 @@
 import { alertRouter } from "~/server/api/routers/alert";
 import { guideRouter } from "~/server/api/routers/guide";
 import { emergencyRouter } from "~/server/api/routers/emergency";
+import { rescueRouter } from "~/server/api/routers/rescue";
+import { volunteerRouter } from "~/server/api/routers/volunteer";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -12,6 +14,8 @@ export const appRouter = createTRPCRouter({
   alert: alertRouter,
   guide: guideRouter,
   emergency: emergencyRouter,
+  rescue: rescueRouter,
+  volunteer: volunteerRouter,
 });
 
 // export type definition of API

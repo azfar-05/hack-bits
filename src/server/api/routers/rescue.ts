@@ -2,6 +2,33 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
+// Search radius steps in kilometers
+const SEARCH_RADII = [2, 5, 10];
+
+/**
+ * Haversine formula to calculate distance between two points
+ * @returns distance in kilometers
+ */
+function haversineDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function toRad(deg: number): number {
+  return deg * (Math.PI / 180);
+}
+
 export const rescueRouter = createTRPCRouter({
   // Create a new rescue request (SOS) - USER only
   create: protectedProcedure
@@ -9,6 +36,8 @@ export const rescueRouter = createTRPCRouter({
       z.object({
         message: z.string().min(1, "Please describe your emergency"),
         location: z.string().optional(),
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -42,12 +71,19 @@ export const rescueRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           message: input.message,
           location: input.location,
+          latitude: input.latitude,
+          longitude: input.longitude,
           status: "PENDING",
         },
       });
 
-      // Attempt to auto-assign a volunteer
-      const assignmentResult = await autoAssignVolunteer(ctx.db, rescueRequest.id);
+      // Attempt to auto-assign a volunteer with radius expansion
+      const assignmentResult = await autoAssignVolunteerWithRadius(
+        ctx.db,
+        rescueRequest.id,
+        input.latitude,
+        input.longitude
+      );
 
       // Return the updated request
       const updatedRequest = await ctx.db.rescueRequest.findUnique({
@@ -128,7 +164,7 @@ export const rescueRouter = createTRPCRouter({
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { createdAt: "asc" }, // Oldest first
+      orderBy: { createdAt: "asc" },
     });
 
     return requests;
@@ -156,10 +192,10 @@ export const rescueRouter = createTRPCRouter({
         });
       }
 
-      if (request.status !== "PENDING") {
+      if (request.status !== "PENDING" && request.status !== "NO_VOLUNTEER") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This request is no longer pending",
+          message: "This request is no longer available",
         });
       }
 
@@ -241,7 +277,7 @@ export const rescueRouter = createTRPCRouter({
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { escalatedAt: "asc" }, // Oldest escalation first
+      orderBy: { escalatedAt: "asc" },
     });
 
     return requests;
@@ -287,6 +323,24 @@ export const rescueRouter = createTRPCRouter({
         });
       }
 
+      // Verify volunteer exists and is a volunteer role
+      const volunteer = await ctx.db.user.findFirst({
+        where: {
+          id: input.volunteerId,
+          role: "VOLUNTEER",
+        },
+        include: {
+          volunteerProfile: true,
+        },
+      });
+
+      if (!volunteer) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Volunteer not found",
+        });
+      }
+
       const updatedRequest = await ctx.db.rescueRequest.update({
         where: { id: input.requestId },
         data: {
@@ -294,7 +348,18 @@ export const rescueRouter = createTRPCRouter({
           status: "ASSIGNED",
           assignedAt: new Date(),
         },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+          volunteer: {
+            select: { id: true, name: true, email: true },
+          },
+        },
       });
+
+      console.log(`[RESCUE] Authority manually assigned volunteer ${volunteer.email} to request ${input.requestId}`);
+      mockSendSMS(volunteer.email, "You have been assigned to a rescue request by authorities!");
 
       return updatedRequest;
     }),
@@ -330,18 +395,106 @@ export const rescueRouter = createTRPCRouter({
 });
 
 /**
- * Auto-assign volunteer logic with NO_VOLUNTEER fallback
+ * Auto-assign volunteer with radius expansion logic
+ * Searches in expanding radii: 2km -> 5km -> 10km
  */
-async function autoAssignVolunteer(
+async function autoAssignVolunteerWithRadius(
+  db: any,
+  requestId: string,
+  userLat?: number,
+  userLon?: number
+): Promise<{ assigned: boolean; message: string; radiusUsed?: number }> {
+  // If no location provided, fall back to simple assignment
+  if (!userLat || !userLon) {
+    return await simpleAssignment(db, requestId);
+  }
+
+  // Get all available volunteers with location
+  const availableVolunteers = await db.volunteerProfile.findMany({
+    where: {
+      available: true,
+      latitude: { not: null },
+      longitude: { not: null },
+      user: {
+        role: "VOLUNTEER",
+        volunteerAssignments: {
+          none: {
+            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          },
+        },
+      },
+    },
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  });
+
+  if (availableVolunteers.length === 0) {
+    return await escalateToAuthority(db, requestId, "No available volunteers with location tracking enabled");
+  }
+
+  // Calculate distances and sort by closest
+  const volunteersWithDistance = availableVolunteers
+    .map((v: any) => ({
+      ...v,
+      distance: haversineDistance(userLat, userLon, v.latitude!, v.longitude!),
+    }))
+    .sort((a: any, b: any) => a.distance - b.distance);
+
+  // Try each radius step
+  for (const radius of SEARCH_RADII) {
+    const nearbyVolunteer = volunteersWithDistance.find((v: any) => v.distance <= radius);
+
+    if (nearbyVolunteer) {
+      // Assign the nearest volunteer within this radius
+      await db.rescueRequest.update({
+        where: { id: requestId },
+        data: {
+          volunteerId: nearbyVolunteer.user.id,
+          status: "ASSIGNED",
+          assignedAt: new Date(),
+          searchRadiusUsed: radius,
+        },
+      });
+
+      console.log(
+        `[RESCUE] Volunteer ${nearbyVolunteer.user.email} assigned (${nearbyVolunteer.distance.toFixed(2)}km away, radius: ${radius}km)`
+      );
+
+      mockSendSMS(
+        nearbyVolunteer.user.email,
+        `New rescue request assigned! Distance: ${nearbyVolunteer.distance.toFixed(2)}km`
+      );
+
+      return {
+        assigned: true,
+        message: `Volunteer ${nearbyVolunteer.user.name || nearbyVolunteer.user.email} assigned (${nearbyVolunteer.distance.toFixed(1)}km away)`,
+        radiusUsed: radius,
+      };
+    }
+
+    console.log(`[RESCUE] No volunteer found within ${radius}km, expanding search...`);
+  }
+
+  // No volunteer found within 10km - escalate
+  return await escalateToAuthority(db, requestId, "No volunteer available within 10km radius");
+}
+
+/**
+ * Simple assignment without location (fallback)
+ */
+async function simpleAssignment(
   db: any,
   requestId: string
 ): Promise<{ assigned: boolean; message: string }> {
-  // Try to find an available volunteer
   const availableVolunteer = await db.user.findFirst({
     where: {
       role: "VOLUNTEER",
-      isAvailable: true,
-      // Not already assigned to an active rescue
+      volunteerProfile: {
+        available: true,
+      },
       volunteerAssignments: {
         none: {
           status: { in: ["ASSIGNED", "IN_PROGRESS"] },
@@ -351,7 +504,6 @@ async function autoAssignVolunteer(
   });
 
   if (availableVolunteer) {
-    // Assign the volunteer
     await db.rescueRequest.update({
       where: { id: requestId },
       data: {
@@ -361,39 +513,45 @@ async function autoAssignVolunteer(
       },
     });
 
-    console.log(`[RESCUE] Volunteer ${availableVolunteer.email} assigned to request ${requestId}`);
-
-    // Mock SMS notification
+    console.log(`[RESCUE] Volunteer ${availableVolunteer.email} assigned (no location data)`);
     mockSendSMS(availableVolunteer.email, "New rescue request assigned to you!");
 
     return {
       assigned: true,
       message: `Volunteer ${availableVolunteer.name || availableVolunteer.email} has been assigned`,
     };
-  } else {
-    // NO VOLUNTEER FALLBACK
-    await db.rescueRequest.update({
-      where: { id: requestId },
-      data: {
-        status: "NO_VOLUNTEER",
-        escalatedAt: new Date(),
-      },
-    });
-
-    console.log(`[RESCUE] No volunteer available. Escalated to authorities. Request: ${requestId}`);
-
-    // Mock emergency notification
-    mockSendEmergencyAlert(requestId);
-
-    return {
-      assigned: false,
-      message: "No volunteer available. Escalated to authorities.",
-    };
   }
+
+  return await escalateToAuthority(db, requestId, "No available volunteers");
 }
 
 /**
- * Mock SMS notification (no external service)
+ * Escalate to authority when no volunteer found
+ */
+async function escalateToAuthority(
+  db: any,
+  requestId: string,
+  reason: string
+): Promise<{ assigned: boolean; message: string }> {
+  await db.rescueRequest.update({
+    where: { id: requestId },
+    data: {
+      status: "NO_VOLUNTEER",
+      escalatedAt: new Date(),
+    },
+  });
+
+  console.log(`[RESCUE] ${reason}. Escalated to authorities. Request: ${requestId}`);
+  mockSendEmergencyAlert(requestId, reason);
+
+  return {
+    assigned: false,
+    message: "No volunteer available. Escalated to authorities.",
+  };
+}
+
+/**
+ * Mock SMS notification
  */
 function mockSendSMS(recipient: string | null, message: string): void {
   console.log(`[MOCK SMS] To: ${recipient}`);
@@ -403,8 +561,9 @@ function mockSendSMS(recipient: string | null, message: string): void {
 /**
  * Mock emergency alert to authorities
  */
-function mockSendEmergencyAlert(requestId: string): void {
+function mockSendEmergencyAlert(requestId: string, reason: string): void {
   console.log(`[MOCK EMERGENCY] Alert sent to all authorities`);
   console.log(`[MOCK EMERGENCY] Request ID: ${requestId}`);
-  console.log(`[MOCK EMERGENCY] Message: URGENT - User in danger with no available volunteers!`);
+  console.log(`[MOCK EMERGENCY] Reason: ${reason}`);
+  console.log(`[MOCK EMERGENCY] Message: URGENT - User in danger needs manual intervention!`);
 }

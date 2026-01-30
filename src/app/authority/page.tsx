@@ -37,6 +37,11 @@ export default function AuthorityDashboard() {
   const [guideContent, setGuideContent] = useState("");
   const [guideSuccess, setGuideSuccess] = useState(false);
 
+  // Manual assign modal state
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedVolunteerId, setSelectedVolunteerId] = useState("");
+
   // Fetch escalated requests (NO_VOLUNTEER)
   const escalatedQuery = api.rescue.getEscalated.useQuery(undefined, {
     refetchInterval: 10000, // Refresh every 10s
@@ -46,6 +51,42 @@ export default function AuthorityDashboard() {
   const allRequestsQuery = api.rescue.getAllRequests.useQuery(undefined, {
     refetchInterval: 30000,
   });
+
+  // Fetch all volunteers with locations
+  const volunteersQuery = api.volunteer.getAllWithLocations.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
+
+  // Manual assign mutation
+  const manualAssign = api.rescue.manualAssign.useMutation({
+    onSuccess: () => {
+      setShowAssignModal(false);
+      setSelectedRequest(null);
+      setSelectedVolunteerId("");
+      escalatedQuery.refetch();
+      allRequestsQuery.refetch();
+    },
+  });
+
+  const handleManualAssign = () => {
+    if (!selectedRequest || !selectedVolunteerId) return;
+    manualAssign.mutate({
+      requestId: selectedRequest.id,
+      volunteerId: selectedVolunteerId,
+    });
+  };
+
+  const calculateDistance = (lat1?: number, lon1?: number, lat2?: number, lon2?: number) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
 
   // tRPC mutations
   const createAlert = api.alert.create.useMutation({
@@ -160,15 +201,25 @@ export default function AuthorityDashboard() {
                       <p className="text-xs text-gray-500">
                         SOS sent: {new Date(request.createdAt).toLocaleTimeString()}
                       </p>
-                      <button
-                        className="mt-2 rounded-md bg-orange-600 px-3 py-1.5 text-sm text-white hover:bg-orange-700"
-                        onClick={() => {
-                          // Mock dispatch action
-                          alert(`Dispatching emergency services to: ${request.location || "Unknown location"}\nUser: ${request.user.name || request.user.email}`);
-                        }}
-                      >
-                        Dispatch Services
-                      </button>
+                      <div className="flex flex-col gap-2 mt-2">
+                        <button
+                          className="rounded-md bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700"
+                          onClick={() => {
+                            setSelectedRequest(request);
+                            setShowAssignModal(true);
+                          }}
+                        >
+                          Assign Volunteer
+                        </button>
+                        <button
+                          className="rounded-md bg-orange-600 px-3 py-1.5 text-sm text-white hover:bg-orange-700"
+                          onClick={() => {
+                            alert(`Dispatching emergency services to: ${request.location || "Unknown location"}\nUser: ${request.user.name || request.user.email}`);
+                          }}
+                        >
+                          Dispatch Services
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -350,6 +401,137 @@ export default function AuthorityDashboard() {
             </form>
           </div>
         </div>
+
+        {/* Manual Assignment Modal */}
+        {showAssignModal && selectedRequest && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-xl max-h-[80vh] overflow-y-auto">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
+                Manually Assign Volunteer
+              </h2>
+
+              <div className="mb-4 rounded-lg bg-orange-50 p-4">
+                <h3 className="font-medium text-orange-800">User in Danger</h3>
+                <p className="text-sm text-gray-700 mt-1">
+                  {selectedRequest.user.name || selectedRequest.user.email}
+                </p>
+                <p className="text-sm text-gray-600">{selectedRequest.message}</p>
+                {selectedRequest.location && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Location: {selectedRequest.location}
+                  </p>
+                )}
+                {selectedRequest.latitude && (
+                  <p className="text-xs text-gray-500">
+                    Coordinates: {selectedRequest.latitude.toFixed(4)}, {selectedRequest.longitude?.toFixed(4)}
+                  </p>
+                )}
+              </div>
+
+              <h3 className="font-medium text-gray-900 mb-3">Available Volunteers</h3>
+              
+              {volunteersQuery.isLoading && (
+                <p className="text-gray-500 text-sm">Loading volunteers...</p>
+              )}
+
+              {volunteersQuery.data && volunteersQuery.data.length === 0 && (
+                <p className="text-gray-500 text-sm">No volunteers registered in the system.</p>
+              )}
+
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {volunteersQuery.data?.map((volunteer) => {
+                  const distance = calculateDistance(
+                    selectedRequest.latitude,
+                    selectedRequest.longitude,
+                    volunteer.latitude ?? undefined,
+                    volunteer.longitude ?? undefined
+                  );
+                  const isBusy = volunteer.activeAssignments > 0;
+
+                  return (
+                    <label
+                      key={volunteer.id}
+                      className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${
+                        selectedVolunteerId === volunteer.id
+                          ? "border-green-500 bg-green-50"
+                          : "border-gray-200 hover:bg-gray-50"
+                      } ${isBusy ? "opacity-50" : ""}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="volunteer"
+                          value={volunteer.id}
+                          checked={selectedVolunteerId === volunteer.id}
+                          onChange={(e) => setSelectedVolunteerId(e.target.value)}
+                          disabled={isBusy}
+                          className="h-4 w-4 text-green-600"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {volunteer.name || volunteer.email}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 ${
+                              volunteer.available ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+                            }`}>
+                              {volunteer.available ? "Available" : "Unavailable"}
+                            </span>
+                            {isBusy && (
+                              <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-yellow-700">
+                                {volunteer.activeAssignments} active rescue
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {distance !== null ? (
+                          <p className="text-sm font-medium text-gray-900">
+                            {distance.toFixed(1)} km
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-400">No location</p>
+                        )}
+                        {volunteer.lastUpdated && (
+                          <p className="text-xs text-gray-400">
+                            Updated {new Date(volunteer.lastUpdated).toLocaleTimeString()}
+                          </p>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {manualAssign.error && (
+                <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+                  {manualAssign.error.message}
+                </div>
+              )}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    setSelectedRequest(null);
+                    setSelectedVolunteerId("");
+                  }}
+                  className="flex-1 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleManualAssign}
+                  disabled={!selectedVolunteerId || manualAssign.isPending}
+                  className="flex-1 rounded-md bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {manualAssign.isPending ? "Assigning..." : "Assign Volunteer"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

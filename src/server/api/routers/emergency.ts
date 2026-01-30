@@ -14,28 +14,23 @@ export const emergencyRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Load user's phone number from DB (must be set in profile)
+      // Load user's phone number from DB (optional for demo)
       const user = await ctx.db.user.findUnique({
         where: { id: userId },
-        select: { phoneNumber: true },
+        select: { phoneNumber: true, email: true },
       });
-
-      if (!user || !user.phoneNumber) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Phone number is required on your profile to send an emergency.",
-        });
-      }
 
       const emergency = await ctx.db.emergencyRequest.create({
         data: {
           userId,
-          phoneNumber: user.phoneNumber,
+          phoneNumber: user?.phoneNumber ?? user?.email ?? "N/A",
           latitude: input.latitude,
           longitude: input.longitude,
           // status defaults to OPEN via Prisma schema
         },
       });
+
+      console.log(`[EMERGENCY] SOS created by ${user?.email} at (${input.latitude}, ${input.longitude})`);
 
       return emergency;
     }),
