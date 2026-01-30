@@ -74,6 +74,7 @@ export const authConfig = {
               name: email.split("@")[0],
               role: "USER" as Role,
               password: hashedPassword,
+              profileCompleted: false, // New users need to complete profile
             },
           });
 
@@ -119,12 +120,38 @@ export const authConfig = {
         role: token.role,
       },
     }),
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === "google" || account?.provider === "github") {
         // Auto-assign USER role for OAuth sign-ins
         if (!user.role) {
           user.role = "USER";
         }
+
+        // Check if this is a new user and mark profile as incomplete
+        if (user.email) {
+          const existingUser = await db.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!existingUser) {
+            // This is a new OAuth user, they'll need to complete their profile
+            await db.user.upsert({
+              where: { email: user.email },
+              create: {
+                email: user.email,
+                name: user.name,
+                image: user.image,
+                role: "USER" as Role,
+                profileCompleted: false,
+              },
+              update: {
+                name: user.name,
+                image: user.image,
+              },
+            });
+          }
+        }
+
         return true;
       }
       return true;

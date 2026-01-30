@@ -118,7 +118,13 @@ export default function VolunteerDashboard() {
   });
 
   // Location update mutation
-  const updateLocation = api.volunteer.updateLocation.useMutation();
+  const updateLocation = api.volunteer.updateLocation.useMutation({
+    onError: (error) => {
+      console.error("Failed to update location:", error.message);
+      // Don't show location update errors to user as they're not critical
+      // The location will be retried on the next update
+    },
+  });
 
   // Accept request mutation
   const acceptRequest = api.rescue.acceptRequest.useMutation({
@@ -143,6 +149,9 @@ export default function VolunteerDashboard() {
 
   // Start location tracking on mount
   useEffect(() => {
+    // Only start tracking if user is authenticated and is a volunteer
+    if (!shouldQuery) return;
+
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by your browser");
       return;
@@ -158,8 +167,10 @@ export default function VolunteerDashboard() {
           const { latitude, longitude } = position.coords;
           setMyLocation({ lat: latitude, lng: longitude });
 
-          // Send location update to server
-          updateLocation.mutate({ latitude, longitude });
+          // Send location update to server only if authenticated and is volunteer
+          if (shouldQuery) {
+            updateLocation.mutate({ latitude, longitude });
+          }
         },
         (error) => {
           console.error("Location error:", error);
@@ -182,20 +193,20 @@ export default function VolunteerDashboard() {
 
     const cleanup = startTracking();
     return cleanup;
-  }, []);
+  }, [shouldQuery]);
 
   // Periodic location update (every 15 seconds as backup)
   useEffect(() => {
-    if (!myLocation) return;
+    if (!myLocation || !shouldQuery) return;
 
     const interval = setInterval(() => {
-      if (myLocation) {
+      if (myLocation && shouldQuery) {
         updateLocation.mutate({ latitude: myLocation.lat, longitude: myLocation.lng });
       }
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [myLocation]);
+  }, [myLocation, shouldQuery]);
 
   const handleSignOut = async () => {
     router.push("/api/auth/signout");
@@ -289,15 +300,15 @@ export default function VolunteerDashboard() {
               {/* Tracking Status */}
               <div
                 className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${
-                  isTracking ? "bg-green-500" : "bg-yellow-500"
+                  isTracking && !updateLocation.error ? "bg-green-500" : "bg-yellow-500"
                 }`}
               >
                 <span
                   className={`h-2 w-2 rounded-full ${
-                    isTracking ? "bg-green-200 animate-pulse" : "bg-yellow-200"
+                    isTracking && !updateLocation.error ? "bg-green-200 animate-pulse" : "bg-yellow-200"
                   }`}
                 />
-                {isTracking ? "Tracking" : "Offline"}
+                {isTracking && !updateLocation.error ? "Tracking" : "Offline"}
               </div>
 
               {/* Availability Toggle */}
@@ -310,6 +321,13 @@ export default function VolunteerDashboard() {
                 }`}
               >
                 {isAvailable ? "Available" : "Unavailable"}
+              </button>
+
+              <button
+                onClick={() => router.push("/profile")}
+                className="rounded-md bg-green-700 px-4 py-2 text-sm font-medium hover:bg-green-800 transition-colors"
+              >
+                Profile
               </button>
 
               <button
@@ -404,6 +422,61 @@ export default function VolunteerDashboard() {
               />
             </svg>
             <span className="text-sm">Location access: {locationError}</span>
+            <button
+              onClick={() => {
+                setLocationError(null);
+                // Retry location tracking
+                if (shouldQuery && navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                      const { latitude, longitude } = position.coords;
+                      setMyLocation({ lat: latitude, lng: longitude });
+                      updateLocation.mutate({ latitude, longitude });
+                      setLocationError(null);
+                    },
+                    (error) => setLocationError(error.message),
+                    { enableHighAccuracy: true, timeout: 15000 }
+                  );
+                }
+              }}
+              className="ml-auto text-sm bg-yellow-100 hover:bg-yellow-200 px-2 py-1 rounded"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Location Update Error Banner */}
+      {updateLocation.error && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-800">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span className="text-sm">
+              Failed to update location: {updateLocation.error.message}
+            </span>
+            <button
+              onClick={() => {
+                updateLocation.reset();
+                // Retry location update if we have current location
+                if (myLocation && shouldQuery) {
+                  updateLocation.mutate({ 
+                    latitude: myLocation.lat, 
+                    longitude: myLocation.lng 
+                  });
+                }
+              }}
+              className="ml-auto text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+            >
+              Retry
+            </button>
           </div>
         </div>
       )}

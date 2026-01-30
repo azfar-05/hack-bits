@@ -2,6 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { TRPCReactProvider } from "~/trpc/react";
+import { ProfileGuard } from "./components/profile-guard";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -10,7 +11,11 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <TRPCReactProvider>{children}</TRPCReactProvider>
+      <TRPCReactProvider>
+        <ProfileGuard>
+          {children}
+        </ProfileGuard>
+      </TRPCReactProvider>
     </SessionProvider>
   );
 }

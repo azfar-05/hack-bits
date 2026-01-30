@@ -179,12 +179,20 @@ export default function AuthorityDashboard() {
               <h1 className="text-3xl font-bold">Authority Dashboard</h1>
               <p className="mt-1 text-red-100">Disaster Alert & Rescue Coordination System</p>
             </div>
-            <button
-              onClick={handleSignOut}
-              className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium hover:bg-red-800 transition-colors"
-            >
-              Sign Out
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push("/profile")}
+                className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium hover:bg-red-800 transition-colors"
+              >
+                Profile
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium hover:bg-red-800 transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>

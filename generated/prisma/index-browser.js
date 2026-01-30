@@ -152,7 +152,11 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   role: 'role',
   phoneNumber: 'phoneNumber',
-  password: 'password'
+  password: 'password',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  address: 'address',
+  profileCompleted: 'profileCompleted'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {

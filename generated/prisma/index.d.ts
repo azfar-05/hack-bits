@@ -4067,8 +4067,20 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -4080,6 +4092,10 @@ export namespace Prisma {
     role: $Enums.Role | null
     phoneNumber: string | null
     password: string | null
+    latitude: number | null
+    longitude: number | null
+    address: string | null
+    profileCompleted: boolean | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4091,6 +4107,10 @@ export namespace Prisma {
     role: $Enums.Role | null
     phoneNumber: string | null
     password: string | null
+    latitude: number | null
+    longitude: number | null
+    address: string | null
+    profileCompleted: boolean | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4102,9 +4122,23 @@ export namespace Prisma {
     role: number
     phoneNumber: number
     password: number
+    latitude: number
+    longitude: number
+    address: number
+    profileCompleted: number
     _all: number
   }
 
+
+  export type UserAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+  }
 
   export type UserMinAggregateInputType = {
     id?: true
@@ -4115,6 +4149,10 @@ export namespace Prisma {
     role?: true
     phoneNumber?: true
     password?: true
+    latitude?: true
+    longitude?: true
+    address?: true
+    profileCompleted?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4126,6 +4164,10 @@ export namespace Prisma {
     role?: true
     phoneNumber?: true
     password?: true
+    latitude?: true
+    longitude?: true
+    address?: true
+    profileCompleted?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4137,6 +4179,10 @@ export namespace Prisma {
     role?: true
     phoneNumber?: true
     password?: true
+    latitude?: true
+    longitude?: true
+    address?: true
+    profileCompleted?: true
     _all?: true
   }
 
@@ -4178,6 +4224,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -4208,6 +4266,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -4221,7 +4281,13 @@ export namespace Prisma {
     role: $Enums.Role
     phoneNumber: string | null
     password: string | null
+    latitude: number | null
+    longitude: number | null
+    address: string | null
+    profileCompleted: boolean
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -4249,6 +4315,10 @@ export namespace Prisma {
     role?: boolean
     phoneNumber?: boolean
     password?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    address?: boolean
+    profileCompleted?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     emergencyRequests?: boolean | User$emergencyRequestsArgs<ExtArgs>
     safetyConfirmations?: boolean | User$safetyConfirmationsArgs<ExtArgs>
@@ -4268,6 +4338,10 @@ export namespace Prisma {
     role?: boolean
     phoneNumber?: boolean
     password?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    address?: boolean
+    profileCompleted?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4279,6 +4353,10 @@ export namespace Prisma {
     role?: boolean
     phoneNumber?: boolean
     password?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    address?: boolean
+    profileCompleted?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -4290,9 +4368,13 @@ export namespace Prisma {
     role?: boolean
     phoneNumber?: boolean
     password?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    address?: boolean
+    profileCompleted?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "phoneNumber" | "password", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "phoneNumber" | "password" | "latitude" | "longitude" | "address" | "profileCompleted", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     emergencyRequests?: boolean | User$emergencyRequestsArgs<ExtArgs>
@@ -4326,6 +4408,10 @@ export namespace Prisma {
       role: $Enums.Role
       phoneNumber: string | null
       password: string | null
+      latitude: number | null
+      longitude: number | null
+      address: string | null
+      profileCompleted: boolean
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4764,6 +4850,10 @@ export namespace Prisma {
     readonly role: FieldRef<"User", 'Role'>
     readonly phoneNumber: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
+    readonly latitude: FieldRef<"User", 'Float'>
+    readonly longitude: FieldRef<"User", 'Float'>
+    readonly address: FieldRef<"User", 'String'>
+    readonly profileCompleted: FieldRef<"User", 'Boolean'>
   }
     
 
@@ -12889,7 +12979,11 @@ export namespace Prisma {
     image: 'image',
     role: 'role',
     phoneNumber: 'phoneNumber',
-    password: 'password'
+    password: 'password',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    address: 'address',
+    profileCompleted: 'profileCompleted'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -13069,20 +13163,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DisasterType'
-   */
-  export type EnumDisasterTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisasterType'>
-    
-
-
-  /**
-   * Reference to a field of type 'DisasterType[]'
-   */
-  export type ListEnumDisasterTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisasterType[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -13093,6 +13173,27 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'DisasterType'
+   */
+  export type EnumDisasterTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisasterType'>
+    
+
+
+  /**
+   * Reference to a field of type 'DisasterType[]'
+   */
+  export type ListEnumDisasterTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisasterType[]'>
     
 
 
@@ -13121,13 +13222,6 @@ export namespace Prisma {
    * Reference to a field of type 'RescueStatus[]'
    */
   export type ListEnumRescueStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RescueStatus[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
   /**
    * Deep Input Types
@@ -13294,6 +13388,10 @@ export namespace Prisma {
     role?: EnumRoleFilter<"User"> | $Enums.Role
     phoneNumber?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
+    latitude?: FloatNullableFilter<"User"> | number | null
+    longitude?: FloatNullableFilter<"User"> | number | null
+    address?: StringNullableFilter<"User"> | string | null
+    profileCompleted?: BoolFilter<"User"> | boolean
     accounts?: AccountListRelationFilter
     emergencyRequests?: EmergencyRequestListRelationFilter
     safetyConfirmations?: SafetyConfirmationListRelationFilter
@@ -13312,6 +13410,10 @@ export namespace Prisma {
     role?: SortOrder
     phoneNumber?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    profileCompleted?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     emergencyRequests?: EmergencyRequestOrderByRelationAggregateInput
     safetyConfirmations?: SafetyConfirmationOrderByRelationAggregateInput
@@ -13333,6 +13435,10 @@ export namespace Prisma {
     role?: EnumRoleFilter<"User"> | $Enums.Role
     phoneNumber?: StringNullableFilter<"User"> | string | null
     password?: StringNullableFilter<"User"> | string | null
+    latitude?: FloatNullableFilter<"User"> | number | null
+    longitude?: FloatNullableFilter<"User"> | number | null
+    address?: StringNullableFilter<"User"> | string | null
+    profileCompleted?: BoolFilter<"User"> | boolean
     accounts?: AccountListRelationFilter
     emergencyRequests?: EmergencyRequestListRelationFilter
     safetyConfirmations?: SafetyConfirmationListRelationFilter
@@ -13351,9 +13457,15 @@ export namespace Prisma {
     role?: SortOrder
     phoneNumber?: SortOrderInput | SortOrder
     password?: SortOrderInput | SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    profileCompleted?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -13368,6 +13480,10 @@ export namespace Prisma {
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     phoneNumber?: StringNullableWithAggregatesFilter<"User"> | string | null
     password?: StringNullableWithAggregatesFilter<"User"> | string | null
+    latitude?: FloatNullableWithAggregatesFilter<"User"> | number | null
+    longitude?: FloatNullableWithAggregatesFilter<"User"> | number | null
+    address?: StringNullableWithAggregatesFilter<"User"> | string | null
+    profileCompleted?: BoolWithAggregatesFilter<"User"> | boolean
   }
 
   export type VerificationTokenWhereInput = {
@@ -13979,6 +14095,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
@@ -13997,6 +14117,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
@@ -14015,6 +14139,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
@@ -14033,6 +14161,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
@@ -14051,6 +14183,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
   }
 
   export type UserUpdateManyMutationInput = {
@@ -14062,6 +14198,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -14073,6 +14213,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type VerificationTokenCreateInput = {
@@ -14769,6 +14913,22 @@ export namespace Prisma {
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type AccountListRelationFilter = {
     every?: AccountWhereInput
     some?: AccountWhereInput
@@ -14833,6 +14993,15 @@ export namespace Prisma {
     role?: SortOrder
     phoneNumber?: SortOrder
     password?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    address?: SortOrder
+    profileCompleted?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -14844,6 +15013,10 @@ export namespace Prisma {
     role?: SortOrder
     phoneNumber?: SortOrder
     password?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    address?: SortOrder
+    profileCompleted?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -14855,6 +15028,15 @@ export namespace Prisma {
     role?: SortOrder
     phoneNumber?: SortOrder
     password?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    address?: SortOrder
+    profileCompleted?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -14879,6 +15061,30 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
@@ -15081,17 +15287,6 @@ export namespace Prisma {
     not?: NestedEnumRescueStatusFilter<$PrismaModel> | $Enums.RescueStatus
   }
 
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type EnumDisasterTypeNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
     in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
@@ -15183,22 +15378,6 @@ export namespace Prisma {
     _max?: NestedEnumRescueStatusFilter<$PrismaModel>
   }
 
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
   export type EnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
     in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
@@ -15207,11 +15386,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
     _max?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type VolunteerProfileCountOrderByAggregateInput = {
@@ -15249,14 +15423,6 @@ export namespace Prisma {
   export type VolunteerProfileSumOrderByAggregateInput = {
     latitude?: SortOrder
     longitude?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type UserCreateNestedOneWithoutAccountsInput = {
@@ -15409,6 +15575,18 @@ export namespace Prisma {
 
   export type EnumRoleFieldUpdateOperationsInput = {
     set?: $Enums.Role
+  }
+
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type AccountUpdateManyWithoutUserNestedInput = {
@@ -15659,14 +15837,6 @@ export namespace Prisma {
     set?: $Enums.RescueStatus
   }
 
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type NullableEnumDisasterTypeFieldUpdateOperationsInput = {
     set?: $Enums.DisasterType | null
   }
@@ -15693,10 +15863,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutVolunteerProfileInput, UserUncheckedCreateWithoutVolunteerProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutVolunteerProfileInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutVolunteerProfileNestedInput = {
@@ -15861,6 +16027,11 @@ export namespace Prisma {
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -15883,6 +16054,30 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumDisasterTypeFilter<$PrismaModel = never> = {
@@ -15970,22 +16165,6 @@ export namespace Prisma {
     _max?: NestedEnumRescueStatusFilter<$PrismaModel>
   }
 
-  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
   export type NestedEnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
     in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
@@ -15994,19 +16173,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
     _max?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -16018,6 +16184,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
@@ -16035,6 +16205,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
@@ -16068,6 +16242,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
@@ -16085,6 +16263,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -16102,6 +16284,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
@@ -16119,6 +16305,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
@@ -16152,6 +16342,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
@@ -16169,6 +16363,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
@@ -16608,6 +16806,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
@@ -16625,6 +16827,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
@@ -16658,6 +16864,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
@@ -16675,6 +16885,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -16692,6 +16906,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
@@ -16709,6 +16927,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
@@ -16742,6 +16964,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
@@ -16759,6 +16985,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -16776,6 +17006,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
@@ -16793,6 +17027,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
@@ -16815,6 +17053,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
@@ -16832,6 +17074,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
@@ -16865,6 +17111,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
@@ -16882,6 +17132,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
@@ -16910,6 +17164,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
@@ -16927,6 +17185,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
@@ -16944,6 +17206,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
@@ -16961,6 +17227,10 @@ export namespace Prisma {
     role?: $Enums.Role
     phoneNumber?: string | null
     password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
     safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
@@ -16994,6 +17264,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
@@ -17011,6 +17285,10 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
     safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput

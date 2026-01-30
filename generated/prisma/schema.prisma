@@ -44,6 +44,12 @@ model User {
   role                 Role                 @default(USER)
   phoneNumber          String?
   password             String?
+  // User location for emergency services
+  latitude             Float?
+  longitude            Float?
+  address              String?
+  // Profile completion tracking
+  profileCompleted     Boolean              @default(false)
   accounts             Account[]
   emergencyRequests    EmergencyRequest[]
   safetyConfirmations  SafetyConfirmation[]
