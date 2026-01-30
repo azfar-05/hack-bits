@@ -280,6 +280,12 @@ export default function UserDashboard() {
                 </button>
               </div>
               <button
+                onClick={() => router.push("/profile")}
+                className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-800"
+              >
+                Profile
+              </button>
+              <button
                 onClick={handleSignOut}
                 className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-800"
               >
