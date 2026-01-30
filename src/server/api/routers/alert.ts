@@ -102,4 +102,40 @@ export const alertRouter = createTRPCRouter({
 
       return nearbyAlerts;
     }),
+
+  // Delete an alert (AUTHORITY only)
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Check if user is AUTHORITY
+      if (ctx.session.user.role !== "AUTHORITY") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only authorities can delete alerts",
+        });
+      }
+
+      // Check if alert exists
+      const alert = await ctx.db.alert.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!alert) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Alert not found",
+        });
+      }
+
+      // Delete the alert
+      await ctx.db.alert.delete({
+        where: { id: input.id },
+      });
+
+      return { success: true, message: "Alert deleted successfully" };
+    }),
 });

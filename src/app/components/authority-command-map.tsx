@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 interface MapMarker {
   lat: number;
@@ -49,6 +50,17 @@ export default function AuthorityCommandMap({
 
   const resourceNodesQuery = api.resourceNode.getAll.useQuery(undefined, {
     refetchInterval: 60000, // Refresh every minute
+  });
+
+  const alertsQuery = api.alert.getAll.useQuery(undefined, {
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Delete alert mutation
+  const deleteAlert = api.alert.delete.useMutation({
+    onSuccess: () => {
+      alertsQuery.refetch();
+    },
   });
 
   // Initialize map
@@ -106,6 +118,74 @@ export default function AuthorityCommandMap({
     markersRef.current = [];
 
     const markers: MapMarker[] = [];
+
+    // Add alerts with circles and delete options
+    if (alertsQuery.data) {
+      alertsQuery.data.forEach((alert) => {
+        const disasterColors: Record<string, { color: string; fillColor: string }> = {
+          FLOOD: { color: "#1d4ed8", fillColor: "#3b82f6" },
+          EARTHQUAKE: { color: "#c2410c", fillColor: "#f97316" },
+          FIRE: { color: "#b91c1c", fillColor: "#ef4444" },
+        };
+
+        const colors = disasterColors[alert.disasterType] || {
+          color: "#6b7280",
+          fillColor: "#9ca3af",
+        };
+
+        // Add circle for affected area
+        const circle = L.circle([alert.latitude, alert.longitude], {
+          radius: alert.radiusKm * 1000, // Convert km to meters
+          color: colors.color,
+          fillColor: colors.fillColor,
+          fillOpacity: 0.2,
+          weight: 2,
+        }).addTo(mapInstanceRef.current);
+
+        markersRef.current.push(circle);
+
+        // Add marker at epicenter with delete button
+        const alertIcon = L.divIcon({
+          className: "custom-marker",
+          html: `
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-600 border-3 border-white shadow-lg">
+              <span class="text-white text-xl">!</span>
+            </div>
+          `,
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],
+        });
+
+        const marker = L.marker([alert.latitude, alert.longitude], {
+          icon: alertIcon,
+        }).addTo(mapInstanceRef.current);
+
+        marker.bindPopup(`
+          <div class="p-3 min-w-[200px]">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-1 rounded-full text-xs font-medium" style="background-color: ${colors.fillColor}20; color: ${colors.color}">
+                ${alert.disasterType}
+              </span>
+              <button 
+                onclick="deleteAlert('${alert.id}')" 
+                class="text-red-600 hover:text-red-800 text-sm font-medium"
+                title="Delete Alert"
+              >
+                🗑️ Delete
+              </button>
+            </div>
+            <h3 class="font-bold text-lg">${alert.title}</h3>
+            <p class="text-sm text-gray-600 mt-1">${alert.message}</p>
+            <div class="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-500">
+              <p>Affected radius: ${alert.radiusKm} km</p>
+              <p>Created: ${new Date(alert.createdAt).toLocaleString()}</p>
+            </div>
+          </div>
+        `);
+
+        markersRef.current.push(marker);
+      });
+    }
 
     // Add danger zones as colored rectangles
     if (dangerZonesQuery.data) {
@@ -429,7 +509,7 @@ export default function AuthorityCommandMap({
       });
     }
 
-  }, [dangerZonesQuery.data, safeZonesQuery.data, allRescueRequestsQuery.data, volunteersQuery.data, resourceNodesQuery.data, mapReady]);
+  }, [dangerZonesQuery.data, safeZonesQuery.data, allRescueRequestsQuery.data, volunteersQuery.data, resourceNodesQuery.data, alertsQuery.data, mapReady]);
 
   const isLoading = dangerZonesQuery.isLoading || safeZonesQuery.isLoading || 
                    allRescueRequestsQuery.isLoading || volunteersQuery.isLoading || 
