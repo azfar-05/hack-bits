@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
@@ -33,6 +33,9 @@ const rescueStatusColors: Record<RescueStatus, string> = {
   NO_VOLUNTEER: "bg-orange-100 text-orange-800 border-orange-200",
 };
 
+// Polling interval for alert delivery (5 seconds)
+const POLLING_INTERVAL = 5000;
+
 export default function VolunteerDashboard() {
   const router = useRouter();
   const utils = api.useUtils();
@@ -41,16 +44,50 @@ export default function VolunteerDashboard() {
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isTracking, setIsTracking] = useState(false);
+  
+  // Alert notification state
+  const [showNewAlert, setShowNewAlert] = useState(false);
+  const [newAlertCount, setNewAlertCount] = useState(0);
+  const previousAlertCount = useRef(0);
 
-  // Fetch pending requests
-  const pendingRequestsQuery = api.rescue.getPendingRequests.useQuery(undefined, {
-    refetchInterval: 10000,
+  // Main polling query - fetches all relevant requests for this volunteer
+  const volunteerAlertsQuery = api.rescue.getForVolunteer.useQuery(undefined, {
+    refetchInterval: POLLING_INTERVAL, // Poll every 5 seconds
+    refetchIntervalInBackground: true, // Keep polling even when tab is not focused
   });
 
-  // Fetch assigned requests
-  const assignedRequestsQuery = api.rescue.getAssignedToMe.useQuery(undefined, {
-    refetchInterval: 10000,
-  });
+  // Extract data from the unified query
+  const assignedRequests = volunteerAlertsQuery.data?.assigned ?? [];
+  const pendingRequests = volunteerAlertsQuery.data?.pending ?? [];
+  const escalatedRequests = volunteerAlertsQuery.data?.escalated ?? [];
+  const totalAlerts = volunteerAlertsQuery.data?.totalAlerts ?? 0;
+
+  // Detect new alerts and show notification
+  useEffect(() => {
+    if (totalAlerts > previousAlertCount.current && previousAlertCount.current > 0) {
+      // New alert arrived!
+      setShowNewAlert(true);
+      setNewAlertCount(totalAlerts - previousAlertCount.current);
+      
+      // Play alert sound (if available)
+      try {
+        const audio = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp2TfGNjcH+RoZ2QeF5eaXqMnZyRfGJgbHuOnp6SfGNhbHuOnp6SfGNhbHuOnZySfGNhbHyOnp6SfGNhbHuOnp6S");
+        audio.volume = 0.5;
+        audio.play().catch(() => {}); // Ignore if audio blocked
+      } catch {}
+      
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setShowNewAlert(false);
+        setNewAlertCount(0);
+      }, 5000);
+    }
+    previousAlertCount.current = totalAlerts;
+  }, [totalAlerts]);
+
+  // Legacy queries for compatibility (still needed for some operations)
+  const pendingRequestsQuery = { data: pendingRequests, isLoading: volunteerAlertsQuery.isLoading };
+  const assignedRequestsQuery = { data: assignedRequests, isLoading: volunteerAlertsQuery.isLoading };
 
   // Fetch my profile
   const myProfileQuery = api.volunteer.getMyProfile.useQuery();
@@ -61,15 +98,14 @@ export default function VolunteerDashboard() {
   // Accept request mutation
   const acceptRequest = api.rescue.acceptRequest.useMutation({
     onSuccess: () => {
-      pendingRequestsQuery.refetch();
-      assignedRequestsQuery.refetch();
+      volunteerAlertsQuery.refetch();
     },
   });
 
   // Update status mutation
   const updateStatus = api.rescue.updateStatus.useMutation({
     onSuccess: () => {
-      assignedRequestsQuery.refetch();
+      volunteerAlertsQuery.refetch();
     },
   });
 
@@ -244,6 +280,49 @@ export default function VolunteerDashboard() {
           </div>
         </div>
       </header>
+
+      {/* New Alert Notification Banner */}
+      {showNewAlert && (
+        <div className="bg-red-600 text-white px-4 py-3 animate-pulse">
+          <div className="mx-auto max-w-7xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-white p-2">
+                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="font-bold text-lg">NEW RESCUE ALERT!</p>
+                <p className="text-sm">{newAlertCount} new request(s) need your help</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowNewAlert(false)}
+              className="rounded-md bg-red-700 px-4 py-2 text-sm hover:bg-red-800"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Polling Status Indicator */}
+      <div className="bg-gray-800 text-white px-4 py-2 text-xs">
+        <div className="mx-auto max-w-7xl flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+            Live polling active (every {POLLING_INTERVAL / 1000}s)
+          </span>
+          <span>
+            Total alerts: {totalAlerts} | Assigned: {assignedRequests.length} | Pending: {pendingRequests.length}
+          </span>
+        </div>
+      </div>
 
       {/* Location Status Banner */}
       {locationError && (
@@ -494,6 +573,73 @@ export default function VolunteerDashboard() {
               ))}
             </div>
           </div>
+
+          {/* Escalated Requests (NO_VOLUNTEER) */}
+          {escalatedRequests.length > 0 && (
+            <div className="rounded-lg bg-white p-6 shadow-md border-2 border-orange-400">
+              <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <svg className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                Escalated - No Volunteer Found
+                <span className="rounded-full bg-orange-100 px-2 py-1 text-xs text-orange-800">
+                  {escalatedRequests.length} critical
+                </span>
+              </h2>
+
+              <div className="space-y-4">
+                {escalatedRequests.map((request) => (
+                  <div key={request.id} className="rounded-lg border-2 border-orange-300 bg-orange-50 p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <span className="inline-block rounded-full bg-orange-500 px-2 py-1 text-xs font-medium text-white">
+                          CRITICAL - ESCALATED
+                        </span>
+                        <p className="mt-2 font-medium text-gray-900">
+                          {request.user.name || request.user.email}
+                        </p>
+                      </div>
+                      <span className="text-xs text-orange-700">{getTimeSince(request.createdAt)}</span>
+                    </div>
+
+                    <p className="text-sm text-gray-700 mb-2">{request.message}</p>
+
+                    {request.location && (
+                      <p className="text-xs text-gray-600 mb-2">
+                        <strong>Location:</strong> {request.location}
+                      </p>
+                    )}
+
+                    {request.latitude && myLocation && (
+                      <p className="text-xs text-gray-600 mb-3">
+                        <strong>Distance:</strong>{" "}
+                        {calculateDistance(
+                          myLocation.lat,
+                          myLocation.lng,
+                          request.latitude,
+                          request.longitude!
+                        ).toFixed(2)}{" "}
+                        km away
+                      </p>
+                    )}
+
+                    <button
+                      onClick={() => acceptRequest.mutate({ requestId: request.id })}
+                      disabled={acceptRequest.isPending || !isAvailable}
+                      className="w-full rounded-md bg-orange-600 px-4 py-2 text-white font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                    >
+                      {acceptRequest.isPending ? "Accepting..." : "Accept Critical Request"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Section */}

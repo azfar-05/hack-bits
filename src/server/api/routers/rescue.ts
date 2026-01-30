@@ -170,6 +170,66 @@ export const rescueRouter = createTRPCRouter({
     return requests;
   }),
 
+  // Get all rescue requests relevant to a volunteer (for polling/alert delivery)
+  // Returns: requests assigned to this volunteer OR pending requests available for acceptance
+  getForVolunteer: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.session.user.role !== "VOLUNTEER") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only volunteers can access this",
+      });
+    }
+
+    const volunteerId = ctx.session.user.id;
+
+    // Get requests assigned to this volunteer (any active status)
+    const assignedRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        volunteerId,
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Get pending requests available for any volunteer
+    const pendingRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        status: "PENDING",
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    // Get NO_VOLUNTEER requests (escalated, but volunteer can still accept)
+    const escalatedRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        status: "NO_VOLUNTEER",
+      },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { escalatedAt: "asc" },
+    });
+
+    return {
+      assigned: assignedRequests,
+      pending: pendingRequests,
+      escalated: escalatedRequests,
+      totalAlerts: assignedRequests.length + pendingRequests.length + escalatedRequests.length,
+    };
+  }),
+
   // Volunteer accepts a rescue request
   acceptRequest: protectedProcedure
     .input(z.object({ requestId: z.string() }))
