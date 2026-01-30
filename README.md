@@ -29,34 +29,33 @@ The solution introduces a unified, multi-role disaster communication platform th
 
 ## Technical Complexity & Stack
 **Frontend:**
-- Next.js (TypeScript)
+- Next.js 15 (TypeScript)
 - Tailwind CSS
-- Progressive Web App (PWA) for offline support
+- Progressive Web App (PWA) capabilities for offline support
 
 **Backend:**
 - tRPC for end-to-end type-safe APIs
-- WebSockets / Socket.IO for real-time updates
+- Real-time updates via polling (5-30 second intervals)
 
 **Database:**
-- PostgreSQL
-- PostGIS for geospatial queries and SOS clustering
-- Prisma ORM
+- PostgreSQL with Prisma ORM
+- Geospatial calculations using Haversine formula
 
 **Authentication:**
-- NextAuth with role-based access (User / Volunteer / Authority)
+- NextAuth v5 with role-based access (USER/VOLUNTEER/AUTHORITY)
+- Google OAuth, GitHub OAuth, and credentials providers
 
 **Maps & Location:**
-- Google Maps API / OpenStreetMap
-- Geo-fencing and live location tracking
+- Leaflet with OpenStreetMap tiles
+- Live location tracking for volunteers
+- Geospatial rescue request assignment
 
 **Notifications:**
-- Firebase Cloud Messaging (FCM) for push notifications
-- Twilio / AWS SNS for SMS fallback
-- WhatsApp Business API for emergency contact alerts
+- Mock SMS notifications (console logging)
+- Firebase configuration ready (not actively used)
 
 **Deployment:**
-- Vercel (Frontend)
-- Railway / Supabase (Backend & Database)
+- Vercel-ready configuration
 
 ---
 
@@ -67,12 +66,54 @@ The solution introduces a unified, multi-role disaster communication platform th
 - Disaster management authorities
 
 **User Interaction:**
-- Citizens receive disaster alerts and safety guides, respond with “I am safe” or “I need help,” and access offline safety information.
-- Volunteers receive nearby SOS requests, accept rescue tasks, share live location and ETA, and update rescue status in real time.
-- Authorities send geo-fenced alerts, monitor live SOS heatmaps, detect SOS clusters, and dispatch large-scale rescue operations.
+- **Citizens (USER role)**: Receive disaster alerts and safety guides, send SOS requests with "I need help" button, cancel requests with "I am safe" button, access offline safety information via localStorage caching.
+- **Volunteers (VOLUNTEER role)**: Receive nearby SOS requests via live polling, accept rescue tasks, share live location tracking, update rescue status (assigned → in progress → completed), create safe zones (shelters, camps, hospitals).
+- **Authorities (AUTHORITY role)**: Send disaster alerts (flood, earthquake, fire), monitor live danger zone heatmaps with risk scoring, view escalated cases requiring manual intervention, manually assign volunteers to critical requests, create and manage safety guides.
 
 **Impact:**
 The system improves disaster preparedness and response by enabling faster communication, better coordination, and real-time situational awareness. It helps save lives during connectivity failures, enables quicker rescue operations, and scales from local to large-scale disaster scenarios.
+
+---
+
+## Key Features (Currently Implemented)
+
+### USER Dashboard
+- **SOS Emergency Button**: Send rescue requests with automatic geolocation capture
+- **Safety Status**: Cancel active requests with "I am safe" button  
+- **Alert Feed**: Real-time disaster alerts with auto-refresh (30s intervals)
+- **Safety Guides**: Disaster-specific instructions with offline caching
+- **Offline Support**: Safety guides cached in localStorage for offline access
+- **Post-SOS Details**: Add emergency type and notes after sending SOS
+
+### VOLUNTEER Dashboard  
+- **Live Rescue Coordination**: Accept pending SOS requests from nearby users
+- **Auto-Assignment**: Receive requests based on proximity (2km → 5km → 10km radius expansion)
+- **Status Management**: Update rescue progress (assigned → in progress → completed)
+- **Location Tracking**: Continuous GPS tracking with 15-second server updates
+- **Live Map**: View assigned user locations with distance calculations
+- **Alert Notifications**: Audio alerts and visual notifications for new requests
+- **Safe Zone Creation**: Create shelters, camps, and hospitals visible to authorities
+- **Availability Toggle**: Set online/offline status for assignment eligibility
+
+### AUTHORITY Dashboard
+- **Command Center Map**: Live view of Karnataka state with danger zones and safe zones
+- **Risk Assessment**: Rule-based scoring system for danger zones:
+  - Formula: `(Recent SOS × 3) + (Unknown Users × 4) + (Growth Rate × 5)`
+  - Risk levels: HIGH (>25), MEDIUM (13-25), LOW (≤12)
+- **Escalated Cases**: Manual intervention for NO_VOLUNTEER requests
+- **Volunteer Management**: View all volunteers with location, availability, and active assignments
+- **Manual Assignment**: Assign specific volunteers to critical cases
+- **Alert Broadcasting**: Create and send disaster alerts (flood, earthquake, fire)
+- **Safety Guide Management**: Create disaster-specific safety instructions
+- **Operations Overview**: Real-time statistics and status monitoring
+
+### Technical Features
+- **Auto-Assignment Algorithm**: Intelligent volunteer matching with radius expansion
+- **Offline Queue**: SOS requests queued in localStorage when offline, synced when online
+- **Real-time Polling**: Live updates every 5-30 seconds across all dashboards
+- **Geospatial Calculations**: Haversine distance formula for proximity matching
+- **Role-based Security**: Strict API access control and route protection
+- **Responsive Design**: Mobile-first interface for emergency situations
 
 ---
 
@@ -127,17 +168,9 @@ New users are automatically created on first login.
 
 | Role | Access |
 |------|--------|
-| **USER** | View disaster alerts, access offline safety guides |
-| **VOLUNTEER** | Placeholder dashboard (SOS features coming soon) |
-| **AUTHORITY** | Create/send disaster alerts, manage safety guides |
-
-### Key Features (MVP)
-
-- **Authentication**: Role-based access control with NextAuth
-- **Disaster Alerts**: Authorities can broadcast alerts (Flood, Earthquake, Fire)
-- **Safety Guides**: Authorities can create safety instructions per disaster type
-- **Offline Support**: Safety guides are cached in localStorage for offline access
-- **Real-time Updates**: Alert feed auto-refreshes every 30 seconds
+| **USER** | Send SOS requests, view disaster alerts, access offline safety guides |
+| **VOLUNTEER** | Accept rescue requests, track location, create safe zones, manage assignments |
+| **AUTHORITY** | Create alerts/guides, monitor danger zones, manage escalated cases, assign volunteers |
 
 ### File Structure
 
@@ -155,12 +188,17 @@ src/
 │   ├── layout.tsx
 │   └── page.tsx                  # Login page
 ├── lib/
-│   └── offline.ts                # localStorage caching utilities
+│   ├── offline.ts                # localStorage caching utilities
+│   └── offline-queue.ts          # Offline SOS queue management
 ├── server/
 │   ├── api/
 │   │   ├── routers/
 │   │   │   ├── alert.ts          # Alert CRUD operations
-│   │   │   └── guide.ts          # Safety guide CRUD
+│   │   │   ├── guide.ts          # Safety guide CRUD
+│   │   │   ├── rescue.ts         # SOS/rescue request logic
+│   │   │   ├── volunteer.ts      # Volunteer location & availability
+│   │   │   ├── dangerZone.ts     # Risk assessment calculations
+│   │   │   └── safeZone.ts       # Safe zone management
 │   │   ├── root.ts               # tRPC router
 │   │   └── trpc.ts               # tRPC context & procedures
 │   ├── auth/                     # NextAuth configuration
