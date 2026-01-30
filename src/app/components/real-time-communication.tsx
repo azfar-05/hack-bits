@@ -37,6 +37,19 @@ type MessageData = {
   priority?: string;
   location?: any;
   isSystemMessage?: boolean;
+  channelId?: string;
+  senderId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  metadata?: any;
+  messageType?: string;
+  isRead?: boolean;
+  sender?: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    role: string;
+  };
 };
 
 export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunicationProps) {
@@ -107,13 +120,13 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
           { channelId: newMessage.channelId },
           {
             ...previousMessages,
-            messages: [...previousMessages.messages, optimisticMessage]
+            messages: [...(previousMessages.messages as any[]), optimisticMessage]
           }
         );
       }
       return { previousMessages };
     },
-    onError: (err, newMessage, context) => {
+    onError: (_, newMessage, context) => {
       if (context?.previousMessages) {
         utils.realtime.getChannelMessages.setData(
           { channelId: newMessage.channelId },
@@ -121,7 +134,7 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
         );
       }
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_, __, variables) => {
       void utils.realtime.getChannelMessages.invalidate({ channelId: variables.channelId });
     },
     onSuccess: () => {
@@ -140,7 +153,11 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
   // Get data from queries and cast to proper types
   const channels = (channelsQuery.data || []) as ChannelData[];
   const availableUsers = availableUsersQuery.data || [];
-  const currentMessages = (messagesQuery.data?.messages || []) as MessageData[];
+  const currentMessages = (messagesQuery.data?.messages || []).map(msg => ({
+    ...msg,
+    isSystemMessage: (msg as any).isSystemMessage || false,
+    channelId: (msg as any).channelId || activeChannel,
+  }));
   const participants = participantsQuery.data || { total: 0, online: 0 };
 
   // Set default active channel when channels load
@@ -377,7 +394,7 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
               </div>
             )}
 
-            {currentMessages.map((message) => (
+            {currentMessages.map((message: any) => (
               <div key={message.id} className="flex gap-3">
                 <div className="flex-shrink-0">
                   <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm ${
