@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { LoginForm } from "~/app/components/login-form";
+import { SosButton } from "~/app/components/sos-button";
 
 export default async function Home() {
   const session = await auth();
@@ -96,6 +97,9 @@ export default async function Home() {
         {/* Login Form */}
         <LoginForm />
       </div>
+
+      {/* SOS Button - Always visible on main page */}
+      <SosButton />
     </main>
   );
 }

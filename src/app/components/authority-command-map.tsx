@@ -320,7 +320,17 @@ export default function AuthorityCommandMap({
         ["PENDING", "ASSIGNED", "IN_PROGRESS", "NO_VOLUNTEER"].includes(req.status)
       );
 
+      console.log("Authority Map - Active rescue requests:", activeRequests.length);
+      
       activeRequests.forEach((request) => {
+        console.log("Processing request:", {
+          id: request.id,
+          latitude: request.latitude,
+          longitude: request.longitude,
+          location: request.location,
+          status: request.status
+        });
+
         const statusColor = request.status === "NO_VOLUNTEER" ? "bg-red-600" :
                            request.status === "PENDING" ? "bg-yellow-500" :
                            request.status === "ASSIGNED" ? "bg-blue-500" :
@@ -337,8 +347,20 @@ export default function AuthorityCommandMap({
           iconAnchor: [16, 16],
         });
 
+        // Validate coordinates before creating marker
+        if (request.latitude! < -90 || request.latitude! > 90 || 
+            request.longitude! < -180 || request.longitude! > 180) {
+          console.error("Invalid coordinates for request:", request.id, {
+            latitude: request.latitude,
+            longitude: request.longitude
+          });
+          return;
+        }
+
         const marker = L.marker([request.latitude!, request.longitude!], { icon })
           .addTo(mapInstanceRef.current);
+
+        console.log("Created marker at:", [request.latitude!, request.longitude!]);
 
         marker.bindPopup(`
           <div class="p-3 min-w-[200px]">
@@ -355,7 +377,7 @@ export default function AuthorityCommandMap({
               </div>
               <div class="flex justify-between">
                 <span>User:</span>
-                <strong>${request.user.name || request.user.email}</strong>
+                <strong>${request.user?.name || request.user?.email || 'Anonymous User'}</strong>
               </div>
               <div class="mb-2">
                 <span class="text-gray-600">Message:</span>

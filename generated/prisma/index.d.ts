@@ -11214,7 +11214,7 @@ export namespace Prisma {
 
   export type RescueRequestGroupByOutputType = {
     id: string
-    userId: string
+    userId: string | null
     volunteerId: string | null
     status: $Enums.RescueStatus
     message: string | null
@@ -11275,7 +11275,7 @@ export namespace Prisma {
     completedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }, ExtArgs["result"]["rescueRequest"]>
 
@@ -11300,7 +11300,7 @@ export namespace Prisma {
     completedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }, ExtArgs["result"]["rescueRequest"]>
 
@@ -11325,7 +11325,7 @@ export namespace Prisma {
     completedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }, ExtArgs["result"]["rescueRequest"]>
 
@@ -11354,27 +11354,27 @@ export namespace Prisma {
 
   export type RescueRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "volunteerId" | "status" | "message" | "location" | "latitude" | "longitude" | "disasterType" | "note" | "searchRadiusUsed" | "etaMinMinutes" | "etaMaxMinutes" | "etaConfidence" | "etaFactors" | "escalatedAt" | "assignedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rescueRequest"]>
   export type RescueRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }
   export type RescueRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }
   export type RescueRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | RescueRequest$userArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
   }
 
   export type $RescueRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "RescueRequest"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       volunteer: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      userId: string
+      userId: string | null
       volunteerId: string | null
       status: $Enums.RescueStatus
       message: string | null
@@ -11787,7 +11787,7 @@ export namespace Prisma {
    */
   export interface Prisma__RescueRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends RescueRequest$userArgs<ExtArgs> = {}>(args?: Subset<T, RescueRequest$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     volunteer<T extends RescueRequest$volunteerArgs<ExtArgs> = {}>(args?: Subset<T, RescueRequest$volunteerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -12231,6 +12231,25 @@ export namespace Prisma {
      * Limit how many RescueRequests to delete.
      */
     limit?: number
+  }
+
+  /**
+   * RescueRequest.user
+   */
+  export type RescueRequest$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -16641,7 +16660,7 @@ export namespace Prisma {
     OR?: RescueRequestWhereInput[]
     NOT?: RescueRequestWhereInput | RescueRequestWhereInput[]
     id?: StringFilter<"RescueRequest"> | string
-    userId?: StringFilter<"RescueRequest"> | string
+    userId?: StringNullableFilter<"RescueRequest"> | string | null
     volunteerId?: StringNullableFilter<"RescueRequest"> | string | null
     status?: EnumRescueStatusFilter<"RescueRequest"> | $Enums.RescueStatus
     message?: StringNullableFilter<"RescueRequest"> | string | null
@@ -16660,13 +16679,13 @@ export namespace Prisma {
     completedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     createdAt?: DateTimeFilter<"RescueRequest"> | Date | string
     updatedAt?: DateTimeFilter<"RescueRequest"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     volunteer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type RescueRequestOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     volunteerId?: SortOrderInput | SortOrder
     status?: SortOrder
     message?: SortOrderInput | SortOrder
@@ -16694,7 +16713,7 @@ export namespace Prisma {
     AND?: RescueRequestWhereInput | RescueRequestWhereInput[]
     OR?: RescueRequestWhereInput[]
     NOT?: RescueRequestWhereInput | RescueRequestWhereInput[]
-    userId?: StringFilter<"RescueRequest"> | string
+    userId?: StringNullableFilter<"RescueRequest"> | string | null
     volunteerId?: StringNullableFilter<"RescueRequest"> | string | null
     status?: EnumRescueStatusFilter<"RescueRequest"> | $Enums.RescueStatus
     message?: StringNullableFilter<"RescueRequest"> | string | null
@@ -16713,13 +16732,13 @@ export namespace Prisma {
     completedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     createdAt?: DateTimeFilter<"RescueRequest"> | Date | string
     updatedAt?: DateTimeFilter<"RescueRequest"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     volunteer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type RescueRequestOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
     volunteerId?: SortOrderInput | SortOrder
     status?: SortOrder
     message?: SortOrderInput | SortOrder
@@ -16750,7 +16769,7 @@ export namespace Prisma {
     OR?: RescueRequestScalarWhereWithAggregatesInput[]
     NOT?: RescueRequestScalarWhereWithAggregatesInput | RescueRequestScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"RescueRequest"> | string
-    userId?: StringWithAggregatesFilter<"RescueRequest"> | string
+    userId?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     volunteerId?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     status?: EnumRescueStatusWithAggregatesFilter<"RescueRequest"> | $Enums.RescueStatus
     message?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
@@ -17608,13 +17627,13 @@ export namespace Prisma {
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutRescueRequestsInput
+    user?: UserCreateNestedOneWithoutRescueRequestsInput
     volunteer?: UserCreateNestedOneWithoutVolunteerAssignmentsInput
   }
 
   export type RescueRequestUncheckedCreateInput = {
     id?: string
-    userId: string
+    userId?: string | null
     volunteerId?: string | null
     status?: $Enums.RescueStatus
     message?: string | null
@@ -17654,13 +17673,13 @@ export namespace Prisma {
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutRescueRequestsNestedInput
+    user?: UserUpdateOneWithoutRescueRequestsNestedInput
     volunteer?: UserUpdateOneWithoutVolunteerAssignmentsNestedInput
   }
 
   export type RescueRequestUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     volunteerId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRescueStatusFieldUpdateOperationsInput | $Enums.RescueStatus
     message?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17683,7 +17702,7 @@ export namespace Prisma {
 
   export type RescueRequestCreateManyInput = {
     id?: string
-    userId: string
+    userId?: string | null
     volunteerId?: string | null
     status?: $Enums.RescueStatus
     message?: string | null
@@ -17727,7 +17746,7 @@ export namespace Prisma {
 
   export type RescueRequestUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     volunteerId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRescueStatusFieldUpdateOperationsInput | $Enums.RescueStatus
     message?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19477,10 +19496,12 @@ export namespace Prisma {
     set?: $Enums.DisasterType | null
   }
 
-  export type UserUpdateOneRequiredWithoutRescueRequestsNestedInput = {
+  export type UserUpdateOneWithoutRescueRequestsNestedInput = {
     create?: XOR<UserCreateWithoutRescueRequestsInput, UserUncheckedCreateWithoutRescueRequestsInput>
     connectOrCreate?: UserCreateOrConnectWithoutRescueRequestsInput
     upsert?: UserUpsertWithoutRescueRequestsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRescueRequestsInput, UserUpdateWithoutRescueRequestsInput>, UserUncheckedUpdateWithoutRescueRequestsInput>
   }
@@ -20319,12 +20340,12 @@ export namespace Prisma {
     completedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutRescueRequestsInput
+    user?: UserCreateNestedOneWithoutRescueRequestsInput
   }
 
   export type RescueRequestUncheckedCreateWithoutVolunteerInput = {
     id?: string
-    userId: string
+    userId?: string | null
     status?: $Enums.RescueStatus
     message?: string | null
     location?: string | null
@@ -20580,7 +20601,7 @@ export namespace Prisma {
     OR?: RescueRequestScalarWhereInput[]
     NOT?: RescueRequestScalarWhereInput | RescueRequestScalarWhereInput[]
     id?: StringFilter<"RescueRequest"> | string
-    userId?: StringFilter<"RescueRequest"> | string
+    userId?: StringNullableFilter<"RescueRequest"> | string | null
     volunteerId?: StringNullableFilter<"RescueRequest"> | string | null
     status?: EnumRescueStatusFilter<"RescueRequest"> | $Enums.RescueStatus
     message?: StringNullableFilter<"RescueRequest"> | string | null
@@ -21524,7 +21545,7 @@ export namespace Prisma {
 
   export type RescueRequestCreateManyVolunteerInput = {
     id?: string
-    userId: string
+    userId?: string | null
     status?: $Enums.RescueStatus
     message?: string | null
     location?: string | null
@@ -21761,12 +21782,12 @@ export namespace Prisma {
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutRescueRequestsNestedInput
+    user?: UserUpdateOneWithoutRescueRequestsNestedInput
   }
 
   export type RescueRequestUncheckedUpdateWithoutVolunteerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRescueStatusFieldUpdateOperationsInput | $Enums.RescueStatus
     message?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21788,7 +21809,7 @@ export namespace Prisma {
 
   export type RescueRequestUncheckedUpdateManyWithoutVolunteerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRescueStatusFieldUpdateOperationsInput | $Enums.RescueStatus
     message?: NullableStringFieldUpdateOperationsInput | string | null
     location?: NullableStringFieldUpdateOperationsInput | string | null

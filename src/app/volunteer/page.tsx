@@ -293,7 +293,7 @@ export default function VolunteerDashboard() {
           lat: request.latitude,
           lng: request.longitude,
           type: "user",
-          label: `${request.user.name || request.user.email}\n${request.message}`,
+          label: `${request.user?.name || request.user?.email || "Anonymous User"}\n${request.message}`,
         });
       }
     });
@@ -604,7 +604,7 @@ export default function VolunteerDashboard() {
                       <span className="inline-block rounded-full px-2 py-1 text-xs font-medium bg-white/50">
                         {rescueStatusLabels[request.status as RescueStatus]}
                       </span>
-                      <p className="mt-2 font-medium">{request.user.name || request.user.email}</p>
+                      <p className="mt-2 font-medium">{request.user?.name || request.user?.email || "Anonymous User"}</p>
                     </div>
                     <span className="text-xs">{getTimeSince(request.createdAt)}</span>
                   </div>
@@ -776,7 +776,7 @@ export default function VolunteerDashboard() {
                         URGENT
                       </span>
                       <p className="mt-2 font-medium text-gray-900">
-                        {request.user.name || request.user.email}
+                        {request.user?.name || request.user?.email || "Anonymous User"}
                       </p>
                     </div>
                     <span className="text-xs text-yellow-700">{getTimeSince(request.createdAt)}</span>
@@ -846,7 +846,7 @@ export default function VolunteerDashboard() {
                           CRITICAL - ESCALATED
                         </span>
                         <p className="mt-2 font-medium text-gray-900">
-                          {request.user.name || request.user.email}
+                          {request.user?.name || request.user?.email || "Anonymous User"}
                         </p>
                       </div>
                       <span className="text-xs text-orange-700">{getTimeSince(request.createdAt)}</span>

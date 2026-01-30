@@ -1,107 +1,32 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
 import { predictResponseTime, type ETAInputs } from "~/lib/eta-prediction";
 
 // Search radius steps in kilometers
 const SEARCH_RADII = [2, 5, 10];
 
-/**
- * Calculate and update ETA for assigned rescue request
- */
-async function calculateAndUpdateETA(
-  db: any,
-  requestId: string,
-  volunteerLat?: number,
-  volunteerLon?: number,
-  userLat?: number,
-  userLon?: number,
-  disasterType?: string
-): Promise<void> {
-  try {
-    // Get current system load (active rescues)
-    const activeRescues = await db.rescueRequest.count({
-      where: {
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      },
-    });
-
-    // Get volunteer status
-    const volunteer = await db.rescueRequest.findUnique({
-      where: { id: requestId },
-      include: {
-        volunteer: {
-          include: {
-            volunteerProfile: true,
-            volunteerAssignments: {
-              where: {
-                status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-                id: { not: requestId }, // Exclude current request
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!volunteer?.volunteer) return;
-
-    // Calculate distance if both locations available
-    let distance = 5; // Default 5km if no location data
-    if (volunteerLat && volunteerLon && userLat && userLon) {
-      distance = haversineDistance(userLat, userLon, volunteerLat, volunteerLon);
-    }
-
-    // Prepare ETA inputs
-    const etaInputs: ETAInputs = {
-      distance,
-      volunteerBusy: volunteer.volunteer.volunteerAssignments.length > 0,
-      activeRescues,
-      disasterType: disasterType as any,
-      volunteerAvailable: volunteer.volunteer.volunteerProfile?.available ?? true,
-    };
-
-    // Calculate ETA using ML-assisted prediction
-    const etaResult = predictResponseTime(etaInputs);
-
-    // Update rescue request with ETA data
-    await db.rescueRequest.update({
-      where: { id: requestId },
-      data: {
-        etaMinMinutes: etaResult.minMinutes,
-        etaMaxMinutes: etaResult.maxMinutes,
-        etaConfidence: etaResult.confidence,
-        etaFactors: JSON.stringify(etaResult.factors),
-      },
-    });
-
-    console.log(`[ETA] Calculated for request ${requestId}: ${etaResult.minMinutes}-${etaResult.maxMinutes}min (${etaResult.confidence} confidence)`);
-  } catch (error) {
-    console.error(`[ETA] Failed to calculate ETA for request ${requestId}:`, error);
-  }
-}
-
-/**
- * Haversine formula to calculate distance between two points
- * @returns distance in kilometers
- */
-function haversineDistance(
+// Haversine formula to calculate distance between two coordinates
+function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
 ): number {
   const R = 6371; // Earth's radius in km
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
-function toRad(deg: number): number {
+function deg2rad(deg: number): number {
   return deg * (Math.PI / 180);
 }
 
@@ -153,41 +78,191 @@ export const rescueRouter = createTRPCRouter({
         },
       });
 
-      // Attempt to auto-assign a volunteer with radius expansion
-      const assignmentResult = await autoAssignVolunteerWithRadius(
-        ctx.db,
-        rescueRequest.id,
-        input.latitude,
-        input.longitude
-      );
+      return rescueRequest;
+    }),
 
-      // Return the updated request
-      const updatedRequest = await ctx.db.rescueRequest.findUnique({
-        where: { id: rescueRequest.id },
-        include: {
-          volunteer: {
-            select: { id: true, name: true, email: true },
-          },
+  // Public SOS endpoint for emergency situations (no authentication required)
+  createSOS: publicProcedure
+    .input(
+      z.object({
+        message: z.string().optional(),
+        location: z.string().optional(),
+        latitude: z.number(),
+        longitude: z.number(),
+        phoneNumber: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Create a temporary user for this SOS if needed
+      // For now, we'll create the request without user association
+      // In production, you might want to create a temporary user record
+      
+      // Create the rescue request
+      const rescueRequest = await ctx.db.rescueRequest.create({
+        data: {
+          message: input.message ?? "SOS Emergency - Immediate Help Needed",
+          location: input.location,
+          latitude: input.latitude,
+          longitude: input.longitude,
+          status: "PENDING",
+          // userId is now optional in the schema
         },
       });
 
+      // Try to assign a nearby volunteer
+      let assignedVolunteer = null;
+      let searchRadiusUsed = 0;
+
+      for (const radius of SEARCH_RADII) {
+        const nearbyVolunteers = await ctx.db.volunteerProfile.findMany({
+          where: {
+            available: true,
+            latitude: { not: null },
+            longitude: { not: null },
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+
+        // Filter volunteers within radius
+        const volunteersInRange = nearbyVolunteers
+          .map((volunteer) => {
+            const distance = calculateDistance(
+              input.latitude,
+              input.longitude,
+              volunteer.latitude!,
+              volunteer.longitude!
+            );
+            return { ...volunteer, distance };
+          })
+          .filter((volunteer) => volunteer.distance <= radius)
+          .sort((a, b) => a.distance - b.distance);
+
+        if (volunteersInRange.length > 0) {
+          // Assign the closest volunteer
+          assignedVolunteer = volunteersInRange[0];
+          searchRadiusUsed = radius;
+          
+          // Update rescue request with volunteer assignment
+          await ctx.db.rescueRequest.update({
+            where: { id: rescueRequest.id },
+            data: {
+              volunteerId: assignedVolunteer.user.id,
+              status: "ASSIGNED",
+              searchRadiusUsed: radius,
+              assignedAt: new Date(),
+            },
+          });
+
+          // Update volunteer availability
+          await ctx.db.volunteerProfile.update({
+            where: { userId: assignedVolunteer.user.id },
+            data: { available: false },
+          });
+
+          // Calculate and update ETA
+          try {
+            const etaInputs: ETAInputs = {
+              distance: assignedVolunteer.distance,
+              volunteerLoad: 1, // Default load
+              systemLoad: 1,    // Default load
+              disasterType: "OTHER",
+              timeOfDay: new Date().getHours(),
+            };
+            
+            const eta = predictResponseTime(etaInputs);
+            
+            await ctx.db.rescueRequest.update({
+              where: { id: rescueRequest.id },
+              data: {
+                etaMinMinutes: Math.floor(eta.estimatedMinutes),
+                etaMaxMinutes: Math.ceil(eta.estimatedMinutes * 1.3),
+                etaConfidence: eta.confidence,
+                etaFactors: JSON.stringify(eta.factors),
+              },
+            });
+          } catch (error) {
+            console.error("Failed to calculate ETA:", error);
+          }
+          
+          break;
+        }
+      }
+
       return {
-        request: updatedRequest,
-        assignmentResult,
+        rescueRequest,
+        assignedVolunteer,
+        searchRadiusUsed,
+        message: assignedVolunteer 
+          ? "SOS sent successfully! Volunteer assigned." 
+          : "SOS sent successfully! Searching for volunteers."
       };
     }),
 
-  // Get user's rescue requests - USER only
-  getMyRequests: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "USER") {
+  // Cancel a rescue request (USER only)
+  cancel: protectedProcedure
+    .input(
+      z.object({
+        requestId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const request = await ctx.db.rescueRequest.findUnique({
+        where: { id: input.requestId },
+      });
+
+      if (!request) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Rescue request not found",
+        });
+      }
+
+      if (request.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only cancel your own rescue requests",
+        });
+      }
+
+      // Update status to cancelled
+      const cancelledRequest = await ctx.db.rescueRequest.update({
+        where: { id: input.requestId },
+        data: { status: "COMPLETED" },
+      });
+
+      // If there was an assigned volunteer, make them available again
+      if (request.volunteerId) {
+        await ctx.db.volunteerProfile.update({
+          where: { userId: request.volunteerId },
+          data: { available: true },
+        });
+      }
+
+      return cancelledRequest;
+    }),
+
+  // Get all rescue requests (for authority dashboard)
+  getAllRequests: protectedProcedure.query(async ({ ctx }) => {
+    // Check if user is AUTHORITY
+    if (ctx.session.user.role !== "AUTHORITY") {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "Only users can view their rescue requests",
+        message: "Only authorities can view all rescue requests",
       });
     }
 
-    const requests = await ctx.db.rescueRequest.findMany({
-      where: { userId: ctx.session.user.id },
+    const allRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS", "NO_VOLUNTEER"] },
+      },
       select: {
         id: true,
         userId: true,
@@ -209,81 +284,103 @@ export const rescueRouter = createTRPCRouter({
         completedAt: true,
         createdAt: true,
         updatedAt: true,
-        volunteer: {
+        user: {
           select: { id: true, name: true, email: true },
+        },
+        volunteer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            volunteerProfile: {
+              select: {
+                latitude: true,
+                longitude: true,
+              },
+            },
+          },
         },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return requests;
+    return allRequests;
   }),
 
-  // Get assigned rescue requests - VOLUNTEER only
-  getAssignedToMe: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "VOLUNTEER") {
+  // Get escalated requests (NO_VOLUNTEER) for authority dashboard
+  getEscalated: protectedProcedure.query(async ({ ctx }) => {
+    // Check if user is AUTHORITY
+    if (ctx.session.user.role !== "AUTHORITY") {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "Only volunteers can view assigned requests",
+        message: "Only authorities can view escalated requests",
       });
     }
 
-    const requests = await ctx.db.rescueRequest.findMany({
+    const escalatedRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        status: "NO_VOLUNTEER",
+      },
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+        volunteer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            volunteerProfile: {
+              select: {
+                latitude: true,
+                longitude: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { escalatedAt: "asc" },
+    });
+
+    return escalatedRequests;
+  }),
+
+  // Get all rescue requests relevant to volunteer (unified query)
+  getForVolunteer: protectedProcedure.query(async ({ ctx }) => {
+    // Check if user is VOLUNTEER
+    if (ctx.session.user.role !== "VOLUNTEER") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only volunteers can view volunteer requests",
+      });
+    }
+
+    // Get assigned requests
+    const assigned = await ctx.db.rescueRequest.findMany({
       where: {
         volunteerId: ctx.session.user.id,
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
       },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return requests;
-  }),
-
-  // Get pending requests for volunteers to accept
-  getPendingRequests: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "VOLUNTEER") {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "Only volunteers can view pending requests",
-      });
-    }
-
-    const requests = await ctx.db.rescueRequest.findMany({
-      where: { status: "PENDING" },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { createdAt: "asc" },
-    });
-
-    return requests;
-  }),
-
-  // Get all rescue requests relevant to a volunteer (for polling/alert delivery)
-  // Returns: requests assigned to this volunteer OR pending requests available for acceptance
-  getForVolunteer: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "VOLUNTEER") {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "Only volunteers can access this",
-      });
-    }
-
-    const volunteerId = ctx.session.user.id;
-
-    // Get requests assigned to this volunteer (any active status)
-    const assignedRequests = await ctx.db.rescueRequest.findMany({
-      where: {
-        volunteerId,
-        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-      },
       select: {
         id: true,
         userId: true,
@@ -309,11 +406,11 @@ export const rescueRouter = createTRPCRouter({
           select: { id: true, name: true, email: true },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { assignedAt: "desc" },
     });
 
-    // Get pending requests available for any volunteer
-    const pendingRequests = await ctx.db.rescueRequest.findMany({
+    // Get pending requests
+    const pending = await ctx.db.rescueRequest.findMany({
       where: {
         status: "PENDING",
       },
@@ -345,8 +442,8 @@ export const rescueRouter = createTRPCRouter({
       orderBy: { createdAt: "asc" },
     });
 
-    // Get NO_VOLUNTEER requests (escalated, but volunteer can still accept)
-    const escalatedRequests = await ctx.db.rescueRequest.findMany({
+    // Get escalated requests
+    const escalated = await ctx.db.rescueRequest.findMany({
       where: {
         status: "NO_VOLUNTEER",
       },
@@ -379,17 +476,152 @@ export const rescueRouter = createTRPCRouter({
     });
 
     return {
-      assigned: assignedRequests,
-      pending: pendingRequests,
-      escalated: escalatedRequests,
-      totalAlerts: assignedRequests.length + pendingRequests.length + escalatedRequests.length,
+      assigned,
+      pending,
+      escalated,
+      totalAlerts: assigned.length + pending.length + escalated.length,
     };
   }),
 
-  // Volunteer accepts a rescue request
+  // Get pending requests available for any volunteer
+  getPendingRequests: protectedProcedure.query(async ({ ctx }) => {
+    // Check if user is VOLUNTEER
+    if (ctx.session.user.role !== "VOLUNTEER") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only volunteers can view pending requests",
+      });
+    }
+
+    const pendingRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        status: "PENDING",
+      },
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return pendingRequests;
+  }),
+
+  // Get requests assigned to current volunteer
+  getMyAssignedRequests: protectedProcedure.query(async ({ ctx }) => {
+    // Check if user is VOLUNTEER
+    if (ctx.session.user.role !== "VOLUNTEER") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only volunteers can view their assigned requests",
+      });
+    }
+
+    const assignedRequests = await ctx.db.rescueRequest.findMany({
+      where: {
+        volunteerId: ctx.session.user.id,
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      },
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: { id: true, name: true, email: true },
+        },
+      },
+      orderBy: { assignedAt: "desc" },
+    });
+
+    return assignedRequests;
+  }),
+
+  // Get current user's rescue requests
+  getMyRequests: protectedProcedure.query(async ({ ctx }) => {
+    const requests = await ctx.db.rescueRequest.findMany({
+      where: { userId: ctx.session.user.id },
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        volunteer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return requests;
+  }),
+
+  // Accept a rescue request (VOLUNTEER only)
   acceptRequest: protectedProcedure
-    .input(z.object({ requestId: z.string() }))
+    .input(
+      z.object({
+        requestId: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
+      // Check if user is VOLUNTEER
       if (ctx.session.user.role !== "VOLUNTEER") {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -399,6 +631,15 @@ export const rescueRouter = createTRPCRouter({
 
       const request = await ctx.db.rescueRequest.findUnique({
         where: { id: input.requestId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
       });
 
       if (!request) {
@@ -411,10 +652,26 @@ export const rescueRouter = createTRPCRouter({
       if (request.status !== "PENDING" && request.status !== "NO_VOLUNTEER") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This request is no longer available",
+          message: "This request cannot be accepted",
         });
       }
 
+      // Check if volunteer already has active assignments
+      const activeAssignments = await ctx.db.rescueRequest.count({
+        where: {
+          volunteerId: ctx.session.user.id,
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+        },
+      });
+
+      if (activeAssignments >= 3) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You already have 3 active rescue assignments",
+        });
+      }
+
+      // Update request status
       const updatedRequest = await ctx.db.rescueRequest.update({
         where: { id: input.requestId },
         data: {
@@ -422,29 +679,72 @@ export const rescueRouter = createTRPCRouter({
           status: "ASSIGNED",
           assignedAt: new Date(),
         },
-        include: {
-          user: {
-            select: { id: true, name: true, email: true },
-          },
-        },
       });
+
+      // Update volunteer availability
+      await ctx.db.volunteerProfile.update({
+        where: { userId: ctx.session.user.id },
+        data: { available: activeAssignments >= 2 }, // Unavailable if 2+ assignments
+      });
+
+      // Calculate and update ETA
+      if (request.latitude && request.longitude) {
+        const volunteerProfile = await ctx.db.volunteerProfile.findUnique({
+          where: { userId: ctx.session.user.id },
+        });
+
+        if (volunteerProfile?.latitude && volunteerProfile?.longitude) {
+          try {
+            const distance = calculateDistance(
+              request.latitude,
+              request.longitude,
+              volunteerProfile.latitude,
+              volunteerProfile.longitude
+            );
+
+            const etaInputs: ETAInputs = {
+              distance,
+              volunteerLoad: activeAssignments + 1,
+              systemLoad: 1, // This would come from system metrics
+              disasterType: request.disasterType ?? "OTHER",
+              timeOfDay: new Date().getHours(),
+            };
+            
+            const eta = predictResponseTime(etaInputs);
+            
+            await ctx.db.rescueRequest.update({
+              where: { id: input.requestId },
+              data: {
+                etaMinMinutes: Math.floor(eta.estimatedMinutes),
+                etaMaxMinutes: Math.ceil(eta.estimatedMinutes * 1.3),
+                etaConfidence: eta.confidence,
+                etaFactors: JSON.stringify(eta.factors),
+              },
+            });
+          } catch (error) {
+            console.error("Failed to calculate ETA:", error);
+          }
+        }
+      }
 
       return updatedRequest;
     }),
 
-  // Update request status - VOLUNTEER only
+  // Update request status (VOLUNTEER only)
   updateStatus: protectedProcedure
     .input(
       z.object({
         requestId: z.string(),
         status: z.enum(["IN_PROGRESS", "COMPLETED"]),
+        note: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Check if user is VOLUNTEER
       if (ctx.session.user.role !== "VOLUNTEER") {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Only volunteers can update rescue status",
+          message: "Only volunteers can update rescue request status",
         });
       }
 
@@ -462,108 +762,38 @@ export const rescueRouter = createTRPCRouter({
       if (request.volunteerId !== ctx.session.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You are not assigned to this request",
+          message: "You can only update requests assigned to you",
         });
       }
 
+      const updateData: any = { status: input.status };
+      if (input.note) updateData.note = input.note;
+      if (input.status === "COMPLETED") updateData.completedAt = new Date();
+
       const updatedRequest = await ctx.db.rescueRequest.update({
         where: { id: input.requestId },
-        data: {
-          status: input.status,
-          completedAt: input.status === "COMPLETED" ? new Date() : undefined,
-        },
+        data: updateData,
       });
+
+      // If completed, make volunteer available again
+      if (input.status === "COMPLETED") {
+        const activeAssignments = await ctx.db.rescueRequest.count({
+          where: {
+            volunteerId: ctx.session.user.id,
+            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          },
+        });
+
+        await ctx.db.volunteerProfile.update({
+          where: { userId: ctx.session.user.id },
+          data: { available: activeAssignments < 3 },
+        });
+      }
 
       return updatedRequest;
     }),
 
-  // Get escalated requests (NO_VOLUNTEER) - AUTHORITY only
-  getEscalated: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "AUTHORITY") {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "Only authorities can view escalated requests",
-      });
-    }
-
-    const requests = await ctx.db.rescueRequest.findMany({
-      where: { status: "NO_VOLUNTEER" },
-      select: {
-        id: true,
-        userId: true,
-        volunteerId: true,
-        status: true,
-        message: true,
-        location: true,
-        latitude: true,
-        longitude: true,
-        disasterType: true,
-        note: true,
-        searchRadiusUsed: true,
-        etaMinMinutes: true,
-        etaMaxMinutes: true,
-        etaConfidence: true,
-        etaFactors: true,
-        escalatedAt: true,
-        assignedAt: true,
-        completedAt: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { escalatedAt: "asc" },
-    });
-
-    return requests;
-  }),
-
-  // Get all requests for authority overview
-  getAllRequests: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.session.user.role !== "AUTHORITY") {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "Only authorities can view all requests",
-      });
-    }
-
-    const requests = await ctx.db.rescueRequest.findMany({
-      select: {
-        id: true,
-        userId: true,
-        volunteerId: true,
-        status: true,
-        message: true,
-        location: true,
-        latitude: true,
-        longitude: true,
-        disasterType: true,
-        note: true,
-        searchRadiusUsed: true,
-        etaMinMinutes: true,
-        etaMaxMinutes: true,
-        etaConfidence: true,
-        etaFactors: true,
-        escalatedAt: true,
-        assignedAt: true,
-        completedAt: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-        volunteer: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return requests;
-  }),
-
-  // Authority manually assigns a volunteer to an escalated request
+  // Manual assignment by authority
   manualAssign: protectedProcedure
     .input(
       z.object({
@@ -572,6 +802,7 @@ export const rescueRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Check if user is AUTHORITY
       if (ctx.session.user.role !== "AUTHORITY") {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -579,15 +810,20 @@ export const rescueRouter = createTRPCRouter({
         });
       }
 
-      // Verify volunteer exists and is a volunteer role
-      const volunteer = await ctx.db.user.findFirst({
-        where: {
-          id: input.volunteerId,
-          role: "VOLUNTEER",
-        },
-        include: {
-          volunteerProfile: true,
-        },
+      const request = await ctx.db.rescueRequest.findUnique({
+        where: { id: input.requestId },
+      });
+
+      if (!request) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Rescue request not found",
+        });
+      }
+
+      const volunteer = await ctx.db.volunteerProfile.findUnique({
+        where: { userId: input.volunteerId },
+        include: { user: true },
       });
 
       if (!volunteer) {
@@ -597,6 +833,14 @@ export const rescueRouter = createTRPCRouter({
         });
       }
 
+      if (!volunteer.available) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Volunteer is not available",
+        });
+      }
+
+      // Update request
       const updatedRequest = await ctx.db.rescueRequest.update({
         where: { id: input.requestId },
         data: {
@@ -604,316 +848,14 @@ export const rescueRouter = createTRPCRouter({
           status: "ASSIGNED",
           assignedAt: new Date(),
         },
-        include: {
-          user: {
-            select: { id: true, name: true, email: true, latitude: true, longitude: true },
-          },
-          volunteer: {
-            select: { id: true, name: true, email: true },
-          },
-        },
       });
 
-      // Calculate ETA for manual assignment
-      await calculateAndUpdateETA(
-        ctx.db,
-        input.requestId,
-        volunteer.volunteerProfile?.latitude ?? undefined,
-        volunteer.volunteerProfile?.longitude ?? undefined,
-        updatedRequest.user.latitude ?? undefined,
-        updatedRequest.user.longitude ?? undefined,
-        updatedRequest.disasterType ?? undefined
-      );
-
-      console.log(`[RESCUE] Authority manually assigned volunteer ${volunteer.email} to request ${input.requestId}`);
-      mockSendSMS(volunteer.email, "You have been assigned to a rescue request by authorities!");
+      // Update volunteer availability
+      await ctx.db.volunteerProfile.update({
+        where: { userId: input.volunteerId },
+        data: { available: false },
+      });
 
       return updatedRequest;
     }),
-
-  // Update optional post-SOS details (disaster type, note) - request owner only
-  updateDetails: protectedProcedure
-    .input(
-      z.object({
-        requestId: z.string(),
-        disasterType: z.enum(["FLOOD", "EARTHQUAKE", "FIRE", "MEDICAL", "BUILDING_COLLAPSE", "OTHER"]).optional(),
-        note: z.string().optional(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const request = await ctx.db.rescueRequest.findUnique({
-        where: { id: input.requestId },
-      });
-
-      if (!request) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Rescue request not found",
-        });
-      }
-
-      if (request.userId !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You can only update your own requests",
-        });
-      }
-
-      const updated = await ctx.db.rescueRequest.update({
-        where: { id: input.requestId },
-        data: {
-          ...(input.disasterType != null && { disasterType: input.disasterType }),
-          ...(input.note != null && { note: input.note }),
-        },
-      });
-
-      return updated;
-    }),
-
-  // Cancel a rescue request - USER only
-  cancel: protectedProcedure
-    .input(z.object({ requestId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const request = await ctx.db.rescueRequest.findUnique({
-        where: { id: input.requestId },
-      });
-
-      if (!request) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Rescue request not found",
-        });
-      }
-
-      if (request.userId !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You can only cancel your own requests",
-        });
-      }
-
-      await ctx.db.rescueRequest.delete({
-        where: { id: input.requestId },
-      });
-
-      return { success: true };
-    }),
 });
-
-/**
- * Auto-assign volunteer with radius expansion logic
- * Searches in expanding radii: 2km -> 5km -> 10km
- */
-async function autoAssignVolunteerWithRadius(
-  db: any,
-  requestId: string,
-  userLat?: number,
-  userLon?: number
-): Promise<{ assigned: boolean; message: string; radiusUsed?: number }> {
-  // If no location provided, fall back to simple assignment
-  if (!userLat || !userLon) {
-    return await simpleAssignment(db, requestId);
-  }
-
-  // Get all available volunteers with location
-  const availableVolunteers = await db.volunteerProfile.findMany({
-    where: {
-      available: true,
-      latitude: { not: null },
-      longitude: { not: null },
-      user: {
-        role: "VOLUNTEER",
-        volunteerAssignments: {
-          none: {
-            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-          },
-        },
-      },
-    },
-    include: {
-      user: {
-        select: { id: true, name: true, email: true },
-      },
-    },
-  });
-
-  if (availableVolunteers.length === 0) {
-    console.log(`[RESCUE] No volunteers with location found, trying simple assignment...`);
-    return await simpleAssignment(db, requestId);
-  }
-
-  // Calculate distances and sort by closest
-  const volunteersWithDistance = availableVolunteers
-    .map((v: any) => ({
-      ...v,
-      distance: haversineDistance(userLat, userLon, v.latitude!, v.longitude!),
-    }))
-    .sort((a: any, b: any) => a.distance - b.distance);
-
-  // Try each radius step
-  for (const radius of SEARCH_RADII) {
-    const nearbyVolunteer = volunteersWithDistance.find((v: any) => v.distance <= radius);
-
-    if (nearbyVolunteer) {
-      // Assign the nearest volunteer within this radius
-      await db.rescueRequest.update({
-        where: { id: requestId },
-        data: {
-          volunteerId: nearbyVolunteer.user.id,
-          status: "ASSIGNED",
-          assignedAt: new Date(),
-          searchRadiusUsed: radius,
-        },
-      });
-
-      // Calculate ETA using ML-assisted prediction
-      await calculateAndUpdateETA(
-        db,
-        requestId,
-        nearbyVolunteer.latitude,
-        nearbyVolunteer.longitude,
-        userLat,
-        userLon
-      );
-
-      console.log(
-        `[RESCUE] Volunteer ${nearbyVolunteer.user.email} assigned (${nearbyVolunteer.distance.toFixed(2)}km away, radius: ${radius}km)`
-      );
-
-      mockSendSMS(
-        nearbyVolunteer.user.email,
-        `New rescue request assigned! Distance: ${nearbyVolunteer.distance.toFixed(2)}km`
-      );
-
-      return {
-        assigned: true,
-        message: `Volunteer ${nearbyVolunteer.user.name || nearbyVolunteer.user.email} assigned (${nearbyVolunteer.distance.toFixed(1)}km away)`,
-        radiusUsed: radius,
-      };
-    }
-
-    console.log(`[RESCUE] No volunteer found within ${radius}km, expanding search...`);
-  }
-
-  // No volunteer found within 10km - try simple assignment as fallback
-  console.log(`[RESCUE] No volunteer within 10km, trying simple assignment...`);
-  return await simpleAssignment(db, requestId);
-}
-
-/**
- * Simple assignment without location (fallback)
- */
-async function simpleAssignment(
-  db: any,
-  requestId: string
-): Promise<{ assigned: boolean; message: string }> {
-  // First try: Find volunteer with profile and available status
-  let availableVolunteer = await db.user.findFirst({
-    where: {
-      role: "VOLUNTEER",
-      volunteerProfile: {
-        available: true,
-      },
-      volunteerAssignments: {
-        none: {
-          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-        },
-      },
-    },
-  });
-
-  // Second try: Find any volunteer without active assignments (even without profile)
-  if (!availableVolunteer) {
-    console.log(`[RESCUE] No volunteers with profiles found, checking all volunteers...`);
-    availableVolunteer = await db.user.findFirst({
-      where: {
-        role: "VOLUNTEER",
-        volunteerAssignments: {
-          none: {
-            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
-          },
-        },
-      },
-    });
-
-    // Create profile for this volunteer if they don't have one
-    if (availableVolunteer) {
-      await db.volunteerProfile.upsert({
-        where: { userId: availableVolunteer.id },
-        create: {
-          userId: availableVolunteer.id,
-          available: true,
-        },
-        update: {}, // No specific update needed if it already exists
-      });
-      console.log(`[RESCUE] Created volunteer profile for ${availableVolunteer.email}`);
-    }
-  }
-
-  if (availableVolunteer) {
-    await db.rescueRequest.update({
-      where: { id: requestId },
-      data: {
-        volunteerId: availableVolunteer.id,
-        status: "ASSIGNED",
-        assignedAt: new Date(),
-      },
-    });
-
-    // Calculate ETA (no location data available)
-    await calculateAndUpdateETA(db, requestId);
-
-    console.log(`[RESCUE] Volunteer ${availableVolunteer.email} assigned (no location data)`);
-    mockSendSMS(availableVolunteer.email, "New rescue request assigned to you!");
-
-    return {
-      assigned: true,
-      message: `Volunteer ${availableVolunteer.name || availableVolunteer.email} has been assigned`,
-    };
-  }
-
-  return await escalateToAuthority(db, requestId, "No available volunteers");
-}
-
-/**
- * Escalate to authority when no volunteer found
- */
-async function escalateToAuthority(
-  db: any,
-  requestId: string,
-  reason: string
-): Promise<{ assigned: boolean; message: string }> {
-  await db.rescueRequest.update({
-    where: { id: requestId },
-    data: {
-      status: "NO_VOLUNTEER",
-      escalatedAt: new Date(),
-    },
-  });
-
-  console.log(`[RESCUE] ${reason}. Escalated to authorities. Request: ${requestId}`);
-  mockSendEmergencyAlert(requestId, reason);
-
-  return {
-    assigned: false,
-    message: "No volunteer available. Escalated to authorities.",
-  };
-}
-
-/**
- * Mock SMS notification
- */
-function mockSendSMS(recipient: string | null, message: string): void {
-  console.log(`[MOCK SMS] To: ${recipient}`);
-  console.log(`[MOCK SMS] Message: ${message}`);
-}
-
-/**
- * Mock emergency alert to authorities
- */
-function mockSendEmergencyAlert(requestId: string, reason: string): void {
-  console.log(`[MOCK EMERGENCY] Alert sent to all authorities`);
-  console.log(`[MOCK EMERGENCY] Request ID: ${requestId}`);
-  console.log(`[MOCK EMERGENCY] Reason: ${reason}`);
-  console.log(`[MOCK EMERGENCY] Message: URGENT - User in danger needs manual intervention!`);
-}
