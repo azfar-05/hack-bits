@@ -47,26 +47,21 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const utils = api.useUtils();
 
-  // Real API queries with faster polling
+  // Lightweight API queries with faster polling
   const channelsQuery = api.realtime.getChannels.useQuery(undefined, {
     enabled: isOpen,
-    refetchInterval: isOpen ? 1000 : false, // Poll every 1 second when open
-    refetchIntervalInBackground: true,
+    refetchInterval: isOpen ? 2000 : false,
   });
 
   const availableUsersQuery = api.realtime.getAvailableUsers.useQuery(undefined, {
     enabled: isOpen && showUserList,
-    refetchInterval: isOpen && showUserList ? 2000 : false, // Poll every 2 seconds
   });
 
   const messagesQuery = api.realtime.getChannelMessages.useQuery(
     { channelId: activeChannel },
     { 
       enabled: isOpen && !!activeChannel,
-      refetchInterval: isOpen && !!activeChannel ? 500 : false, // Poll every 500ms for messages
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: true,
-      refetchOnMount: true,
+      refetchInterval: isOpen && !!activeChannel ? 1000 : false, // 1 second polling
     }
   );
 
@@ -74,21 +69,16 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
     { channelId: activeChannel },
     { 
       enabled: isOpen && !!activeChannel,
-      refetchInterval: isOpen && !!activeChannel ? 3000 : false, // Poll every 3 seconds
-      refetchIntervalInBackground: true,
+      refetchInterval: isOpen && !!activeChannel ? 5000 : false,
     }
   );
 
-  // Mutations with optimistic updates
+  // Optimistic mutations
   const sendMessageMutation = api.realtime.sendMessage.useMutation({
     onMutate: async (newMessage) => {
-      // Cancel any outgoing refetches
       await utils.realtime.getChannelMessages.cancel({ channelId: newMessage.channelId });
-
-      // Snapshot the previous value
       const previousMessages = utils.realtime.getChannelMessages.getData({ channelId: newMessage.channelId });
 
-      // Optimistically update to the new value
       if (previousMessages && session) {
         const optimisticMessage = {
           id: `temp_${Date.now()}`,
@@ -121,11 +111,9 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
           }
         );
       }
-
       return { previousMessages };
     },
     onError: (err, newMessage, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousMessages) {
         utils.realtime.getChannelMessages.setData(
           { channelId: newMessage.channelId },
@@ -134,7 +122,6 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
       }
     },
     onSettled: (data, error, variables) => {
-      // Always refetch after error or success to sync with server
       void utils.realtime.getChannelMessages.invalidate({ channelId: variables.channelId });
     },
     onSuccess: () => {
@@ -146,7 +133,6 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
     onSuccess: (conversation) => {
       setActiveChannel(`dm_${conversation.id}`);
       setShowUserList(false);
-      // Refetch channels to show the new conversation
       void channelsQuery.refetch();
     },
   });
@@ -164,60 +150,15 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
     }
   }, [channels, activeChannel]);
 
-  // Auto-scroll to bottom when new messages arrive with smooth animation
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
-        behavior: "smooth",
-        block: "end"
-      });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [currentMessages, activeChannel]);
 
-  // Show typing indicator and message status
-  const [isTyping, setIsTyping] = useState(false);
-  const [lastMessageTime, setLastMessageTime] = useState<Date | null>(null);
-
-  // Update last message time when new messages arrive
-  useEffect(() => {
-    if (currentMessages.length > 0) {
-      const latestMessage = currentMessages[currentMessages.length - 1];
-      if (latestMessage && (!lastMessageTime || new Date(latestMessage.timestamp) > lastMessageTime)) {
-        setLastMessageTime(new Date(latestMessage.timestamp));
-      }
-    }
-  }, [currentMessages, lastMessageTime]);
-
-  // Show notification for new messages
-  useEffect(() => {
-    if (currentMessages.length > 0 && lastMessageTime) {
-      const latestMessage = currentMessages[currentMessages.length - 1];
-      if (latestMessage && latestMessage.senderId !== session?.user?.id) {
-        // Show browser notification for new messages from others
-        if (Notification.permission === "granted" && document.hidden) {
-          new Notification(`New message from ${latestMessage.senderName}`, {
-            body: latestMessage.content.substring(0, 100),
-            icon: "/favicon.ico",
-            tag: "emergency-chat"
-          });
-        }
-      }
-    }
-  }, [currentMessages, session?.user?.id]);
-
-  // Request notification permission when component mounts
-  useEffect(() => {
-    if (isOpen && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-  }, [isOpen]);
-
   const handleSendMessage = () => {
     if (!newMessage.trim() || !session || !activeChannel) return;
-
-    // Show typing indicator briefly
-    setIsTyping(true);
-    setTimeout(() => setIsTyping(false), 1000);
 
     sendMessageMutation.mutate({
       channelId: activeChannel,
@@ -227,7 +168,6 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
     });
   };
 
-  // Handle Enter key press for faster messaging
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -263,105 +203,79 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 2147483647 }}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[80vh] flex overflow-hidden relative" style={{ zIndex: 2147483647 }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 2147483647 }}>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[70vh] flex overflow-hidden" style={{ zIndex: 2147483647 }}>
         
-        {/* Channel Sidebar */}
-        <div className="w-80 bg-gray-900 text-white flex flex-col">
-          <div className="p-6 border-b border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">🚨 Emergency Comms</h2>
+        {/* Simplified Sidebar */}
+        <div className="w-64 bg-gray-800 text-white flex flex-col">
+          <div className="p-4 border-b border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold">🚨 Emergency</h2>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-1 text-gray-400 hover:text-white rounded"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                ✕
               </button>
             </div>
-            <div className="text-sm text-gray-300">
-              Real-time emergency communication
-            </div>
+            <div className="text-xs text-gray-400">Real-time communication</div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
-            {/* Channels Section */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Channels</h3>
-              </div>
-              <div className="space-y-2">
-                {channelsQuery.isLoading && (
-                  <div className="text-center text-gray-400 py-4">Loading channels...</div>
-                )}
-                
+          <div className="flex-1 overflow-y-auto p-3">
+            {/* Channels */}
+            <div className="mb-4">
+              <h3 className="text-xs font-medium text-gray-400 uppercase mb-2">Channels</h3>
+              <div className="space-y-1">
                 {channels.filter(c => !c.isDM).map((channel) => (
                   <button
                     key={channel.id}
                     onClick={() => setActiveChannel(channel.id)}
-                    className={`w-full text-left p-3 rounded-xl transition-all ${
+                    className={`w-full text-left p-2 rounded text-sm transition-colors ${
                       activeChannel === channel.id
-                        ? "bg-gray-700 border-2 border-blue-500"
-                        : "bg-gray-800 hover:bg-gray-700 border-2 border-transparent"
+                        ? "bg-gray-600 text-white"
+                        : "text-gray-300 hover:bg-gray-700"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-sm">{channel.name}</span>
-                      {channel.isActive && (
-                        <div className="flex items-center gap-1">
-                          <div className="h-2 w-2 bg-green-400 rounded-full animate-pulse"></div>
-                          <span className="text-xs text-green-400">LIVE</span>
-                        </div>
-                      )}
+                    <div className="flex items-center justify-between">
+                      <span>{channel.name}</span>
+                      {channel.isActive && <div className="h-1.5 w-1.5 bg-green-400 rounded-full"></div>}
                     </div>
-                    <div className="text-xs text-gray-400">{channel.description}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Direct Messages Section */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">Direct Messages</h3>
+            {/* Direct Messages */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-medium text-gray-400 uppercase">Direct</h3>
                 <button
                   onClick={() => setShowUserList(!showUserList)}
-                  className="p-1 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-                  title="Start new conversation"
+                  className="p-1 text-gray-400 hover:text-white text-xs"
                 >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
+                  +
                 </button>
               </div>
 
-              {/* User List for Starting Conversations */}
+              {/* User List */}
               {showUserList && (
-                <div className="mb-4 p-3 bg-gray-800 rounded-xl">
-                  <div className="text-xs text-gray-400 mb-2">Start conversation with:</div>
-                  <div className="space-y-1 max-h-32 overflow-y-auto">
-                    {availableUsersQuery.isLoading && (
-                      <div className="text-xs text-gray-400">Loading users...</div>
-                    )}
+                <div className="mb-3 p-2 bg-gray-700 rounded text-xs">
+                  <div className="text-gray-400 mb-1">Start chat:</div>
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
                     {availableUsers.map((user) => (
                       <button
                         key={user.id}
                         onClick={() => handleStartConversation(user.id)}
-                        className="w-full text-left p-2 rounded-lg hover:bg-gray-700 transition-colors"
-                        disabled={startConversationMutation.isPending}
+                        className="w-full text-left p-1 rounded hover:bg-gray-600 transition-colors"
                       >
                         <div className="flex items-center gap-2">
-                          <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                            user.role === "AUTHORITY" ? "bg-red-100 text-red-600" :
-                            user.role === "VOLUNTEER" ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
+                          <div className={`h-4 w-4 rounded-full flex items-center justify-center text-xs ${
+                            user.role === "AUTHORITY" ? "bg-red-500" :
+                            user.role === "VOLUNTEER" ? "bg-green-500" : "bg-blue-500"
                           }`}>
                             {getRoleIcon(user.role)}
                           </div>
-                          <div>
-                            <div className="text-xs font-medium">{user.name || user.email}</div>
-                            <div className="text-xs text-gray-400 capitalize">{user.role.toLowerCase()}</div>
-                          </div>
+                          <span className="text-xs truncate">{user.name || user.email}</span>
                         </div>
                       </button>
                     ))}
@@ -369,28 +283,27 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
                 </div>
               )}
 
-              {/* Direct Message Conversations */}
-              <div className="space-y-2">
+              {/* DM Conversations */}
+              <div className="space-y-1">
                 {channels.filter(c => c.isDM).map((conversation) => (
                   <button
                     key={conversation.id}
                     onClick={() => setActiveChannel(conversation.id)}
-                    className={`w-full text-left p-3 rounded-xl transition-all ${
+                    className={`w-full text-left p-2 rounded text-sm transition-colors ${
                       activeChannel === conversation.id
-                        ? "bg-gray-700 border-2 border-blue-500"
-                        : "bg-gray-800 hover:bg-gray-700 border-2 border-transparent"
+                        ? "bg-gray-600 text-white"
+                        : "text-gray-300 hover:bg-gray-700"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${
-                        conversation.otherUser?.role === "AUTHORITY" ? "bg-red-100 text-red-600" :
-                        conversation.otherUser?.role === "VOLUNTEER" ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
+                    <div className="flex items-center gap-2">
+                      <div className={`h-4 w-4 rounded-full flex items-center justify-center text-xs ${
+                        conversation.otherUser?.role === "AUTHORITY" ? "bg-red-500" :
+                        conversation.otherUser?.role === "VOLUNTEER" ? "bg-green-500" : "bg-blue-500"
                       }`}>
                         {getRoleIcon(conversation.otherUser?.role || "USER")}
                       </div>
-                      <span className="font-semibold text-sm">{conversation.otherUser?.name || conversation.otherUser?.email}</span>
+                      <span className="truncate">{conversation.otherUser?.name || conversation.otherUser?.email}</span>
                     </div>
-                    <div className="text-xs text-gray-400 truncate">{conversation.description}</div>
                   </button>
                 ))}
               </div>
@@ -398,138 +311,117 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
           </div>
 
           {/* User Status */}
-          <div className="p-4 border-t border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-blue-500 rounded-full flex items-center justify-center">
+          <div className="p-3 border-t border-gray-700">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center text-xs">
                 {getRoleIcon(session?.user?.role || "USER")}
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-medium">{session?.user?.name || "Anonymous"}</div>
-                <div className="text-xs text-gray-400 capitalize">
-                  {session?.user?.role?.toLowerCase() || "user"}
-                </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium truncate">{session?.user?.name || "You"}</div>
+                <div className="text-xs text-gray-400">{session?.user?.role?.toLowerCase()}</div>
               </div>
-              <div className="h-3 w-3 bg-green-400 rounded-full"></div>
+              <div className="h-2 w-2 bg-green-400 rounded-full"></div>
             </div>
           </div>
         </div>
 
         {/* Chat Area */}
         <div className="flex-1 flex flex-col">
-          {/* Chat Header */}
-          <div className="p-6 border-b border-gray-200 bg-gray-50">
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="font-semibold text-gray-900">
                   {activeChannelData?.name || "Select Channel"}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-gray-600">
                   {isDirectMessage 
-                    ? `Private conversation with ${activeChannelData?.otherUser?.name || activeChannelData?.otherUser?.email}`
+                    ? `Private with ${activeChannelData?.otherUser?.name || activeChannelData?.otherUser?.email}`
                     : activeChannelData?.description || ""
                   }
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <div className={`h-2 w-2 rounded-full animate-pulse ${
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className={`h-1.5 w-1.5 rounded-full ${
                     messagesQuery.isLoading ? "bg-yellow-500" : 
                     messagesQuery.error ? "bg-red-500" : "bg-green-500"
                   }`}></div>
-                  <span>{participants.online} online</span>
-                  {messagesQuery.isLoading && (
-                    <span className="text-xs text-yellow-600">Syncing...</span>
-                  )}
-                  {messagesQuery.error && (
-                    <span className="text-xs text-red-600">Connection error</span>
-                  )}
+                  <span className="text-gray-600">{participants.online} online</span>
                 </div>
                 {activeChannelData?.type === "EMERGENCY" && (
-                  <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium animate-pulse">
-                    � ACTIVE EMERGENCY
-                  </div>
+                  <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+                    🚨 EMERGENCY
+                  </span>
                 )}
                 {isDirectMessage && (
-                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
                     🔒 PRIVATE
-                  </div>
+                  </span>
                 )}
-                <div className="text-xs text-gray-500">
-                  Last update: {new Date().toLocaleTimeString()}
-                </div>
               </div>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messagesQuery.isLoading && (
-              <div className="text-center text-gray-500 py-8">Loading messages...</div>
+              <div className="text-center text-gray-500 py-4 text-sm">Loading...</div>
             )}
 
             {currentMessages.length === 0 && !messagesQuery.isLoading && (
               <div className="text-center text-gray-500 py-8">
-                <div className="text-4xl mb-4">💬</div>
-                <p className="font-medium">No messages yet</p>
-                <p className="text-sm">
-                  {isDirectMessage 
-                    ? "Start a private conversation!" 
-                    : "Be the first to start the conversation!"
-                  }
-                </p>
+                <div className="text-2xl mb-2">💬</div>
+                <p className="text-sm font-medium">No messages yet</p>
+                <p className="text-xs text-gray-400">Start the conversation!</p>
               </div>
             )}
 
             {currentMessages.map((message) => (
-              <div key={message.id} className="flex gap-4">
+              <div key={message.id} className="flex gap-3">
                 <div className="flex-shrink-0">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center text-lg ${
-                    message.senderRole === "AUTHORITY" ? "bg-red-100" :
-                    message.senderRole === "VOLUNTEER" ? "bg-green-100" : "bg-blue-100"
+                  <div className={`h-8 w-8 rounded-full flex items-center justify-center text-sm ${
+                    message.senderRole === "AUTHORITY" ? "bg-red-100 text-red-600" :
+                    message.senderRole === "VOLUNTEER" ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
                   }`}>
                     {getRoleIcon(message.senderRole)}
                   </div>
                 </div>
                 
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-gray-900">{message.senderName}</span>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${getRoleColor(message.senderRole)}`}>
+                    <span className="text-sm font-medium text-gray-900 truncate">{message.senderName}</span>
+                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${getRoleColor(message.senderRole)}`}>
                       {message.senderRole}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {new Date(message.timestamp).toLocaleTimeString()}
+                      {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                     {message.priority === "HIGH" && (
-                      <span className="text-xs bg-red-600 text-white px-2 py-1 rounded-full">
-                        HIGH PRIORITY
+                      <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded">
+                        HIGH
                       </span>
                     )}
                     {message.id.startsWith("temp_") && (
-                      <span className="text-xs text-gray-400 animate-pulse">
-                        Sending...
-                      </span>
+                      <span className="text-xs text-gray-400">Sending...</span>
                     )}
                   </div>
                   
-                  <div className={`p-3 rounded-xl transition-all ${
+                  <div className={`p-2.5 rounded-lg text-sm ${
                     message.isSystemMessage 
                       ? "bg-red-50 border border-red-200 text-red-900" 
                       : message.id.startsWith("temp_")
                         ? "bg-blue-50 border border-blue-200 opacity-70"
                         : "bg-gray-50"
                   }`}>
-                    <p className="text-sm">{message.content}</p>
+                    <p>{message.content}</p>
                     
                     {message.location && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
                         <div className="flex items-center gap-2 text-xs text-blue-700">
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
-                          <span>Location shared</span>
+                          <span>📍 Location shared</span>
                           <button className="text-blue-600 hover:text-blue-800 font-medium">
-                            View on map
+                            View
                           </button>
                         </div>
                       </div>
@@ -539,51 +431,19 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
               </div>
             ))}
 
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex gap-4 opacity-60">
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                    <div className="flex space-x-1">
-                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="p-3 bg-gray-100 rounded-xl">
-                    <p className="text-sm text-gray-500 italic">Someone is typing...</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message Input */}
-          <div className="p-6 border-t border-gray-200 bg-white">
-            <div className="flex gap-3">
-              <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-              </button>
-              
-              <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-              </button>
-
+          {/* Input */}
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex gap-2">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder={`Message ${isDirectMessage ? activeChannelData?.otherUser?.name || "user" : activeChannelData?.name || "channel"}...`}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 autoComplete="off"
                 autoFocus
               />
@@ -591,27 +451,23 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
               <button
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || sendMessageMutation.isPending}
-                className="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
               >
-                {sendMessageMutation.isPending ? "Sending..." : "Send"}
+                {sendMessageMutation.isPending ? "..." : "Send"}
               </button>
             </div>
             
             {activeChannelData?.type === "EMERGENCY" && (
-              <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
-                <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>Emergency channel - All messages are monitored by authorities</span>
+              <div className="mt-2 flex items-center gap-1 text-xs text-gray-600">
+                <span className="text-red-500">⚠️</span>
+                <span>Emergency channel - monitored by authorities</span>
               </div>
             )}
             
             {isDirectMessage && (
-              <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
-                <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span>Private conversation - Only you and {activeChannelData?.otherUser?.name || "the other user"} can see these messages</span>
+              <div className="mt-2 flex items-center gap-1 text-xs text-gray-600">
+                <span className="text-blue-500">�</span>
+                <span>Private conversation</span>
               </div>
             )}
           </div>
