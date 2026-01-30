@@ -1,120 +1,111 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
-    output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// User roles for the disaster alert system
-enum Role {
-    USER
-    VOLUNTEER
-    AUTHORITY
-}
-
-// Disaster types
-enum DisasterType {
-    FLOOD
-    EARTHQUAKE
-    FIRE
-}
-
-// Necessary for Next auth
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String?
-    access_token             String?
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String?
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refresh_token_expires_in Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String?  @unique
-  emailVerified DateTime?
-  image         String?
-
-  phoneNumber   String?  // 👈 ADD THIS
-
-  accounts Account[]
-  sessions Session[]
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String?              @unique
+  emailVerified       DateTime?
+  image               String?
+  role                Role                 @default(USER)
+  phoneNumber         String?
+  password            String?
+  accounts            Account[]
+  emergencyRequests   EmergencyRequest[]
+  safetyConfirmations SafetyConfirmation[]
+  sessions            Session[]
 }
-
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }
 
-// Disaster alerts sent by authorities
 model Alert {
-    id           String       @id @default(cuid())
-    title        String
-    message      String
-    disasterType DisasterType
-    createdAt    DateTime     @default(now())
+  id           String       @id @default(cuid())
+  title        String
+  message      String
+  disasterType DisasterType
+  createdAt    DateTime     @default(now())
 }
 
-// Safety guides for each disaster type
 model SafetyGuide {
-    id           String       @id @default(cuid())
-    disasterType DisasterType @unique
-    content      String
-    createdAt    DateTime     @default(now())
-    updatedAt    DateTime     @updatedAt
-}
-
-// Emergency request workflow for users signaling SOS
-enum EmergencyStatus {
-    OPEN
-    RESOLVED
+  id           String       @id @default(cuid())
+  disasterType DisasterType @unique
+  content      String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model EmergencyRequest {
-    id          String          @id @default(cuid())
-    userId      String
-    user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-    phoneNumber String
-    latitude    Float
-    longitude   Float
-    createdAt   DateTime        @default(now())
-    status      EmergencyStatus @default(OPEN)
+  id          String          @id @default(cuid())
+  userId      String
+  phoneNumber String
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime        @default(now())
+  status      EmergencyStatus @default(OPEN)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Simple safety confirmation when user marks themselves safe and no open emergency exists
 model SafetyConfirmation {
-    id          String   @id @default(cuid())
-    userId      String
-    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    phoneNumber String
-    createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  phoneNumber String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  VOLUNTEER
+  AUTHORITY
+}
+
+enum DisasterType {
+  FLOOD
+  EARTHQUAKE
+  FIRE
+}
+
+enum EmergencyStatus {
+  OPEN
+  RESOLVED
 }

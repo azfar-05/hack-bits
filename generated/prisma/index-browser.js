@@ -150,7 +150,9 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   emailVerified: 'emailVerified',
   image: 'image',
-  role: 'role'
+  role: 'role',
+  phoneNumber: 'phoneNumber',
+  password: 'password'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
@@ -173,6 +175,23 @@ exports.Prisma.SafetyGuideScalarFieldEnum = {
   content: 'content',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EmergencyRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  phoneNumber: 'phoneNumber',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  createdAt: 'createdAt',
+  status: 'status'
+};
+
+exports.Prisma.SafetyConfirmationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  phoneNumber: 'phoneNumber',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -201,13 +220,20 @@ exports.DisasterType = exports.$Enums.DisasterType = {
   FIRE: 'FIRE'
 };
 
+exports.EmergencyStatus = exports.$Enums.EmergencyStatus = {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
   VerificationToken: 'VerificationToken',
   Alert: 'Alert',
-  SafetyGuide: 'SafetyGuide'
+  SafetyGuide: 'SafetyGuide',
+  EmergencyRequest: 'EmergencyRequest',
+  SafetyConfirmation: 'SafetyConfirmation'
 };
 
 /**

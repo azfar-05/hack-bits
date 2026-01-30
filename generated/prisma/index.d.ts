@@ -43,6 +43,16 @@ export type Alert = $Result.DefaultSelection<Prisma.$AlertPayload>
  * 
  */
 export type SafetyGuide = $Result.DefaultSelection<Prisma.$SafetyGuidePayload>
+/**
+ * Model EmergencyRequest
+ * 
+ */
+export type EmergencyRequest = $Result.DefaultSelection<Prisma.$EmergencyRequestPayload>
+/**
+ * Model SafetyConfirmation
+ * 
+ */
+export type SafetyConfirmation = $Result.DefaultSelection<Prisma.$SafetyConfirmationPayload>
 
 /**
  * Enums
@@ -65,6 +75,14 @@ export const DisasterType: {
 
 export type DisasterType = (typeof DisasterType)[keyof typeof DisasterType]
 
+
+export const EmergencyStatus: {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED'
+};
+
+export type EmergencyStatus = (typeof EmergencyStatus)[keyof typeof EmergencyStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -74,6 +92,10 @@ export const Role: typeof $Enums.Role
 export type DisasterType = $Enums.DisasterType
 
 export const DisasterType: typeof $Enums.DisasterType
+
+export type EmergencyStatus = $Enums.EmergencyStatus
+
+export const EmergencyStatus: typeof $Enums.EmergencyStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -252,6 +274,26 @@ export class PrismaClient<
     * ```
     */
   get safetyGuide(): Prisma.SafetyGuideDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.emergencyRequest`: Exposes CRUD operations for the **EmergencyRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EmergencyRequests
+    * const emergencyRequests = await prisma.emergencyRequest.findMany()
+    * ```
+    */
+  get emergencyRequest(): Prisma.EmergencyRequestDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.safetyConfirmation`: Exposes CRUD operations for the **SafetyConfirmation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SafetyConfirmations
+    * const safetyConfirmations = await prisma.safetyConfirmation.findMany()
+    * ```
+    */
+  get safetyConfirmation(): Prisma.SafetyConfirmationDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -698,7 +740,9 @@ export namespace Prisma {
     User: 'User',
     VerificationToken: 'VerificationToken',
     Alert: 'Alert',
-    SafetyGuide: 'SafetyGuide'
+    SafetyGuide: 'SafetyGuide',
+    EmergencyRequest: 'EmergencyRequest',
+    SafetyConfirmation: 'SafetyConfirmation'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -717,7 +761,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "account" | "session" | "user" | "verificationToken" | "alert" | "safetyGuide"
+      modelProps: "account" | "session" | "user" | "verificationToken" | "alert" | "safetyGuide" | "emergencyRequest" | "safetyConfirmation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1165,6 +1209,154 @@ export namespace Prisma {
           }
         }
       }
+      EmergencyRequest: {
+        payload: Prisma.$EmergencyRequestPayload<ExtArgs>
+        fields: Prisma.EmergencyRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmergencyRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmergencyRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.EmergencyRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmergencyRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          findMany: {
+            args: Prisma.EmergencyRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>[]
+          }
+          create: {
+            args: Prisma.EmergencyRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          createMany: {
+            args: Prisma.EmergencyRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EmergencyRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.EmergencyRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          update: {
+            args: Prisma.EmergencyRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.EmergencyRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmergencyRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EmergencyRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.EmergencyRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmergencyRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.EmergencyRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmergencyRequest>
+          }
+          groupBy: {
+            args: Prisma.EmergencyRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmergencyRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmergencyRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<EmergencyRequestCountAggregateOutputType> | number
+          }
+        }
+      }
+      SafetyConfirmation: {
+        payload: Prisma.$SafetyConfirmationPayload<ExtArgs>
+        fields: Prisma.SafetyConfirmationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SafetyConfirmationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SafetyConfirmationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          findFirst: {
+            args: Prisma.SafetyConfirmationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SafetyConfirmationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          findMany: {
+            args: Prisma.SafetyConfirmationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>[]
+          }
+          create: {
+            args: Prisma.SafetyConfirmationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          createMany: {
+            args: Prisma.SafetyConfirmationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SafetyConfirmationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>[]
+          }
+          delete: {
+            args: Prisma.SafetyConfirmationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          update: {
+            args: Prisma.SafetyConfirmationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          deleteMany: {
+            args: Prisma.SafetyConfirmationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SafetyConfirmationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SafetyConfirmationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>[]
+          }
+          upsert: {
+            args: Prisma.SafetyConfirmationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafetyConfirmationPayload>
+          }
+          aggregate: {
+            args: Prisma.SafetyConfirmationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSafetyConfirmation>
+          }
+          groupBy: {
+            args: Prisma.SafetyConfirmationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SafetyConfirmationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SafetyConfirmationCountArgs<ExtArgs>
+            result: $Utils.Optional<SafetyConfirmationCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1267,6 +1459,8 @@ export namespace Prisma {
     verificationToken?: VerificationTokenOmit
     alert?: AlertOmit
     safetyGuide?: SafetyGuideOmit
+    emergencyRequest?: EmergencyRequestOmit
+    safetyConfirmation?: SafetyConfirmationOmit
   }
 
   /* Types for Logging */
@@ -1348,11 +1542,15 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     accounts: number
+    emergencyRequests: number
+    safetyConfirmations: number
     sessions: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+    emergencyRequests?: boolean | UserCountOutputTypeCountEmergencyRequestsArgs
+    safetyConfirmations?: boolean | UserCountOutputTypeCountSafetyConfirmationsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   }
 
@@ -1372,6 +1570,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AccountWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEmergencyRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmergencyRequestWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSafetyConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SafetyConfirmationWhereInput
   }
 
   /**
@@ -3648,6 +3860,8 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     role: $Enums.Role | null
+    phoneNumber: string | null
+    password: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -3657,6 +3871,8 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     role: $Enums.Role | null
+    phoneNumber: string | null
+    password: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -3666,6 +3882,8 @@ export namespace Prisma {
     emailVerified: number
     image: number
     role: number
+    phoneNumber: number
+    password: number
     _all: number
   }
 
@@ -3677,6 +3895,8 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     role?: true
+    phoneNumber?: true
+    password?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -3686,6 +3906,8 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     role?: true
+    phoneNumber?: true
+    password?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -3695,6 +3917,8 @@ export namespace Prisma {
     emailVerified?: true
     image?: true
     role?: true
+    phoneNumber?: true
+    password?: true
     _all?: true
   }
 
@@ -3777,6 +4001,8 @@ export namespace Prisma {
     emailVerified: Date | null
     image: string | null
     role: $Enums.Role
+    phoneNumber: string | null
+    password: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -3803,7 +4029,11 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     role?: boolean
+    phoneNumber?: boolean
+    password?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    emergencyRequests?: boolean | User$emergencyRequestsArgs<ExtArgs>
+    safetyConfirmations?: boolean | User$safetyConfirmationsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -3815,6 +4045,8 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     role?: boolean
+    phoneNumber?: boolean
+    password?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3824,6 +4056,8 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     role?: boolean
+    phoneNumber?: boolean
+    password?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -3833,11 +4067,15 @@ export namespace Prisma {
     emailVerified?: boolean
     image?: boolean
     role?: boolean
+    phoneNumber?: boolean
+    password?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "phoneNumber" | "password", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    emergencyRequests?: boolean | User$emergencyRequestsArgs<ExtArgs>
+    safetyConfirmations?: boolean | User$safetyConfirmationsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -3848,6 +4086,8 @@ export namespace Prisma {
     name: "User"
     objects: {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
+      emergencyRequests: Prisma.$EmergencyRequestPayload<ExtArgs>[]
+      safetyConfirmations: Prisma.$SafetyConfirmationPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3857,6 +4097,8 @@ export namespace Prisma {
       emailVerified: Date | null
       image: string | null
       role: $Enums.Role
+      phoneNumber: string | null
+      password: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -4252,6 +4494,8 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    emergencyRequests<T extends User$emergencyRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$emergencyRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    safetyConfirmations<T extends User$safetyConfirmationsArgs<ExtArgs> = {}>(args?: Subset<T, User$safetyConfirmationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4288,6 +4532,8 @@ export namespace Prisma {
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly image: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
+    readonly phoneNumber: FieldRef<"User", 'String'>
+    readonly password: FieldRef<"User", 'String'>
   }
     
 
@@ -4697,6 +4943,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
+  }
+
+  /**
+   * User.emergencyRequests
+   */
+  export type User$emergencyRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    where?: EmergencyRequestWhereInput
+    orderBy?: EmergencyRequestOrderByWithRelationInput | EmergencyRequestOrderByWithRelationInput[]
+    cursor?: EmergencyRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmergencyRequestScalarFieldEnum | EmergencyRequestScalarFieldEnum[]
+  }
+
+  /**
+   * User.safetyConfirmations
+   */
+  export type User$safetyConfirmationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    where?: SafetyConfirmationWhereInput
+    orderBy?: SafetyConfirmationOrderByWithRelationInput | SafetyConfirmationOrderByWithRelationInput[]
+    cursor?: SafetyConfirmationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SafetyConfirmationScalarFieldEnum | SafetyConfirmationScalarFieldEnum[]
   }
 
   /**
@@ -7702,6 +7996,2173 @@ export namespace Prisma {
 
 
   /**
+   * Model EmergencyRequest
+   */
+
+  export type AggregateEmergencyRequest = {
+    _count: EmergencyRequestCountAggregateOutputType | null
+    _avg: EmergencyRequestAvgAggregateOutputType | null
+    _sum: EmergencyRequestSumAggregateOutputType | null
+    _min: EmergencyRequestMinAggregateOutputType | null
+    _max: EmergencyRequestMaxAggregateOutputType | null
+  }
+
+  export type EmergencyRequestAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+  }
+
+  export type EmergencyRequestSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+  }
+
+  export type EmergencyRequestMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    phoneNumber: string | null
+    latitude: number | null
+    longitude: number | null
+    createdAt: Date | null
+    status: $Enums.EmergencyStatus | null
+  }
+
+  export type EmergencyRequestMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    phoneNumber: string | null
+    latitude: number | null
+    longitude: number | null
+    createdAt: Date | null
+    status: $Enums.EmergencyStatus | null
+  }
+
+  export type EmergencyRequestCountAggregateOutputType = {
+    id: number
+    userId: number
+    phoneNumber: number
+    latitude: number
+    longitude: number
+    createdAt: number
+    status: number
+    _all: number
+  }
+
+
+  export type EmergencyRequestAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+  }
+
+  export type EmergencyRequestSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+  }
+
+  export type EmergencyRequestMinAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    latitude?: true
+    longitude?: true
+    createdAt?: true
+    status?: true
+  }
+
+  export type EmergencyRequestMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    latitude?: true
+    longitude?: true
+    createdAt?: true
+    status?: true
+  }
+
+  export type EmergencyRequestCountAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    latitude?: true
+    longitude?: true
+    createdAt?: true
+    status?: true
+    _all?: true
+  }
+
+  export type EmergencyRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmergencyRequest to aggregate.
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyRequests to fetch.
+     */
+    orderBy?: EmergencyRequestOrderByWithRelationInput | EmergencyRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmergencyRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EmergencyRequests
+    **/
+    _count?: true | EmergencyRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EmergencyRequestAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EmergencyRequestSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmergencyRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmergencyRequestMaxAggregateInputType
+  }
+
+  export type GetEmergencyRequestAggregateType<T extends EmergencyRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmergencyRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmergencyRequest[P]>
+      : GetScalarType<T[P], AggregateEmergencyRequest[P]>
+  }
+
+
+
+
+  export type EmergencyRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmergencyRequestWhereInput
+    orderBy?: EmergencyRequestOrderByWithAggregationInput | EmergencyRequestOrderByWithAggregationInput[]
+    by: EmergencyRequestScalarFieldEnum[] | EmergencyRequestScalarFieldEnum
+    having?: EmergencyRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmergencyRequestCountAggregateInputType | true
+    _avg?: EmergencyRequestAvgAggregateInputType
+    _sum?: EmergencyRequestSumAggregateInputType
+    _min?: EmergencyRequestMinAggregateInputType
+    _max?: EmergencyRequestMaxAggregateInputType
+  }
+
+  export type EmergencyRequestGroupByOutputType = {
+    id: string
+    userId: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt: Date
+    status: $Enums.EmergencyStatus
+    _count: EmergencyRequestCountAggregateOutputType | null
+    _avg: EmergencyRequestAvgAggregateOutputType | null
+    _sum: EmergencyRequestSumAggregateOutputType | null
+    _min: EmergencyRequestMinAggregateOutputType | null
+    _max: EmergencyRequestMaxAggregateOutputType | null
+  }
+
+  type GetEmergencyRequestGroupByPayload<T extends EmergencyRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmergencyRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmergencyRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmergencyRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], EmergencyRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmergencyRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    createdAt?: boolean
+    status?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyRequest"]>
+
+  export type EmergencyRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    createdAt?: boolean
+    status?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyRequest"]>
+
+  export type EmergencyRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    createdAt?: boolean
+    status?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["emergencyRequest"]>
+
+  export type EmergencyRequestSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    createdAt?: boolean
+    status?: boolean
+  }
+
+  export type EmergencyRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "phoneNumber" | "latitude" | "longitude" | "createdAt" | "status", ExtArgs["result"]["emergencyRequest"]>
+  export type EmergencyRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EmergencyRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EmergencyRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $EmergencyRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EmergencyRequest"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      phoneNumber: string
+      latitude: number
+      longitude: number
+      createdAt: Date
+      status: $Enums.EmergencyStatus
+    }, ExtArgs["result"]["emergencyRequest"]>
+    composites: {}
+  }
+
+  type EmergencyRequestGetPayload<S extends boolean | null | undefined | EmergencyRequestDefaultArgs> = $Result.GetResult<Prisma.$EmergencyRequestPayload, S>
+
+  type EmergencyRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmergencyRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EmergencyRequestCountAggregateInputType | true
+    }
+
+  export interface EmergencyRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EmergencyRequest'], meta: { name: 'EmergencyRequest' } }
+    /**
+     * Find zero or one EmergencyRequest that matches the filter.
+     * @param {EmergencyRequestFindUniqueArgs} args - Arguments to find a EmergencyRequest
+     * @example
+     * // Get one EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmergencyRequestFindUniqueArgs>(args: SelectSubset<T, EmergencyRequestFindUniqueArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EmergencyRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EmergencyRequestFindUniqueOrThrowArgs} args - Arguments to find a EmergencyRequest
+     * @example
+     * // Get one EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmergencyRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, EmergencyRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmergencyRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestFindFirstArgs} args - Arguments to find a EmergencyRequest
+     * @example
+     * // Get one EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmergencyRequestFindFirstArgs>(args?: SelectSubset<T, EmergencyRequestFindFirstArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EmergencyRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestFindFirstOrThrowArgs} args - Arguments to find a EmergencyRequest
+     * @example
+     * // Get one EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmergencyRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, EmergencyRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EmergencyRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EmergencyRequests
+     * const emergencyRequests = await prisma.emergencyRequest.findMany()
+     * 
+     * // Get first 10 EmergencyRequests
+     * const emergencyRequests = await prisma.emergencyRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const emergencyRequestWithIdOnly = await prisma.emergencyRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EmergencyRequestFindManyArgs>(args?: SelectSubset<T, EmergencyRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EmergencyRequest.
+     * @param {EmergencyRequestCreateArgs} args - Arguments to create a EmergencyRequest.
+     * @example
+     * // Create one EmergencyRequest
+     * const EmergencyRequest = await prisma.emergencyRequest.create({
+     *   data: {
+     *     // ... data to create a EmergencyRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmergencyRequestCreateArgs>(args: SelectSubset<T, EmergencyRequestCreateArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EmergencyRequests.
+     * @param {EmergencyRequestCreateManyArgs} args - Arguments to create many EmergencyRequests.
+     * @example
+     * // Create many EmergencyRequests
+     * const emergencyRequest = await prisma.emergencyRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmergencyRequestCreateManyArgs>(args?: SelectSubset<T, EmergencyRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EmergencyRequests and returns the data saved in the database.
+     * @param {EmergencyRequestCreateManyAndReturnArgs} args - Arguments to create many EmergencyRequests.
+     * @example
+     * // Create many EmergencyRequests
+     * const emergencyRequest = await prisma.emergencyRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EmergencyRequests and only return the `id`
+     * const emergencyRequestWithIdOnly = await prisma.emergencyRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EmergencyRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, EmergencyRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EmergencyRequest.
+     * @param {EmergencyRequestDeleteArgs} args - Arguments to delete one EmergencyRequest.
+     * @example
+     * // Delete one EmergencyRequest
+     * const EmergencyRequest = await prisma.emergencyRequest.delete({
+     *   where: {
+     *     // ... filter to delete one EmergencyRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmergencyRequestDeleteArgs>(args: SelectSubset<T, EmergencyRequestDeleteArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EmergencyRequest.
+     * @param {EmergencyRequestUpdateArgs} args - Arguments to update one EmergencyRequest.
+     * @example
+     * // Update one EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmergencyRequestUpdateArgs>(args: SelectSubset<T, EmergencyRequestUpdateArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EmergencyRequests.
+     * @param {EmergencyRequestDeleteManyArgs} args - Arguments to filter EmergencyRequests to delete.
+     * @example
+     * // Delete a few EmergencyRequests
+     * const { count } = await prisma.emergencyRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmergencyRequestDeleteManyArgs>(args?: SelectSubset<T, EmergencyRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmergencyRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EmergencyRequests
+     * const emergencyRequest = await prisma.emergencyRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmergencyRequestUpdateManyArgs>(args: SelectSubset<T, EmergencyRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EmergencyRequests and returns the data updated in the database.
+     * @param {EmergencyRequestUpdateManyAndReturnArgs} args - Arguments to update many EmergencyRequests.
+     * @example
+     * // Update many EmergencyRequests
+     * const emergencyRequest = await prisma.emergencyRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EmergencyRequests and only return the `id`
+     * const emergencyRequestWithIdOnly = await prisma.emergencyRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EmergencyRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, EmergencyRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EmergencyRequest.
+     * @param {EmergencyRequestUpsertArgs} args - Arguments to update or create a EmergencyRequest.
+     * @example
+     * // Update or create a EmergencyRequest
+     * const emergencyRequest = await prisma.emergencyRequest.upsert({
+     *   create: {
+     *     // ... data to create a EmergencyRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EmergencyRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmergencyRequestUpsertArgs>(args: SelectSubset<T, EmergencyRequestUpsertArgs<ExtArgs>>): Prisma__EmergencyRequestClient<$Result.GetResult<Prisma.$EmergencyRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EmergencyRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestCountArgs} args - Arguments to filter EmergencyRequests to count.
+     * @example
+     * // Count the number of EmergencyRequests
+     * const count = await prisma.emergencyRequest.count({
+     *   where: {
+     *     // ... the filter for the EmergencyRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmergencyRequestCountArgs>(
+      args?: Subset<T, EmergencyRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmergencyRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EmergencyRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmergencyRequestAggregateArgs>(args: Subset<T, EmergencyRequestAggregateArgs>): Prisma.PrismaPromise<GetEmergencyRequestAggregateType<T>>
+
+    /**
+     * Group by EmergencyRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmergencyRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmergencyRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmergencyRequestGroupByArgs['orderBy'] }
+        : { orderBy?: EmergencyRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmergencyRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmergencyRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EmergencyRequest model
+   */
+  readonly fields: EmergencyRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EmergencyRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmergencyRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EmergencyRequest model
+   */
+  interface EmergencyRequestFieldRefs {
+    readonly id: FieldRef<"EmergencyRequest", 'String'>
+    readonly userId: FieldRef<"EmergencyRequest", 'String'>
+    readonly phoneNumber: FieldRef<"EmergencyRequest", 'String'>
+    readonly latitude: FieldRef<"EmergencyRequest", 'Float'>
+    readonly longitude: FieldRef<"EmergencyRequest", 'Float'>
+    readonly createdAt: FieldRef<"EmergencyRequest", 'DateTime'>
+    readonly status: FieldRef<"EmergencyRequest", 'EmergencyStatus'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EmergencyRequest findUnique
+   */
+  export type EmergencyRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyRequest to fetch.
+     */
+    where: EmergencyRequestWhereUniqueInput
+  }
+
+  /**
+   * EmergencyRequest findUniqueOrThrow
+   */
+  export type EmergencyRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyRequest to fetch.
+     */
+    where: EmergencyRequestWhereUniqueInput
+  }
+
+  /**
+   * EmergencyRequest findFirst
+   */
+  export type EmergencyRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyRequest to fetch.
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyRequests to fetch.
+     */
+    orderBy?: EmergencyRequestOrderByWithRelationInput | EmergencyRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmergencyRequests.
+     */
+    cursor?: EmergencyRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmergencyRequests.
+     */
+    distinct?: EmergencyRequestScalarFieldEnum | EmergencyRequestScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyRequest findFirstOrThrow
+   */
+  export type EmergencyRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyRequest to fetch.
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyRequests to fetch.
+     */
+    orderBy?: EmergencyRequestOrderByWithRelationInput | EmergencyRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EmergencyRequests.
+     */
+    cursor?: EmergencyRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EmergencyRequests.
+     */
+    distinct?: EmergencyRequestScalarFieldEnum | EmergencyRequestScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyRequest findMany
+   */
+  export type EmergencyRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter, which EmergencyRequests to fetch.
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EmergencyRequests to fetch.
+     */
+    orderBy?: EmergencyRequestOrderByWithRelationInput | EmergencyRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EmergencyRequests.
+     */
+    cursor?: EmergencyRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EmergencyRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EmergencyRequests.
+     */
+    skip?: number
+    distinct?: EmergencyRequestScalarFieldEnum | EmergencyRequestScalarFieldEnum[]
+  }
+
+  /**
+   * EmergencyRequest create
+   */
+  export type EmergencyRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EmergencyRequest.
+     */
+    data: XOR<EmergencyRequestCreateInput, EmergencyRequestUncheckedCreateInput>
+  }
+
+  /**
+   * EmergencyRequest createMany
+   */
+  export type EmergencyRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EmergencyRequests.
+     */
+    data: EmergencyRequestCreateManyInput | EmergencyRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EmergencyRequest createManyAndReturn
+   */
+  export type EmergencyRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many EmergencyRequests.
+     */
+    data: EmergencyRequestCreateManyInput | EmergencyRequestCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EmergencyRequest update
+   */
+  export type EmergencyRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EmergencyRequest.
+     */
+    data: XOR<EmergencyRequestUpdateInput, EmergencyRequestUncheckedUpdateInput>
+    /**
+     * Choose, which EmergencyRequest to update.
+     */
+    where: EmergencyRequestWhereUniqueInput
+  }
+
+  /**
+   * EmergencyRequest updateMany
+   */
+  export type EmergencyRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EmergencyRequests.
+     */
+    data: XOR<EmergencyRequestUpdateManyMutationInput, EmergencyRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which EmergencyRequests to update
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * Limit how many EmergencyRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmergencyRequest updateManyAndReturn
+   */
+  export type EmergencyRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update EmergencyRequests.
+     */
+    data: XOR<EmergencyRequestUpdateManyMutationInput, EmergencyRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which EmergencyRequests to update
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * Limit how many EmergencyRequests to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EmergencyRequest upsert
+   */
+  export type EmergencyRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EmergencyRequest to update in case it exists.
+     */
+    where: EmergencyRequestWhereUniqueInput
+    /**
+     * In case the EmergencyRequest found by the `where` argument doesn't exist, create a new EmergencyRequest with this data.
+     */
+    create: XOR<EmergencyRequestCreateInput, EmergencyRequestUncheckedCreateInput>
+    /**
+     * In case the EmergencyRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmergencyRequestUpdateInput, EmergencyRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * EmergencyRequest delete
+   */
+  export type EmergencyRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+    /**
+     * Filter which EmergencyRequest to delete.
+     */
+    where: EmergencyRequestWhereUniqueInput
+  }
+
+  /**
+   * EmergencyRequest deleteMany
+   */
+  export type EmergencyRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EmergencyRequests to delete
+     */
+    where?: EmergencyRequestWhereInput
+    /**
+     * Limit how many EmergencyRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EmergencyRequest without action
+   */
+  export type EmergencyRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EmergencyRequest
+     */
+    select?: EmergencyRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EmergencyRequest
+     */
+    omit?: EmergencyRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmergencyRequestInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SafetyConfirmation
+   */
+
+  export type AggregateSafetyConfirmation = {
+    _count: SafetyConfirmationCountAggregateOutputType | null
+    _min: SafetyConfirmationMinAggregateOutputType | null
+    _max: SafetyConfirmationMaxAggregateOutputType | null
+  }
+
+  export type SafetyConfirmationMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    phoneNumber: string | null
+    createdAt: Date | null
+  }
+
+  export type SafetyConfirmationMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    phoneNumber: string | null
+    createdAt: Date | null
+  }
+
+  export type SafetyConfirmationCountAggregateOutputType = {
+    id: number
+    userId: number
+    phoneNumber: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SafetyConfirmationMinAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    createdAt?: true
+  }
+
+  export type SafetyConfirmationMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    createdAt?: true
+  }
+
+  export type SafetyConfirmationCountAggregateInputType = {
+    id?: true
+    userId?: true
+    phoneNumber?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SafetyConfirmationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SafetyConfirmation to aggregate.
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafetyConfirmations to fetch.
+     */
+    orderBy?: SafetyConfirmationOrderByWithRelationInput | SafetyConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SafetyConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafetyConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafetyConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SafetyConfirmations
+    **/
+    _count?: true | SafetyConfirmationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SafetyConfirmationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SafetyConfirmationMaxAggregateInputType
+  }
+
+  export type GetSafetyConfirmationAggregateType<T extends SafetyConfirmationAggregateArgs> = {
+        [P in keyof T & keyof AggregateSafetyConfirmation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSafetyConfirmation[P]>
+      : GetScalarType<T[P], AggregateSafetyConfirmation[P]>
+  }
+
+
+
+
+  export type SafetyConfirmationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SafetyConfirmationWhereInput
+    orderBy?: SafetyConfirmationOrderByWithAggregationInput | SafetyConfirmationOrderByWithAggregationInput[]
+    by: SafetyConfirmationScalarFieldEnum[] | SafetyConfirmationScalarFieldEnum
+    having?: SafetyConfirmationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SafetyConfirmationCountAggregateInputType | true
+    _min?: SafetyConfirmationMinAggregateInputType
+    _max?: SafetyConfirmationMaxAggregateInputType
+  }
+
+  export type SafetyConfirmationGroupByOutputType = {
+    id: string
+    userId: string
+    phoneNumber: string
+    createdAt: Date
+    _count: SafetyConfirmationCountAggregateOutputType | null
+    _min: SafetyConfirmationMinAggregateOutputType | null
+    _max: SafetyConfirmationMaxAggregateOutputType | null
+  }
+
+  type GetSafetyConfirmationGroupByPayload<T extends SafetyConfirmationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SafetyConfirmationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SafetyConfirmationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SafetyConfirmationGroupByOutputType[P]>
+            : GetScalarType<T[P], SafetyConfirmationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SafetyConfirmationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safetyConfirmation"]>
+
+  export type SafetyConfirmationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safetyConfirmation"]>
+
+  export type SafetyConfirmationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safetyConfirmation"]>
+
+  export type SafetyConfirmationSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    phoneNumber?: boolean
+    createdAt?: boolean
+  }
+
+  export type SafetyConfirmationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "phoneNumber" | "createdAt", ExtArgs["result"]["safetyConfirmation"]>
+  export type SafetyConfirmationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SafetyConfirmationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SafetyConfirmationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SafetyConfirmationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SafetyConfirmation"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      phoneNumber: string
+      createdAt: Date
+    }, ExtArgs["result"]["safetyConfirmation"]>
+    composites: {}
+  }
+
+  type SafetyConfirmationGetPayload<S extends boolean | null | undefined | SafetyConfirmationDefaultArgs> = $Result.GetResult<Prisma.$SafetyConfirmationPayload, S>
+
+  type SafetyConfirmationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SafetyConfirmationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SafetyConfirmationCountAggregateInputType | true
+    }
+
+  export interface SafetyConfirmationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SafetyConfirmation'], meta: { name: 'SafetyConfirmation' } }
+    /**
+     * Find zero or one SafetyConfirmation that matches the filter.
+     * @param {SafetyConfirmationFindUniqueArgs} args - Arguments to find a SafetyConfirmation
+     * @example
+     * // Get one SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SafetyConfirmationFindUniqueArgs>(args: SelectSubset<T, SafetyConfirmationFindUniqueArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SafetyConfirmation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SafetyConfirmationFindUniqueOrThrowArgs} args - Arguments to find a SafetyConfirmation
+     * @example
+     * // Get one SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SafetyConfirmationFindUniqueOrThrowArgs>(args: SelectSubset<T, SafetyConfirmationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SafetyConfirmation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationFindFirstArgs} args - Arguments to find a SafetyConfirmation
+     * @example
+     * // Get one SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SafetyConfirmationFindFirstArgs>(args?: SelectSubset<T, SafetyConfirmationFindFirstArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SafetyConfirmation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationFindFirstOrThrowArgs} args - Arguments to find a SafetyConfirmation
+     * @example
+     * // Get one SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SafetyConfirmationFindFirstOrThrowArgs>(args?: SelectSubset<T, SafetyConfirmationFindFirstOrThrowArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SafetyConfirmations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SafetyConfirmations
+     * const safetyConfirmations = await prisma.safetyConfirmation.findMany()
+     * 
+     * // Get first 10 SafetyConfirmations
+     * const safetyConfirmations = await prisma.safetyConfirmation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const safetyConfirmationWithIdOnly = await prisma.safetyConfirmation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SafetyConfirmationFindManyArgs>(args?: SelectSubset<T, SafetyConfirmationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SafetyConfirmation.
+     * @param {SafetyConfirmationCreateArgs} args - Arguments to create a SafetyConfirmation.
+     * @example
+     * // Create one SafetyConfirmation
+     * const SafetyConfirmation = await prisma.safetyConfirmation.create({
+     *   data: {
+     *     // ... data to create a SafetyConfirmation
+     *   }
+     * })
+     * 
+     */
+    create<T extends SafetyConfirmationCreateArgs>(args: SelectSubset<T, SafetyConfirmationCreateArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SafetyConfirmations.
+     * @param {SafetyConfirmationCreateManyArgs} args - Arguments to create many SafetyConfirmations.
+     * @example
+     * // Create many SafetyConfirmations
+     * const safetyConfirmation = await prisma.safetyConfirmation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SafetyConfirmationCreateManyArgs>(args?: SelectSubset<T, SafetyConfirmationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SafetyConfirmations and returns the data saved in the database.
+     * @param {SafetyConfirmationCreateManyAndReturnArgs} args - Arguments to create many SafetyConfirmations.
+     * @example
+     * // Create many SafetyConfirmations
+     * const safetyConfirmation = await prisma.safetyConfirmation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SafetyConfirmations and only return the `id`
+     * const safetyConfirmationWithIdOnly = await prisma.safetyConfirmation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SafetyConfirmationCreateManyAndReturnArgs>(args?: SelectSubset<T, SafetyConfirmationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SafetyConfirmation.
+     * @param {SafetyConfirmationDeleteArgs} args - Arguments to delete one SafetyConfirmation.
+     * @example
+     * // Delete one SafetyConfirmation
+     * const SafetyConfirmation = await prisma.safetyConfirmation.delete({
+     *   where: {
+     *     // ... filter to delete one SafetyConfirmation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SafetyConfirmationDeleteArgs>(args: SelectSubset<T, SafetyConfirmationDeleteArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SafetyConfirmation.
+     * @param {SafetyConfirmationUpdateArgs} args - Arguments to update one SafetyConfirmation.
+     * @example
+     * // Update one SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SafetyConfirmationUpdateArgs>(args: SelectSubset<T, SafetyConfirmationUpdateArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SafetyConfirmations.
+     * @param {SafetyConfirmationDeleteManyArgs} args - Arguments to filter SafetyConfirmations to delete.
+     * @example
+     * // Delete a few SafetyConfirmations
+     * const { count } = await prisma.safetyConfirmation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SafetyConfirmationDeleteManyArgs>(args?: SelectSubset<T, SafetyConfirmationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SafetyConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SafetyConfirmations
+     * const safetyConfirmation = await prisma.safetyConfirmation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SafetyConfirmationUpdateManyArgs>(args: SelectSubset<T, SafetyConfirmationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SafetyConfirmations and returns the data updated in the database.
+     * @param {SafetyConfirmationUpdateManyAndReturnArgs} args - Arguments to update many SafetyConfirmations.
+     * @example
+     * // Update many SafetyConfirmations
+     * const safetyConfirmation = await prisma.safetyConfirmation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SafetyConfirmations and only return the `id`
+     * const safetyConfirmationWithIdOnly = await prisma.safetyConfirmation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SafetyConfirmationUpdateManyAndReturnArgs>(args: SelectSubset<T, SafetyConfirmationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SafetyConfirmation.
+     * @param {SafetyConfirmationUpsertArgs} args - Arguments to update or create a SafetyConfirmation.
+     * @example
+     * // Update or create a SafetyConfirmation
+     * const safetyConfirmation = await prisma.safetyConfirmation.upsert({
+     *   create: {
+     *     // ... data to create a SafetyConfirmation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SafetyConfirmation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SafetyConfirmationUpsertArgs>(args: SelectSubset<T, SafetyConfirmationUpsertArgs<ExtArgs>>): Prisma__SafetyConfirmationClient<$Result.GetResult<Prisma.$SafetyConfirmationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SafetyConfirmations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationCountArgs} args - Arguments to filter SafetyConfirmations to count.
+     * @example
+     * // Count the number of SafetyConfirmations
+     * const count = await prisma.safetyConfirmation.count({
+     *   where: {
+     *     // ... the filter for the SafetyConfirmations we want to count
+     *   }
+     * })
+    **/
+    count<T extends SafetyConfirmationCountArgs>(
+      args?: Subset<T, SafetyConfirmationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SafetyConfirmationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SafetyConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SafetyConfirmationAggregateArgs>(args: Subset<T, SafetyConfirmationAggregateArgs>): Prisma.PrismaPromise<GetSafetyConfirmationAggregateType<T>>
+
+    /**
+     * Group by SafetyConfirmation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafetyConfirmationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SafetyConfirmationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SafetyConfirmationGroupByArgs['orderBy'] }
+        : { orderBy?: SafetyConfirmationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SafetyConfirmationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSafetyConfirmationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SafetyConfirmation model
+   */
+  readonly fields: SafetyConfirmationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SafetyConfirmation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SafetyConfirmationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SafetyConfirmation model
+   */
+  interface SafetyConfirmationFieldRefs {
+    readonly id: FieldRef<"SafetyConfirmation", 'String'>
+    readonly userId: FieldRef<"SafetyConfirmation", 'String'>
+    readonly phoneNumber: FieldRef<"SafetyConfirmation", 'String'>
+    readonly createdAt: FieldRef<"SafetyConfirmation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SafetyConfirmation findUnique
+   */
+  export type SafetyConfirmationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which SafetyConfirmation to fetch.
+     */
+    where: SafetyConfirmationWhereUniqueInput
+  }
+
+  /**
+   * SafetyConfirmation findUniqueOrThrow
+   */
+  export type SafetyConfirmationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which SafetyConfirmation to fetch.
+     */
+    where: SafetyConfirmationWhereUniqueInput
+  }
+
+  /**
+   * SafetyConfirmation findFirst
+   */
+  export type SafetyConfirmationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which SafetyConfirmation to fetch.
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafetyConfirmations to fetch.
+     */
+    orderBy?: SafetyConfirmationOrderByWithRelationInput | SafetyConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SafetyConfirmations.
+     */
+    cursor?: SafetyConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafetyConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafetyConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SafetyConfirmations.
+     */
+    distinct?: SafetyConfirmationScalarFieldEnum | SafetyConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * SafetyConfirmation findFirstOrThrow
+   */
+  export type SafetyConfirmationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which SafetyConfirmation to fetch.
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafetyConfirmations to fetch.
+     */
+    orderBy?: SafetyConfirmationOrderByWithRelationInput | SafetyConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SafetyConfirmations.
+     */
+    cursor?: SafetyConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafetyConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafetyConfirmations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SafetyConfirmations.
+     */
+    distinct?: SafetyConfirmationScalarFieldEnum | SafetyConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * SafetyConfirmation findMany
+   */
+  export type SafetyConfirmationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter, which SafetyConfirmations to fetch.
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafetyConfirmations to fetch.
+     */
+    orderBy?: SafetyConfirmationOrderByWithRelationInput | SafetyConfirmationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SafetyConfirmations.
+     */
+    cursor?: SafetyConfirmationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafetyConfirmations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafetyConfirmations.
+     */
+    skip?: number
+    distinct?: SafetyConfirmationScalarFieldEnum | SafetyConfirmationScalarFieldEnum[]
+  }
+
+  /**
+   * SafetyConfirmation create
+   */
+  export type SafetyConfirmationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SafetyConfirmation.
+     */
+    data: XOR<SafetyConfirmationCreateInput, SafetyConfirmationUncheckedCreateInput>
+  }
+
+  /**
+   * SafetyConfirmation createMany
+   */
+  export type SafetyConfirmationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SafetyConfirmations.
+     */
+    data: SafetyConfirmationCreateManyInput | SafetyConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SafetyConfirmation createManyAndReturn
+   */
+  export type SafetyConfirmationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to create many SafetyConfirmations.
+     */
+    data: SafetyConfirmationCreateManyInput | SafetyConfirmationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SafetyConfirmation update
+   */
+  export type SafetyConfirmationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SafetyConfirmation.
+     */
+    data: XOR<SafetyConfirmationUpdateInput, SafetyConfirmationUncheckedUpdateInput>
+    /**
+     * Choose, which SafetyConfirmation to update.
+     */
+    where: SafetyConfirmationWhereUniqueInput
+  }
+
+  /**
+   * SafetyConfirmation updateMany
+   */
+  export type SafetyConfirmationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SafetyConfirmations.
+     */
+    data: XOR<SafetyConfirmationUpdateManyMutationInput, SafetyConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which SafetyConfirmations to update
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * Limit how many SafetyConfirmations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SafetyConfirmation updateManyAndReturn
+   */
+  export type SafetyConfirmationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * The data used to update SafetyConfirmations.
+     */
+    data: XOR<SafetyConfirmationUpdateManyMutationInput, SafetyConfirmationUncheckedUpdateManyInput>
+    /**
+     * Filter which SafetyConfirmations to update
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * Limit how many SafetyConfirmations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SafetyConfirmation upsert
+   */
+  export type SafetyConfirmationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SafetyConfirmation to update in case it exists.
+     */
+    where: SafetyConfirmationWhereUniqueInput
+    /**
+     * In case the SafetyConfirmation found by the `where` argument doesn't exist, create a new SafetyConfirmation with this data.
+     */
+    create: XOR<SafetyConfirmationCreateInput, SafetyConfirmationUncheckedCreateInput>
+    /**
+     * In case the SafetyConfirmation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SafetyConfirmationUpdateInput, SafetyConfirmationUncheckedUpdateInput>
+  }
+
+  /**
+   * SafetyConfirmation delete
+   */
+  export type SafetyConfirmationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+    /**
+     * Filter which SafetyConfirmation to delete.
+     */
+    where: SafetyConfirmationWhereUniqueInput
+  }
+
+  /**
+   * SafetyConfirmation deleteMany
+   */
+  export type SafetyConfirmationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SafetyConfirmations to delete
+     */
+    where?: SafetyConfirmationWhereInput
+    /**
+     * Limit how many SafetyConfirmations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SafetyConfirmation without action
+   */
+  export type SafetyConfirmationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafetyConfirmation
+     */
+    select?: SafetyConfirmationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafetyConfirmation
+     */
+    omit?: SafetyConfirmationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafetyConfirmationInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -7750,7 +10211,9 @@ export namespace Prisma {
     email: 'email',
     emailVerified: 'emailVerified',
     image: 'image',
-    role: 'role'
+    role: 'role',
+    phoneNumber: 'phoneNumber',
+    password: 'password'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -7785,6 +10248,29 @@ export namespace Prisma {
   };
 
   export type SafetyGuideScalarFieldEnum = (typeof SafetyGuideScalarFieldEnum)[keyof typeof SafetyGuideScalarFieldEnum]
+
+
+  export const EmergencyRequestScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    phoneNumber: 'phoneNumber',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    createdAt: 'createdAt',
+    status: 'status'
+  };
+
+  export type EmergencyRequestScalarFieldEnum = (typeof EmergencyRequestScalarFieldEnum)[keyof typeof EmergencyRequestScalarFieldEnum]
+
+
+  export const SafetyConfirmationScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    phoneNumber: 'phoneNumber',
+    createdAt: 'createdAt'
+  };
+
+  export type SafetyConfirmationScalarFieldEnum = (typeof SafetyConfirmationScalarFieldEnum)[keyof typeof SafetyConfirmationScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -7897,6 +10383,20 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmergencyStatus'
+   */
+  export type EnumEmergencyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmergencyStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmergencyStatus[]'
+   */
+  export type ListEnumEmergencyStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmergencyStatus[]'>
     
   /**
    * Deep Input Types
@@ -8061,7 +10561,11 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
+    phoneNumber?: StringNullableFilter<"User"> | string | null
+    password?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
+    emergencyRequests?: EmergencyRequestListRelationFilter
+    safetyConfirmations?: SafetyConfirmationListRelationFilter
     sessions?: SessionListRelationFilter
   }
 
@@ -8072,7 +10576,11 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     role?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
+    password?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
+    emergencyRequests?: EmergencyRequestOrderByRelationAggregateInput
+    safetyConfirmations?: SafetyConfirmationOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
   }
 
@@ -8086,7 +10594,11 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
+    phoneNumber?: StringNullableFilter<"User"> | string | null
+    password?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
+    emergencyRequests?: EmergencyRequestListRelationFilter
+    safetyConfirmations?: SafetyConfirmationListRelationFilter
     sessions?: SessionListRelationFilter
   }, "id" | "email">
 
@@ -8097,6 +10609,8 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     role?: SortOrder
+    phoneNumber?: SortOrderInput | SortOrder
+    password?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -8112,6 +10626,8 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
+    phoneNumber?: StringNullableWithAggregatesFilter<"User"> | string | null
+    password?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type VerificationTokenWhereInput = {
@@ -8259,6 +10775,123 @@ export namespace Prisma {
     content?: StringWithAggregatesFilter<"SafetyGuide"> | string
     createdAt?: DateTimeWithAggregatesFilter<"SafetyGuide"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SafetyGuide"> | Date | string
+  }
+
+  export type EmergencyRequestWhereInput = {
+    AND?: EmergencyRequestWhereInput | EmergencyRequestWhereInput[]
+    OR?: EmergencyRequestWhereInput[]
+    NOT?: EmergencyRequestWhereInput | EmergencyRequestWhereInput[]
+    id?: StringFilter<"EmergencyRequest"> | string
+    userId?: StringFilter<"EmergencyRequest"> | string
+    phoneNumber?: StringFilter<"EmergencyRequest"> | string
+    latitude?: FloatFilter<"EmergencyRequest"> | number
+    longitude?: FloatFilter<"EmergencyRequest"> | number
+    createdAt?: DateTimeFilter<"EmergencyRequest"> | Date | string
+    status?: EnumEmergencyStatusFilter<"EmergencyRequest"> | $Enums.EmergencyStatus
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type EmergencyRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    createdAt?: SortOrder
+    status?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type EmergencyRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EmergencyRequestWhereInput | EmergencyRequestWhereInput[]
+    OR?: EmergencyRequestWhereInput[]
+    NOT?: EmergencyRequestWhereInput | EmergencyRequestWhereInput[]
+    userId?: StringFilter<"EmergencyRequest"> | string
+    phoneNumber?: StringFilter<"EmergencyRequest"> | string
+    latitude?: FloatFilter<"EmergencyRequest"> | number
+    longitude?: FloatFilter<"EmergencyRequest"> | number
+    createdAt?: DateTimeFilter<"EmergencyRequest"> | Date | string
+    status?: EnumEmergencyStatusFilter<"EmergencyRequest"> | $Enums.EmergencyStatus
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type EmergencyRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    createdAt?: SortOrder
+    status?: SortOrder
+    _count?: EmergencyRequestCountOrderByAggregateInput
+    _avg?: EmergencyRequestAvgOrderByAggregateInput
+    _max?: EmergencyRequestMaxOrderByAggregateInput
+    _min?: EmergencyRequestMinOrderByAggregateInput
+    _sum?: EmergencyRequestSumOrderByAggregateInput
+  }
+
+  export type EmergencyRequestScalarWhereWithAggregatesInput = {
+    AND?: EmergencyRequestScalarWhereWithAggregatesInput | EmergencyRequestScalarWhereWithAggregatesInput[]
+    OR?: EmergencyRequestScalarWhereWithAggregatesInput[]
+    NOT?: EmergencyRequestScalarWhereWithAggregatesInput | EmergencyRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EmergencyRequest"> | string
+    userId?: StringWithAggregatesFilter<"EmergencyRequest"> | string
+    phoneNumber?: StringWithAggregatesFilter<"EmergencyRequest"> | string
+    latitude?: FloatWithAggregatesFilter<"EmergencyRequest"> | number
+    longitude?: FloatWithAggregatesFilter<"EmergencyRequest"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"EmergencyRequest"> | Date | string
+    status?: EnumEmergencyStatusWithAggregatesFilter<"EmergencyRequest"> | $Enums.EmergencyStatus
+  }
+
+  export type SafetyConfirmationWhereInput = {
+    AND?: SafetyConfirmationWhereInput | SafetyConfirmationWhereInput[]
+    OR?: SafetyConfirmationWhereInput[]
+    NOT?: SafetyConfirmationWhereInput | SafetyConfirmationWhereInput[]
+    id?: StringFilter<"SafetyConfirmation"> | string
+    userId?: StringFilter<"SafetyConfirmation"> | string
+    phoneNumber?: StringFilter<"SafetyConfirmation"> | string
+    createdAt?: DateTimeFilter<"SafetyConfirmation"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SafetyConfirmationOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SafetyConfirmationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SafetyConfirmationWhereInput | SafetyConfirmationWhereInput[]
+    OR?: SafetyConfirmationWhereInput[]
+    NOT?: SafetyConfirmationWhereInput | SafetyConfirmationWhereInput[]
+    userId?: StringFilter<"SafetyConfirmation"> | string
+    phoneNumber?: StringFilter<"SafetyConfirmation"> | string
+    createdAt?: DateTimeFilter<"SafetyConfirmation"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type SafetyConfirmationOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    createdAt?: SortOrder
+    _count?: SafetyConfirmationCountOrderByAggregateInput
+    _max?: SafetyConfirmationMaxOrderByAggregateInput
+    _min?: SafetyConfirmationMinOrderByAggregateInput
+  }
+
+  export type SafetyConfirmationScalarWhereWithAggregatesInput = {
+    AND?: SafetyConfirmationScalarWhereWithAggregatesInput | SafetyConfirmationScalarWhereWithAggregatesInput[]
+    OR?: SafetyConfirmationScalarWhereWithAggregatesInput[]
+    NOT?: SafetyConfirmationScalarWhereWithAggregatesInput | SafetyConfirmationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SafetyConfirmation"> | string
+    userId?: StringWithAggregatesFilter<"SafetyConfirmation"> | string
+    phoneNumber?: StringWithAggregatesFilter<"SafetyConfirmation"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SafetyConfirmation"> | Date | string
   }
 
   export type AccountCreateInput = {
@@ -8427,7 +11060,11 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -8438,7 +11075,11 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -8449,7 +11090,11 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -8460,7 +11105,11 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -8471,6 +11120,8 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -8480,6 +11131,8 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -8489,6 +11142,8 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VerificationTokenCreateInput = {
@@ -8643,6 +11298,123 @@ export namespace Prisma {
     content?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmergencyRequestCreateInput = {
+    id?: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+    user: UserCreateNestedOneWithoutEmergencyRequestsInput
+  }
+
+  export type EmergencyRequestUncheckedCreateInput = {
+    id?: string
+    userId: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+    user?: UserUpdateOneRequiredWithoutEmergencyRequestsNestedInput
+  }
+
+  export type EmergencyRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestCreateManyInput = {
+    id?: string
+    userId: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type SafetyConfirmationCreateInput = {
+    id?: string
+    phoneNumber: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutSafetyConfirmationsInput
+  }
+
+  export type SafetyConfirmationUncheckedCreateInput = {
+    id?: string
+    userId: string
+    phoneNumber: string
+    createdAt?: Date | string
+  }
+
+  export type SafetyConfirmationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSafetyConfirmationsNestedInput
+  }
+
+  export type SafetyConfirmationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafetyConfirmationCreateManyInput = {
+    id?: string
+    userId: string
+    phoneNumber: string
+    createdAt?: Date | string
+  }
+
+  export type SafetyConfirmationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafetyConfirmationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -8881,6 +11653,18 @@ export namespace Prisma {
     none?: AccountWhereInput
   }
 
+  export type EmergencyRequestListRelationFilter = {
+    every?: EmergencyRequestWhereInput
+    some?: EmergencyRequestWhereInput
+    none?: EmergencyRequestWhereInput
+  }
+
+  export type SafetyConfirmationListRelationFilter = {
+    every?: SafetyConfirmationWhereInput
+    some?: SafetyConfirmationWhereInput
+    none?: SafetyConfirmationWhereInput
+  }
+
   export type SessionListRelationFilter = {
     every?: SessionWhereInput
     some?: SessionWhereInput
@@ -8888,6 +11672,14 @@ export namespace Prisma {
   }
 
   export type AccountOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EmergencyRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SafetyConfirmationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -8902,6 +11694,8 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     role?: SortOrder
+    phoneNumber?: SortOrder
+    password?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -8911,6 +11705,8 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     role?: SortOrder
+    phoneNumber?: SortOrder
+    password?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -8920,6 +11716,8 @@ export namespace Prisma {
     emailVerified?: SortOrder
     image?: SortOrder
     role?: SortOrder
+    phoneNumber?: SortOrder
+    password?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -9034,6 +11832,111 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type EnumEmergencyStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmergencyStatusFilter<$PrismaModel> | $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    createdAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type EmergencyRequestAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+  }
+
+  export type EmergencyRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    createdAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type EmergencyRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    createdAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type EmergencyRequestSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type EnumEmergencyStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmergencyStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmergencyStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmergencyStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmergencyStatusFilter<$PrismaModel>
+  }
+
+  export type SafetyConfirmationCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SafetyConfirmationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SafetyConfirmationMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    phoneNumber?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
@@ -9089,6 +11992,20 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
+  export type EmergencyRequestCreateNestedManyWithoutUserInput = {
+    create?: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput> | EmergencyRequestCreateWithoutUserInput[] | EmergencyRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EmergencyRequestCreateOrConnectWithoutUserInput | EmergencyRequestCreateOrConnectWithoutUserInput[]
+    createMany?: EmergencyRequestCreateManyUserInputEnvelope
+    connect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+  }
+
+  export type SafetyConfirmationCreateNestedManyWithoutUserInput = {
+    create?: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput> | SafetyConfirmationCreateWithoutUserInput[] | SafetyConfirmationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SafetyConfirmationCreateOrConnectWithoutUserInput | SafetyConfirmationCreateOrConnectWithoutUserInput[]
+    createMany?: SafetyConfirmationCreateManyUserInputEnvelope
+    connect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -9101,6 +12018,20 @@ export namespace Prisma {
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
     createMany?: AccountCreateManyUserInputEnvelope
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  }
+
+  export type EmergencyRequestUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput> | EmergencyRequestCreateWithoutUserInput[] | EmergencyRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EmergencyRequestCreateOrConnectWithoutUserInput | EmergencyRequestCreateOrConnectWithoutUserInput[]
+    createMany?: EmergencyRequestCreateManyUserInputEnvelope
+    connect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+  }
+
+  export type SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput> | SafetyConfirmationCreateWithoutUserInput[] | SafetyConfirmationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SafetyConfirmationCreateOrConnectWithoutUserInput | SafetyConfirmationCreateOrConnectWithoutUserInput[]
+    createMany?: SafetyConfirmationCreateManyUserInputEnvelope
+    connect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
   }
 
   export type SessionUncheckedCreateNestedManyWithoutUserInput = {
@@ -9132,6 +12063,34 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type EmergencyRequestUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput> | EmergencyRequestCreateWithoutUserInput[] | EmergencyRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EmergencyRequestCreateOrConnectWithoutUserInput | EmergencyRequestCreateOrConnectWithoutUserInput[]
+    upsert?: EmergencyRequestUpsertWithWhereUniqueWithoutUserInput | EmergencyRequestUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EmergencyRequestCreateManyUserInputEnvelope
+    set?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    disconnect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    delete?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    connect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    update?: EmergencyRequestUpdateWithWhereUniqueWithoutUserInput | EmergencyRequestUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EmergencyRequestUpdateManyWithWhereWithoutUserInput | EmergencyRequestUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EmergencyRequestScalarWhereInput | EmergencyRequestScalarWhereInput[]
+  }
+
+  export type SafetyConfirmationUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput> | SafetyConfirmationCreateWithoutUserInput[] | SafetyConfirmationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SafetyConfirmationCreateOrConnectWithoutUserInput | SafetyConfirmationCreateOrConnectWithoutUserInput[]
+    upsert?: SafetyConfirmationUpsertWithWhereUniqueWithoutUserInput | SafetyConfirmationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SafetyConfirmationCreateManyUserInputEnvelope
+    set?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    disconnect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    delete?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    connect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    update?: SafetyConfirmationUpdateWithWhereUniqueWithoutUserInput | SafetyConfirmationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SafetyConfirmationUpdateManyWithWhereWithoutUserInput | SafetyConfirmationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SafetyConfirmationScalarWhereInput | SafetyConfirmationScalarWhereInput[]
+  }
+
   export type SessionUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -9160,6 +12119,34 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput> | EmergencyRequestCreateWithoutUserInput[] | EmergencyRequestUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EmergencyRequestCreateOrConnectWithoutUserInput | EmergencyRequestCreateOrConnectWithoutUserInput[]
+    upsert?: EmergencyRequestUpsertWithWhereUniqueWithoutUserInput | EmergencyRequestUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EmergencyRequestCreateManyUserInputEnvelope
+    set?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    disconnect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    delete?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    connect?: EmergencyRequestWhereUniqueInput | EmergencyRequestWhereUniqueInput[]
+    update?: EmergencyRequestUpdateWithWhereUniqueWithoutUserInput | EmergencyRequestUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EmergencyRequestUpdateManyWithWhereWithoutUserInput | EmergencyRequestUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EmergencyRequestScalarWhereInput | EmergencyRequestScalarWhereInput[]
+  }
+
+  export type SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput> | SafetyConfirmationCreateWithoutUserInput[] | SafetyConfirmationUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SafetyConfirmationCreateOrConnectWithoutUserInput | SafetyConfirmationCreateOrConnectWithoutUserInput[]
+    upsert?: SafetyConfirmationUpsertWithWhereUniqueWithoutUserInput | SafetyConfirmationUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SafetyConfirmationCreateManyUserInputEnvelope
+    set?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    disconnect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    delete?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    connect?: SafetyConfirmationWhereUniqueInput | SafetyConfirmationWhereUniqueInput[]
+    update?: SafetyConfirmationUpdateWithWhereUniqueWithoutUserInput | SafetyConfirmationUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SafetyConfirmationUpdateManyWithWhereWithoutUserInput | SafetyConfirmationUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SafetyConfirmationScalarWhereInput | SafetyConfirmationScalarWhereInput[]
+  }
+
   export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -9176,6 +12163,46 @@ export namespace Prisma {
 
   export type EnumDisasterTypeFieldUpdateOperationsInput = {
     set?: $Enums.DisasterType
+  }
+
+  export type UserCreateNestedOneWithoutEmergencyRequestsInput = {
+    create?: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEmergencyRequestsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type EnumEmergencyStatusFieldUpdateOperationsInput = {
+    set?: $Enums.EmergencyStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutEmergencyRequestsNestedInput = {
+    create?: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEmergencyRequestsInput
+    upsert?: UserUpsertWithoutEmergencyRequestsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEmergencyRequestsInput, UserUpdateWithoutEmergencyRequestsInput>, UserUncheckedUpdateWithoutEmergencyRequestsInput>
+  }
+
+  export type UserCreateNestedOneWithoutSafetyConfirmationsInput = {
+    create?: XOR<UserCreateWithoutSafetyConfirmationsInput, UserUncheckedCreateWithoutSafetyConfirmationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSafetyConfirmationsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSafetyConfirmationsNestedInput = {
+    create?: XOR<UserCreateWithoutSafetyConfirmationsInput, UserUncheckedCreateWithoutSafetyConfirmationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSafetyConfirmationsInput
+    upsert?: UserUpsertWithoutSafetyConfirmationsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSafetyConfirmationsInput, UserUpdateWithoutSafetyConfirmationsInput>, UserUncheckedUpdateWithoutSafetyConfirmationsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -9373,6 +12400,50 @@ export namespace Prisma {
     _max?: NestedEnumDisasterTypeFilter<$PrismaModel>
   }
 
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumEmergencyStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmergencyStatusFilter<$PrismaModel> | $Enums.EmergencyStatus
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEmergencyStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmergencyStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmergencyStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmergencyStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmergencyStatusFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -9380,6 +12451,10 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -9390,6 +12465,10 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -9416,6 +12495,10 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -9426,6 +12509,10 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -9436,7 +12523,11 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -9446,7 +12537,11 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     image?: string | null
     role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -9472,7 +12567,11 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -9482,7 +12581,11 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -9522,6 +12625,56 @@ export namespace Prisma {
 
   export type AccountCreateManyUserInputEnvelope = {
     data: AccountCreateManyUserInput | AccountCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EmergencyRequestCreateWithoutUserInput = {
+    id?: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUncheckedCreateWithoutUserInput = {
+    id?: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestCreateOrConnectWithoutUserInput = {
+    where: EmergencyRequestWhereUniqueInput
+    create: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput>
+  }
+
+  export type EmergencyRequestCreateManyUserInputEnvelope = {
+    data: EmergencyRequestCreateManyUserInput | EmergencyRequestCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SafetyConfirmationCreateWithoutUserInput = {
+    id?: string
+    phoneNumber: string
+    createdAt?: Date | string
+  }
+
+  export type SafetyConfirmationUncheckedCreateWithoutUserInput = {
+    id?: string
+    phoneNumber: string
+    createdAt?: Date | string
+  }
+
+  export type SafetyConfirmationCreateOrConnectWithoutUserInput = {
+    where: SafetyConfirmationWhereUniqueInput
+    create: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput>
+  }
+
+  export type SafetyConfirmationCreateManyUserInputEnvelope = {
+    data: SafetyConfirmationCreateManyUserInput | SafetyConfirmationCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -9582,6 +12735,61 @@ export namespace Prisma {
     refresh_token_expires_in?: IntNullableFilter<"Account"> | number | null
   }
 
+  export type EmergencyRequestUpsertWithWhereUniqueWithoutUserInput = {
+    where: EmergencyRequestWhereUniqueInput
+    update: XOR<EmergencyRequestUpdateWithoutUserInput, EmergencyRequestUncheckedUpdateWithoutUserInput>
+    create: XOR<EmergencyRequestCreateWithoutUserInput, EmergencyRequestUncheckedCreateWithoutUserInput>
+  }
+
+  export type EmergencyRequestUpdateWithWhereUniqueWithoutUserInput = {
+    where: EmergencyRequestWhereUniqueInput
+    data: XOR<EmergencyRequestUpdateWithoutUserInput, EmergencyRequestUncheckedUpdateWithoutUserInput>
+  }
+
+  export type EmergencyRequestUpdateManyWithWhereWithoutUserInput = {
+    where: EmergencyRequestScalarWhereInput
+    data: XOR<EmergencyRequestUpdateManyMutationInput, EmergencyRequestUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type EmergencyRequestScalarWhereInput = {
+    AND?: EmergencyRequestScalarWhereInput | EmergencyRequestScalarWhereInput[]
+    OR?: EmergencyRequestScalarWhereInput[]
+    NOT?: EmergencyRequestScalarWhereInput | EmergencyRequestScalarWhereInput[]
+    id?: StringFilter<"EmergencyRequest"> | string
+    userId?: StringFilter<"EmergencyRequest"> | string
+    phoneNumber?: StringFilter<"EmergencyRequest"> | string
+    latitude?: FloatFilter<"EmergencyRequest"> | number
+    longitude?: FloatFilter<"EmergencyRequest"> | number
+    createdAt?: DateTimeFilter<"EmergencyRequest"> | Date | string
+    status?: EnumEmergencyStatusFilter<"EmergencyRequest"> | $Enums.EmergencyStatus
+  }
+
+  export type SafetyConfirmationUpsertWithWhereUniqueWithoutUserInput = {
+    where: SafetyConfirmationWhereUniqueInput
+    update: XOR<SafetyConfirmationUpdateWithoutUserInput, SafetyConfirmationUncheckedUpdateWithoutUserInput>
+    create: XOR<SafetyConfirmationCreateWithoutUserInput, SafetyConfirmationUncheckedCreateWithoutUserInput>
+  }
+
+  export type SafetyConfirmationUpdateWithWhereUniqueWithoutUserInput = {
+    where: SafetyConfirmationWhereUniqueInput
+    data: XOR<SafetyConfirmationUpdateWithoutUserInput, SafetyConfirmationUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SafetyConfirmationUpdateManyWithWhereWithoutUserInput = {
+    where: SafetyConfirmationScalarWhereInput
+    data: XOR<SafetyConfirmationUpdateManyMutationInput, SafetyConfirmationUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SafetyConfirmationScalarWhereInput = {
+    AND?: SafetyConfirmationScalarWhereInput | SafetyConfirmationScalarWhereInput[]
+    OR?: SafetyConfirmationScalarWhereInput[]
+    NOT?: SafetyConfirmationScalarWhereInput | SafetyConfirmationScalarWhereInput[]
+    id?: StringFilter<"SafetyConfirmation"> | string
+    userId?: StringFilter<"SafetyConfirmation"> | string
+    phoneNumber?: StringFilter<"SafetyConfirmation"> | string
+    createdAt?: DateTimeFilter<"SafetyConfirmation"> | Date | string
+  }
+
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
     where: SessionWhereUniqueInput
     update: XOR<SessionUpdateWithoutUserInput, SessionUncheckedUpdateWithoutUserInput>
@@ -9608,6 +12816,150 @@ export namespace Prisma {
     expires?: DateTimeFilter<"Session"> | Date | string
   }
 
+  export type UserCreateWithoutEmergencyRequestsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEmergencyRequestsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEmergencyRequestsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
+  }
+
+  export type UserUpsertWithoutEmergencyRequestsInput = {
+    update: XOR<UserUpdateWithoutEmergencyRequestsInput, UserUncheckedUpdateWithoutEmergencyRequestsInput>
+    create: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEmergencyRequestsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEmergencyRequestsInput, UserUncheckedUpdateWithoutEmergencyRequestsInput>
+  }
+
+  export type UserUpdateWithoutEmergencyRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEmergencyRequestsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSafetyConfirmationsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSafetyConfirmationsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSafetyConfirmationsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSafetyConfirmationsInput, UserUncheckedCreateWithoutSafetyConfirmationsInput>
+  }
+
+  export type UserUpsertWithoutSafetyConfirmationsInput = {
+    update: XOR<UserUpdateWithoutSafetyConfirmationsInput, UserUncheckedUpdateWithoutSafetyConfirmationsInput>
+    create: XOR<UserCreateWithoutSafetyConfirmationsInput, UserUncheckedCreateWithoutSafetyConfirmationsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSafetyConfirmationsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSafetyConfirmationsInput, UserUncheckedUpdateWithoutSafetyConfirmationsInput>
+  }
+
+  export type UserUpdateWithoutSafetyConfirmationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSafetyConfirmationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type AccountCreateManyUserInput = {
     id?: string
     type: string
@@ -9621,6 +12973,21 @@ export namespace Prisma {
     id_token?: string | null
     session_state?: string | null
     refresh_token_expires_in?: number | null
+  }
+
+  export type EmergencyRequestCreateManyUserInput = {
+    id?: string
+    phoneNumber: string
+    latitude: number
+    longitude: number
+    createdAt?: Date | string
+    status?: $Enums.EmergencyStatus
+  }
+
+  export type SafetyConfirmationCreateManyUserInput = {
+    id?: string
+    phoneNumber: string
+    createdAt?: Date | string
   }
 
   export type SessionCreateManyUserInput = {
@@ -9672,6 +13039,51 @@ export namespace Prisma {
     id_token?: NullableStringFieldUpdateOperationsInput | string | null
     session_state?: NullableStringFieldUpdateOperationsInput | string | null
     refresh_token_expires_in?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type EmergencyRequestUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type EmergencyRequestUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumEmergencyStatusFieldUpdateOperationsInput | $Enums.EmergencyStatus
+  }
+
+  export type SafetyConfirmationUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafetyConfirmationUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafetyConfirmationUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionUpdateWithoutUserInput = {

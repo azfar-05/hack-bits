@@ -1,7 +1,10 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import { type Role } from "~/generated/prisma";
+import bcrypt from "bcryptjs";
 
 import { db } from "~/server/db";
 
@@ -33,52 +36,66 @@ declare module "next-auth/jwt" {
  */
 export const authConfig = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "user@example.com" },
-        role: { label: "Role", type: "text" },
-        phoneNumber: { label: "Phone", type: "text" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "user@example.com",
+        },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials?.password) return null;
 
         const email = credentials.email as string;
-        const roleInput = (credentials.role as string)?.toUpperCase() || "USER";
-        
-        // Validate role
-        const validRoles = ["USER", "VOLUNTEER", "AUTHORITY"];
-        const role = validRoles.includes(roleInput) ? roleInput : "USER";
+        const password = credentials.password as string;
 
-        // Find or create user (mock auth for demo)
-        let user = await db.user.findUnique({
+        // Find user by email
+        const user = await db.user.findUnique({
           where: { email },
         });
 
         if (!user) {
-          // If role is USER, require phoneNumber at signup
-          const phoneNumber = (credentials.phoneNumber as string) || null;
-          if (role === "USER" && !phoneNumber) {
-            // Deny sign-in/create when USER does not provide phone number
-            return null;
-          }
-
-          user = await db.user.create({
+          // Create new user with default USER role
+          const hashedPassword = await bcrypt.hash(password, 12);
+          const newUser = await db.user.create({
             data: {
               email,
               name: email.split("@")[0],
-              role: role as Role,
-              phoneNumber: phoneNumber,
+              role: "USER" as Role,
+              password: hashedPassword,
             },
           });
+
+          return {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+            role: newUser.role,
+          };
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+        // Verify password if user exists
+        if (user.password && (await bcrypt.compare(password, user.password))) {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        }
+
+        return null;
       },
     }),
   ],
@@ -102,6 +119,16 @@ export const authConfig = {
         role: token.role,
       },
     }),
+    async signIn({ user, account }) {
+      if (account?.provider === "google" || account?.provider === "github") {
+        // Auto-assign USER role for OAuth sign-ins
+        if (!user.role) {
+          user.role = "USER";
+        }
+        return true;
+      }
+      return true;
+    },
   },
   pages: {
     signIn: "/",
