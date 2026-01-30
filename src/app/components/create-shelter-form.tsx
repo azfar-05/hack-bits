@@ -18,6 +18,11 @@ export function CreateShelterForm({ onSuccess, onCancel }: CreateShelterFormProp
   });
   const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationMethod, setLocationMethod] = useState<"gps" | "manual">("gps");
+  const [manualLocation, setManualLocation] = useState({
+    latitude: "",
+    longitude: "",
+  });
 
   const createSafeZone = api.safeZone.create.useMutation({
     onSuccess: () => {
@@ -64,16 +69,41 @@ export function CreateShelterForm({ onSuccess, onCancel }: CreateShelterFormProp
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.latitude || !formData.longitude) {
-      setLocationError("Please get your current location first");
-      return;
+    let finalLatitude = formData.latitude;
+    let finalLongitude = formData.longitude;
+    
+    // If using manual location, get values from manual inputs
+    if (locationMethod === "manual") {
+      if (!manualLocation.latitude || !manualLocation.longitude) {
+        setLocationError("Please enter both latitude and longitude");
+        return;
+      }
+      
+      finalLatitude = parseFloat(manualLocation.latitude);
+      finalLongitude = parseFloat(manualLocation.longitude);
+      
+      // Validate coordinate ranges
+      if (finalLatitude < -90 || finalLatitude > 90) {
+        setLocationError("Latitude must be between -90 and 90");
+        return;
+      }
+      if (finalLongitude < -180 || finalLongitude > 180) {
+        setLocationError("Longitude must be between -180 and 180");
+        return;
+      }
+    } else {
+      // GPS method validation
+      if (!formData.latitude || !formData.longitude) {
+        setLocationError("Please get your current location first");
+        return;
+      }
     }
 
     createSafeZone.mutate({
       name: formData.name,
       type: formData.type,
-      latitude: formData.latitude,
-      longitude: formData.longitude,
+      latitude: finalLatitude,
+      longitude: finalLongitude,
       capacity: formData.capacity ? parseInt(formData.capacity) : undefined,
     });
   };
@@ -150,36 +180,122 @@ export function CreateShelterForm({ onSuccess, onCancel }: CreateShelterFormProp
 
         {/* Location Section */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Location *
           </label>
           
-          <button
-            type="button"
-            onClick={getCurrentLocation}
-            disabled={locationStatus === "loading"}
-            className={`w-full rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              locationStatus === "success"
-                ? "bg-green-100 text-green-800 border border-green-200"
-                : locationStatus === "loading"
-                ? "bg-gray-100 text-gray-600 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700"
-            }`}
-          >
-            {locationStatus === "loading" && (
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600 inline" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            )}
-            {locationStatus === "loading" ? "Getting Location..." : 
-             locationStatus === "success" ? "✓ Location Obtained" : 
-             "Get Current Location"}
-          </button>
+          {/* Location Method Toggle */}
+          <div className="flex rounded-md border border-gray-300 mb-3">
+            <button
+              type="button"
+              onClick={() => {
+                setLocationMethod("gps");
+                setLocationError(null);
+              }}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-l-md transition-colors ${
+                locationMethod === "gps"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              📍 Use GPS
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLocationMethod("manual");
+                setLocationStatus("idle");
+                setLocationError(null);
+              }}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-r-md transition-colors ${
+                locationMethod === "manual"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              ✏️ Enter Manually
+            </button>
+          </div>
 
-          {locationStatus === "success" && (
-            <div className="mt-2 text-xs text-green-600">
-              📍 Lat: {formData.latitude.toFixed(4)}, Lng: {formData.longitude.toFixed(4)}
+          {/* GPS Location Method */}
+          {locationMethod === "gps" && (
+            <div>
+              <button
+                type="button"
+                onClick={getCurrentLocation}
+                disabled={locationStatus === "loading"}
+                className={`w-full rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                  locationStatus === "success"
+                    ? "bg-green-100 text-green-800 border border-green-200"
+                    : locationStatus === "loading"
+                    ? "bg-gray-100 text-gray-600 cursor-not-allowed"
+                    : "bg-green-600 text-white hover:bg-green-700"
+                }`}
+              >
+                {locationStatus === "loading" && (
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600 inline" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {locationStatus === "loading" ? "Getting Location..." : 
+                 locationStatus === "success" ? "✓ Location Obtained" : 
+                 "Get Current Location"}
+              </button>
+
+              {locationStatus === "success" && (
+                <div className="mt-2 text-xs text-green-600">
+                  📍 Lat: {formData.latitude.toFixed(4)}, Lng: {formData.longitude.toFixed(4)}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Manual Location Method */}
+          {locationMethod === "manual" && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="manual-latitude" className="block text-xs font-medium text-gray-600 mb-1">
+                    Latitude *
+                  </label>
+                  <input
+                    type="number"
+                    id="manual-latitude"
+                    step="any"
+                    min="-90"
+                    max="90"
+                    value={manualLocation.latitude}
+                    onChange={(e) => setManualLocation(prev => ({ ...prev, latitude: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    placeholder="e.g., 15.3173"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="manual-longitude" className="block text-xs font-medium text-gray-600 mb-1">
+                    Longitude *
+                  </label>
+                  <input
+                    type="number"
+                    id="manual-longitude"
+                    step="any"
+                    min="-180"
+                    max="180"
+                    value={manualLocation.longitude}
+                    onChange={(e) => setManualLocation(prev => ({ ...prev, longitude: e.target.value }))}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    placeholder="e.g., 75.7139"
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">
+                💡 Tip: You can get coordinates from Google Maps by right-clicking on a location
+              </div>
+              {manualLocation.latitude && manualLocation.longitude && (
+                <div className="text-xs text-green-600">
+                  📍 Coordinates: {parseFloat(manualLocation.latitude).toFixed(4)}, {parseFloat(manualLocation.longitude).toFixed(4)}
+                </div>
+              )}
             </div>
           )}
 
@@ -217,7 +333,7 @@ export function CreateShelterForm({ onSuccess, onCancel }: CreateShelterFormProp
           )}
           <button
             type="submit"
-            disabled={createSafeZone.isPending || locationStatus !== "success"}
+            disabled={createSafeZone.isPending || (locationMethod === "gps" && locationStatus !== "success") || (locationMethod === "manual" && (!manualLocation.latitude || !manualLocation.longitude))}
             className="flex-1 rounded-md bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {createSafeZone.isPending ? "Creating..." : "Create Safe Zone"}

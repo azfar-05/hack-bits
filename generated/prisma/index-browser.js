@@ -242,6 +242,20 @@ exports.Prisma.SafeZoneScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ResourceNodeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  resourceType: 'resourceType',
+  quantity: 'quantity',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  createdBy: 'createdBy',
+  contactInfo: 'contactInfo',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -290,6 +304,21 @@ exports.SafeZoneType = exports.$Enums.SafeZoneType = {
   HOSPITAL: 'HOSPITAL'
 };
 
+exports.ResourceType = exports.$Enums.ResourceType = {
+  BOAT: 'BOAT',
+  GENERATOR: 'GENERATOR',
+  WATER: 'WATER',
+  FOOD: 'FOOD',
+  MEDICAL: 'MEDICAL',
+  OTHER: 'OTHER'
+};
+
+exports.CreatorType = exports.$Enums.CreatorType = {
+  VOLUNTEER: 'VOLUNTEER',
+  BUSINESS: 'BUSINESS',
+  AUTHORITY: 'AUTHORITY'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
@@ -301,7 +330,8 @@ exports.Prisma.ModelName = {
   SafetyConfirmation: 'SafetyConfirmation',
   RescueRequest: 'RescueRequest',
   VolunteerProfile: 'VolunteerProfile',
-  SafeZone: 'SafeZone'
+  SafeZone: 'SafeZone',
+  ResourceNode: 'ResourceNode'
 };
 
 /**

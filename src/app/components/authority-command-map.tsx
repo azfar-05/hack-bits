@@ -47,6 +47,10 @@ export default function AuthorityCommandMap({
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  const resourceNodesQuery = api.resourceNode.getAll.useQuery(undefined, {
+    refetchInterval: 60000, // Refresh every minute
+  });
+
   // Initialize map
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -333,6 +337,70 @@ export default function AuthorityCommandMap({
       });
     }
 
+    // Add resource nodes
+    if (resourceNodesQuery.data) {
+      resourceNodesQuery.data.forEach((resource) => {
+        const emoji = resource.resourceType === "BOAT" ? "🚤" :
+                     resource.resourceType === "GENERATOR" ? "⚡" :
+                     resource.resourceType === "WATER" ? "💧" :
+                     resource.resourceType === "FOOD" ? "🍞" :
+                     resource.resourceType === "MEDICAL" ? "🏥" : "📦";
+
+        const icon = L.divIcon({
+          className: "custom-marker",
+          html: `
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 border-2 border-white shadow-lg">
+              <span class="text-white text-xs">${emoji}</span>
+            </div>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+        });
+
+        const marker = L.marker([resource.latitude, resource.longitude], { icon })
+          .addTo(mapInstanceRef.current);
+
+        marker.bindPopup(`
+          <div class="p-3 min-w-[200px]">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-2xl">${emoji}</span>
+              <strong class="text-lg">${resource.name}</strong>
+            </div>
+            <div class="space-y-1 text-sm">
+              <div class="flex justify-between">
+                <span>Type:</span>
+                <strong>${resource.resourceType}</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>Quantity:</span>
+                <strong class="text-blue-600">${resource.quantity}</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>Shared by:</span>
+                <strong>${resource.creator.name || resource.creator.email}</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>Type:</span>
+                <span class="px-2 py-1 rounded-full text-xs ${resource.createdBy === 'AUTHORITY' ? 'bg-red-100 text-red-800' : 
+                  resource.createdBy === 'BUSINESS' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">${resource.createdBy}</span>
+              </div>
+              ${resource.contactInfo ? `
+                <div class="mt-2 pt-2 border-t">
+                  <span class="text-gray-600">Contact:</span>
+                  <p class="font-medium">${resource.contactInfo}</p>
+                </div>
+              ` : ''}
+              <div class="text-xs text-gray-500 mt-2 pt-2 border-t">
+                Added: ${new Date(resource.createdAt).toLocaleDateString('en-IN')}
+              </div>
+            </div>
+          </div>
+        `);
+
+        markersRef.current.push(marker);
+      });
+    }
+
     // Draw lines between assigned volunteers and users
     if (allRescueRequestsQuery.data) {
       const assignedRequests = allRescueRequestsQuery.data.filter(req => 
@@ -361,10 +429,11 @@ export default function AuthorityCommandMap({
       });
     }
 
-  }, [dangerZonesQuery.data, safeZonesQuery.data, allRescueRequestsQuery.data, volunteersQuery.data, mapReady]);
+  }, [dangerZonesQuery.data, safeZonesQuery.data, allRescueRequestsQuery.data, volunteersQuery.data, resourceNodesQuery.data, mapReady]);
 
   const isLoading = dangerZonesQuery.isLoading || safeZonesQuery.isLoading || 
-                   allRescueRequestsQuery.isLoading || volunteersQuery.isLoading;
+                   allRescueRequestsQuery.isLoading || volunteersQuery.isLoading || 
+                   resourceNodesQuery.isLoading;
 
   return (
     <div className={`relative ${className}`}>
@@ -433,6 +502,10 @@ export default function AuthorityCommandMap({
             <span>Safe Zone</span>
           </div>
           <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-indigo-500 rounded-full"></div>
+            <span>Resource Node</span>
+          </div>
+          <div className="flex items-center gap-2">
             <div className="w-3 h-0.5 bg-indigo-500" style={{borderStyle: 'dashed'}}></div>
             <span>Active Rescue</span>
           </div>
@@ -466,6 +539,12 @@ export default function AuthorityCommandMap({
               {dangerZonesQuery.data?.filter(z => z.riskLevel === "HIGH").length || 0}
             </div>
             <div className="text-gray-600">High Risk</div>
+          </div>
+          <div>
+            <div className="text-indigo-600 font-bold text-lg">
+              {resourceNodesQuery.data?.length || 0}
+            </div>
+            <div className="text-gray-600">Resources</div>
           </div>
         </div>
       </div>

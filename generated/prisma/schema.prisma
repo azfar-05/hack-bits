@@ -62,6 +62,8 @@ model User {
   volunteerProfile     VolunteerProfile?
   // Safe zones created by this user
   createdSafeZones     SafeZone[]
+  // Resource nodes created by this user
+  createdResourceNodes ResourceNode[]
 }
 
 model VerificationToken {
@@ -150,6 +152,23 @@ enum RiskLevel {
   HIGH
 }
 
+// Resource types for disaster response
+enum ResourceType {
+  BOAT
+  GENERATOR
+  WATER
+  FOOD
+  MEDICAL
+  OTHER
+}
+
+// Creator types for resources
+enum CreatorType {
+  VOLUNTEER
+  BUSINESS
+  AUTHORITY
+}
+
 // Rescue requests (SOS) from users in danger
 model RescueRequest {
   id               String        @id @default(cuid())
@@ -205,4 +224,23 @@ model SafeZone {
   updatedAt DateTime     @updatedAt
 
   @@index([latitude, longitude])
+}
+
+// Resource nodes for disaster response (crowdsourced resources)
+model ResourceNode {
+  id           String       @id @default(cuid())
+  name         String
+  resourceType ResourceType
+  quantity     Int
+  latitude     Float
+  longitude    Float
+  createdBy    CreatorType
+  contactInfo  String?
+  userId       String // User ID who created this resource
+  creator      User         @relation(fields: [userId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([latitude, longitude])
+  @@index([resourceType])
 }
