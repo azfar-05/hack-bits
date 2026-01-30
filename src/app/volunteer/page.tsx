@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
 import { CreateShelterForm } from "~/app/components/create-shelter-form";
@@ -270,7 +270,8 @@ export default function VolunteerDashboard() {
   }, [myLocation, shouldQuery]);
 
   const handleSignOut = async () => {
-    router.push("/api/auth/signout");
+    await signOut({ redirect: false });
+    router.push("/");
   };
 
   const getTimeSince = (date: Date) => {
@@ -348,37 +349,46 @@ export default function VolunteerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-green-600 text-white shadow-lg">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <header className="bg-white border-b border-gray-200">
+        <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Volunteer Dashboard</h1>
-              <p className="mt-1 text-green-100">Disaster Alert & Rescue Coordination System</p>
-            </div>
             <div className="flex items-center gap-4">
+              <div className="h-10 w-10 rounded-xl bg-green-500 flex items-center justify-center">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900">Volunteer Hub</h1>
+                <p className="text-sm text-gray-500">Emergency Response Network</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
               {/* Tracking Status */}
-              <div
-                className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${
-                  isTracking && !updateLocation.error ? "bg-green-500" : "bg-yellow-500"
-                }`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    isTracking && !updateLocation.error ? "bg-green-200 animate-pulse" : "bg-yellow-200"
-                  }`}
-                />
-                {isTracking && !updateLocation.error ? "Tracking" : "Offline"}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+                isTracking && !updateLocation.error 
+                  ? "bg-green-50 text-green-700" 
+                  : "bg-yellow-50 text-yellow-700"
+              }`}>
+                <div className={`h-2 w-2 rounded-full ${
+                  isTracking && !updateLocation.error 
+                    ? "bg-green-500 animate-pulse" 
+                    : "bg-yellow-500"
+                }`}></div>
+                <span className="font-medium">
+                  {isTracking && !updateLocation.error ? "Live" : "Offline"}
+                </span>
               </div>
 
               {/* Availability Toggle */}
               <button
                 onClick={() => setAvailability.mutate({ available: !isAvailable })}
-                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isAvailable
-                    ? "bg-green-700 hover:bg-green-800"
-                    : "bg-gray-500 hover:bg-gray-600"
+                    ? "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
                 {isAvailable ? "Available" : "Unavailable"}
@@ -386,16 +396,20 @@ export default function VolunteerDashboard() {
 
               <button
                 onClick={() => router.push("/profile")}
-                className="rounded-md bg-green-700 px-4 py-2 text-sm font-medium hover:bg-green-800 transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Profile
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </button>
 
               <button
                 onClick={handleSignOut}
-                className="rounded-md bg-green-700 px-4 py-2 text-sm font-medium hover:bg-green-800 transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Sign Out
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
               </button>
             </div>
           </div>
@@ -404,27 +418,22 @@ export default function VolunteerDashboard() {
 
       {/* New Alert Notification Banner */}
       {showNewAlert && (
-        <div className="bg-red-600 text-white px-4 py-3 animate-pulse">
+        <div className="bg-red-500 text-white px-6 py-4 animate-pulse">
           <div className="mx-auto max-w-7xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="rounded-full bg-white p-2">
-                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
+              <div className="rounded-xl bg-white p-2">
+                <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
               </div>
               <div>
-                <p className="font-bold text-lg">NEW RESCUE ALERT!</p>
-                <p className="text-sm">{newAlertCount} new request(s) need your help</p>
+                <p className="font-semibold text-lg">NEW RESCUE ALERT!</p>
+                <p className="text-sm text-red-100">{newAlertCount} new request(s) need your help</p>
               </div>
             </div>
             <button
               onClick={() => setShowNewAlert(false)}
-              className="rounded-md bg-red-700 px-4 py-2 text-sm hover:bg-red-800"
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 transition-colors"
             >
               Dismiss
             </button>
@@ -432,37 +441,38 @@ export default function VolunteerDashboard() {
         </div>
       )}
 
-      {/* Polling Status Indicator */}
-      <div className="bg-gray-800 text-white px-4 py-2 text-xs">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${volunteerAlertsQuery.error ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></span>
-            {volunteerAlertsQuery.error ? 'Connection error' : `Live polling active (every ${POLLING_INTERVAL / 1000}s)`}
-          </span>
-          <span>
-            Total alerts: {totalAlerts} | Assigned: {assignedRequests.length} | Pending: {pendingRequests.length}
-          </span>
+      {/* Status Indicators */}
+      <div className="bg-gray-800 text-white px-6 py-3">
+        <div className="mx-auto max-w-7xl flex items-center justify-between text-sm">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-2">
+              <div className={`h-2 w-2 rounded-full ${volunteerAlertsQuery.error ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></div>
+              <span className="font-medium">
+                {volunteerAlertsQuery.error ? 'Connection error' : `Live polling (${POLLING_INTERVAL / 1000}s)`}
+              </span>
+            </span>
+          </div>
+          <div className="flex items-center gap-6 text-xs">
+            <span>Total: <span className="font-medium">{totalAlerts}</span></span>
+            <span>Assigned: <span className="font-medium text-green-400">{assignedRequests.length}</span></span>
+            <span>Pending: <span className="font-medium text-yellow-400">{pendingRequests.length}</span></span>
+          </div>
         </div>
       </div>
 
-      {/* Error Banner */}
+      {/* Error Banners */}
       {volunteerAlertsQuery.error && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
-          <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-800">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+        <div className="bg-red-50 border-b border-red-200 px-6 py-4">
+          <div className="mx-auto max-w-7xl flex items-center gap-3 text-red-800">
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="text-sm">
+            <span className="text-sm flex-1">
               Error loading rescue data: {volunteerAlertsQuery.error.message}
             </span>
             <button
               onClick={() => volunteerAlertsQuery.refetch()}
-              className="ml-auto text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+              className="text-sm bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
             >
               Retry
             </button>
@@ -470,23 +480,16 @@ export default function VolunteerDashboard() {
         </div>
       )}
 
-      {/* Location Status Banner */}
       {locationError && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-3">
-          <div className="mx-auto max-w-7xl flex items-center gap-2 text-yellow-800">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-4">
+          <div className="mx-auto max-w-7xl flex items-center gap-3 text-amber-800">
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="text-sm">Location access: {locationError}</span>
+            <span className="text-sm flex-1">Location access: {locationError}</span>
             <button
               onClick={() => {
                 setLocationError(null);
-                // Retry location tracking
                 if (shouldQuery && navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -496,15 +499,11 @@ export default function VolunteerDashboard() {
                       setLocationError(null);
                     },
                     (error) => setLocationError(error.message),
-                    { 
-                      enableHighAccuracy: true, 
-                      timeout: 30000, // Increased timeout for GPS lock
-                      maximumAge: 0 // Force fresh location, no cache
-                    }
+                    { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
                   );
                 }
               }}
-              className="ml-auto text-sm bg-yellow-100 hover:bg-yellow-200 px-2 py-1 rounded"
+              className="text-sm bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
             >
               Retry
             </button>
@@ -512,33 +511,23 @@ export default function VolunteerDashboard() {
         </div>
       )}
 
-      {/* Location Update Error Banner */}
       {updateLocation.error && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
-          <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-800">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+        <div className="bg-red-50 border-b border-red-200 px-6 py-4">
+          <div className="mx-auto max-w-7xl flex items-center gap-3 text-red-800">
+            <svg className="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <span className="text-sm">
+            <span className="text-sm flex-1">
               Failed to update location: {updateLocation.error.message}
             </span>
             <button
               onClick={() => {
                 updateLocation.reset();
-                // Retry location update if we have current location
                 if (myLocation && shouldQuery) {
-                  updateLocation.mutate({ 
-                    latitude: myLocation.lat, 
-                    longitude: myLocation.lng 
-                  });
+                  updateLocation.mutate({ latitude: myLocation.lat, longitude: myLocation.lng });
                 }
               }}
-              className="ml-auto text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+              className="text-sm bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
             >
               Retry
             </button>
@@ -549,45 +538,42 @@ export default function VolunteerDashboard() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Live Map Section */}
         {assignedRequestsQuery.data && assignedRequestsQuery.data.length > 0 && (
-          <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                />
-              </svg>
-              Live Rescue Map
-            </h2>
-
-            <div className="mb-4 flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="h-4 w-4 rounded-full bg-red-500"></span>
-                <span className="text-gray-600">User in danger</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-4 w-4 rounded-full bg-blue-500"></span>
-                <span className="text-gray-600">Your location</span>
-              </div>
+          <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                </div>
+                Live Rescue Map
+              </h2>
               {myLocation && assignedRequestsQuery.data[0]?.latitude && (
-                <div className="ml-auto text-gray-600">
-                  Distance:{" "}
-                  <span className="font-medium">
+                <div className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg">
+                  Distance: <span className="font-medium text-gray-900">
                     {calculateDistance(
                       myLocation.lat,
                       myLocation.lng,
                       assignedRequestsQuery.data[0].latitude,
                       assignedRequestsQuery.data[0].longitude!
-                    ).toFixed(2)}{" "}
-                    km
+                    ).toFixed(2)} km
                   </span>
                 </div>
               )}
             </div>
 
-            <div className="h-[400px] rounded-lg overflow-hidden border border-gray-200">
+            <div className="mb-4 flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                <span className="text-gray-600">User in danger</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                <span className="text-gray-600">Your location</span>
+              </div>
+            </div>
+
+            <div className="h-[400px] rounded-xl overflow-hidden border border-gray-200">
               <RescueMap markers={mapMarkers} />
             </div>
           </div>
@@ -595,23 +581,22 @@ export default function VolunteerDashboard() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* My Assigned Requests */}
-          <div className="rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                />
-              </svg>
-              My Assigned Rescues
+          <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                </div>
+                My Assigned Rescues
+              </h2>
               {assignedRequestsQuery.data && assignedRequestsQuery.data.length > 0 && (
-                <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
                   {assignedRequestsQuery.data.length} active
                 </span>
               )}
-            </h2>
+            </div>
 
             {assignedRequestsQuery.isLoading && (
               <div className="text-center text-gray-500 py-8">Loading...</div>
@@ -756,19 +741,21 @@ export default function VolunteerDashboard() {
           </div>
 
           {/* Pending Requests */}
-          <div className="rounded-lg bg-white p-6 shadow-md">
+          <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
             <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <svg className="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+              <div className="p-2 bg-yellow-50 rounded-lg">
+                <svg className="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
               Pending SOS Requests
               {pendingRequestsQuery.data && pendingRequestsQuery.data.length > 0 && (
-                <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-800 animate-pulse">
+                <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800 animate-pulse">
                   {pendingRequestsQuery.data.length} waiting
                 </span>
               )}

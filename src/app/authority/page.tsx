@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { api } from "~/trpc/react";
 import AuthorityCommandMap from "~/app/components/authority-command-map";
 import { PredictiveAnalyticsMap } from "~/app/components/predictive-analytics-map";
@@ -189,7 +189,8 @@ export default function AuthorityDashboard() {
   };
 
   const handleSignOut = async () => {
-    router.push("/api/auth/signout");
+    await signOut({ redirect: false });
+    router.push("/");
   };
 
   // Show loading screen while session is loading
