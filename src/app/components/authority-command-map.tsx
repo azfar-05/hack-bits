@@ -63,6 +63,23 @@ export default function AuthorityCommandMap({
     },
   });
 
+  // Make delete function globally accessible for popup buttons
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).deleteAlert = (alertId: string) => {
+        if (confirm("Are you sure you want to delete this alert?")) {
+          deleteAlert.mutate({ id: alertId });
+        }
+      };
+    }
+    
+    return () => {
+      if (typeof window !== "undefined") {
+        delete (window as any).deleteAlert;
+      }
+    };
+  }, [deleteAlert]);
+
   // Initialize map
   useEffect(() => {
     if (typeof window === "undefined") return;
