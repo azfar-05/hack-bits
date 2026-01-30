@@ -1,33 +1,29 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req });
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+  });
+
   const path = req.nextUrl.pathname;
 
-  // Redirect unauthenticated users to home
+  // Allow public routes
+  if (path === "/" || path.startsWith("/api")) {
+    return NextResponse.next();
+  }
+
+  // Redirect unauthenticated users
   if (!token) {
     return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  const role = token.role as string;
-
-  // Role-based route protection
-  if (path.startsWith("/authority") && role !== "AUTHORITY") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (path.startsWith("/volunteer") && role !== "VOLUNTEER") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (path.startsWith("/user") && role !== "USER") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();
 }
 
+// Apply middleware only to app routes
 export const config = {
-  matcher: ["/dashboard", "/user/:path*", "/volunteer/:path*", "/authority/:path*"],
+  matcher: ["/authority/:path*", "/volunteer/:path*", "/user/:path*"],
 };
