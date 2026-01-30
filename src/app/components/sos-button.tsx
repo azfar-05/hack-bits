@@ -79,106 +79,160 @@ function SosModal({ isOpen, onClose, onSendSos, isSending }: SosModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-red-600">🚨 SOS Emergency</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-md mx-4 rounded-2xl bg-white shadow-2xl border border-gray-100">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+              <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Emergency Alert</h2>
+              <p className="text-sm text-gray-500">Help is being coordinated</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors"
             disabled={isSending}
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-          <p className="text-sm text-red-700">
-            <strong>Emergency alert sent!</strong> Help is being coordinated.
-            {isLoadingLocation && (
-              <span className="block mt-1 text-blue-600">
-                🔍 Obtaining your precise location... (this may take up to 30 seconds for GPS)
-              </span>
-            )}
-            {location && !isLoadingLocation && (
-              <span className="block mt-1 text-green-600">
-                ✅ Location: {formatCoordinatesForDisplay(location.latitude, location.longitude).latitude}, {formatCoordinatesForDisplay(location.latitude, location.longitude).longitude}
-              </span>
-            )}
-          </p>
+        <div className="p-6 space-y-6">
+          {/* Status Alert */}
+          <div className="p-4 bg-green-50 rounded-xl border border-green-200">
+            <div className="flex items-start gap-3">
+              <div className="h-5 w-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green-800">Emergency alert sent successfully!</p>
+                {isLoadingLocation && (
+                  <p className="text-sm text-blue-700 mt-1 flex items-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Getting precise location...
+                  </p>
+                )}
+                {location && !isLoadingLocation && (
+                  <p className="text-sm text-green-700 mt-1 flex items-center gap-2">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Location: {formatCoordinatesForDisplay(location.latitude, location.longitude).latitude}, {formatCoordinatesForDisplay(location.latitude, location.longitude).longitude}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {locationError && (
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="flex items-start gap-3">
+                <svg className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm text-amber-800">{locationError}</p>
+                  <button
+                    type="button"
+                    onClick={() => window.location.reload()}
+                    className="mt-2 text-sm text-amber-700 hover:text-amber-900 underline"
+                  >
+                    Reload and try again
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="Your contact number"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-colors"
+              />
+              <p className="text-xs text-gray-500 mt-1">Optional - helps responders contact you</p>
+            </div>
+
+            <div>
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                Additional Details
+              </label>
+              <textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Describe the emergency situation..."
+                rows={3}
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-colors resize-none"
+              />
+              <p className="text-xs text-gray-500 mt-1">Optional - any details that might help</p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSending}
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                disabled={isSending}
+                className="flex-1 rounded-xl bg-red-500 px-4 py-3 text-white font-medium hover:bg-red-600 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              >
+                {isSending ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Send Details
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-
-        {locationError && (
-          <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-            <p className="text-sm text-yellow-700">{locationError}</p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="mt-2 text-xs text-blue-600 hover:underline"
-            >
-              Reload page and try again
-            </button>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-              Phone Number (Optional)
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter your phone number"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-              Additional Details (Optional)
-            </label>
-            <textarea
-              id="message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe the emergency situation..."
-              rows={3}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSending}
-              className="flex-1 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSending}
-              className="flex-1 rounded-md bg-red-600 px-4 py-2 text-white font-medium hover:bg-red-700 disabled:opacity-50"
-            >
-              {isSending ? "Sending..." : "Send Details"}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
 }
 
 export function SosButton() {
-  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [initialSosSent, setInitialSosSent] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   // SOS mutation (unauthenticated)
   const createSos = api.rescue.createSOS.useMutation({
@@ -196,6 +250,9 @@ export function SosButton() {
       alert("Geolocation is not supported by your browser.");
       return;
     }
+
+    setIsPressed(true);
+    setTimeout(() => setIsPressed(false), 200);
 
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -267,30 +324,53 @@ export function SosButton() {
   return (
     <>
       {/* Floating SOS Button */}
-      <button
-        onClick={handleSosClick}
-        disabled={createSos.isPending || initialSosSent}
-        className={`fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full px-6 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 ${
-          initialSosSent
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-red-600 hover:bg-red-700 animate-pulse"
-        } ${createSos.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        <svg
-          className="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+          onClick={handleSosClick}
+          disabled={createSos.isPending || initialSosSent}
+          className={`group relative flex items-center justify-center h-16 w-16 rounded-full font-bold text-white shadow-2xl transition-all duration-300 ${
+            initialSosSent
+              ? "bg-green-500 hover:bg-green-600 scale-110"
+              : createSos.isPending
+              ? "bg-red-400 cursor-not-allowed"
+              : "bg-red-500 hover:bg-red-600 hover:scale-110 active:scale-95"
+          } ${isPressed ? "scale-95" : ""} ${!initialSosSent && !createSos.isPending ? "animate-pulse" : ""}`}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-        {createSos.isPending ? "Sending..." : initialSosSent ? "Help Sent!" : "SOS"}
-      </button>
+          {/* Ripple effect */}
+          {!initialSosSent && !createSos.isPending && (
+            <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-20"></div>
+          )}
+          
+          {/* Icon */}
+          {createSos.isPending ? (
+            <svg className="h-6 w-6 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : initialSosSent ? (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          )}
+
+          {/* Tooltip */}
+          <div className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+            {createSos.isPending ? "Sending..." : initialSosSent ? "Help Sent!" : "Emergency SOS"}
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+          </div>
+        </button>
+
+        {/* Label for accessibility */}
+        {!initialSosSent && !createSos.isPending && (
+          <div className="absolute -top-2 -left-8 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-bounce">
+            SOS
+          </div>
+        )}
+      </div>
 
       {/* SOS Modal for additional details */}
       <SosModal
