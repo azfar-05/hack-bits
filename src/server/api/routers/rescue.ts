@@ -34,7 +34,7 @@ export const rescueRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        message: z.string().min(1, "Please describe your emergency"),
+        message: z.string().optional(), // Optional for panic-first SOS
         location: z.string().optional(),
         latitude: z.number().optional(),
         longitude: z.number().optional(),
@@ -69,7 +69,7 @@ export const rescueRouter = createTRPCRouter({
       const rescueRequest = await ctx.db.rescueRequest.create({
         data: {
           userId: ctx.session.user.id,
-          message: input.message,
+          message: input.message ?? "Emergency SOS", // Default message for panic-first SOS
           location: input.location,
           latitude: input.latitude,
           longitude: input.longitude,
