@@ -79,6 +79,7 @@ The system improves disaster preparedness and response by enabling faster commun
 
 ### USER Dashboard
 - **SOS Emergency Button**: Send rescue requests with automatic geolocation capture
+- **ML-assisted ETA Display**: View estimated help arrival time with confidence levels
 - **Safety Status**: Cancel active requests with "I am safe" button  
 - **Alert Feed**: Real-time disaster alerts with auto-refresh (30s intervals)
 - **Safety Guides**: Disaster-specific instructions with offline caching
@@ -88,6 +89,7 @@ The system improves disaster preparedness and response by enabling faster commun
 ### VOLUNTEER Dashboard  
 - **Live Rescue Coordination**: Accept pending SOS requests from nearby users
 - **Auto-Assignment**: Receive requests based on proximity (2km → 5km → 10km radius expansion)
+- **ML-assisted ETA Display**: View predicted response times with confidence levels and contributing factors
 - **Status Management**: Update rescue progress (assigned → in progress → completed)
 - **Location Tracking**: Continuous GPS tracking with 15-second server updates
 - **Live Map**: View assigned user locations with distance calculations
@@ -97,18 +99,20 @@ The system improves disaster preparedness and response by enabling faster commun
 
 ### AUTHORITY Dashboard
 - **Command Center Map**: Live view of Karnataka state with danger zones and safe zones
+- **ML-assisted Priority Board**: Assigned rescues sorted by predicted ETA for optimal coordination
 - **Risk Assessment**: Rule-based scoring system for danger zones:
   - Formula: `(Recent SOS × 3) + (Unknown Users × 4) + (Growth Rate × 5)`
   - Risk levels: HIGH (>25), MEDIUM (13-25), LOW (≤12)
-- **Escalated Cases**: Manual intervention for NO_VOLUNTEER requests
+- **Escalated Cases**: Manual intervention for NO_VOLUNTEER requests with ETA predictions
 - **Volunteer Management**: View all volunteers with location, availability, and active assignments
-- **Manual Assignment**: Assign specific volunteers to critical cases
+- **Manual Assignment**: Assign specific volunteers to critical cases with automatic ETA calculation
 - **Alert Broadcasting**: Create and send disaster alerts (flood, earthquake, fire)
 - **Safety Guide Management**: Create disaster-specific safety instructions
 - **Operations Overview**: Real-time statistics and status monitoring
 
 ### Technical Features
 - **Auto-Assignment Algorithm**: Intelligent volunteer matching with radius expansion
+- **ML-assisted Response Time Prediction**: Real-time ETA estimation using distance, volunteer status, system load, and disaster severity
 - **Offline Queue**: SOS requests queued in localStorage when offline, synced when online
 - **Real-time Polling**: Live updates every 5-30 seconds across all dashboards
 - **Geospatial Calculations**: Haversine distance formula for proximity matching
@@ -189,7 +193,8 @@ src/
 │   └── page.tsx                  # Login page
 ├── lib/
 │   ├── offline.ts                # localStorage caching utilities
-│   └── offline-queue.ts          # Offline SOS queue management
+│   ├── offline-queue.ts          # Offline SOS queue management
+│   └── eta-prediction.ts         # ML-assisted response time prediction
 ├── server/
 │   ├── api/
 │   │   ├── routers/

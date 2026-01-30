@@ -10719,12 +10719,16 @@ export namespace Prisma {
     latitude: number | null
     longitude: number | null
     searchRadiusUsed: number | null
+    etaMinMinutes: number | null
+    etaMaxMinutes: number | null
   }
 
   export type RescueRequestSumAggregateOutputType = {
     latitude: number | null
     longitude: number | null
     searchRadiusUsed: number | null
+    etaMinMinutes: number | null
+    etaMaxMinutes: number | null
   }
 
   export type RescueRequestMinAggregateOutputType = {
@@ -10739,6 +10743,10 @@ export namespace Prisma {
     disasterType: $Enums.DisasterType | null
     note: string | null
     searchRadiusUsed: number | null
+    etaMinMinutes: number | null
+    etaMaxMinutes: number | null
+    etaConfidence: string | null
+    etaFactors: string | null
     escalatedAt: Date | null
     assignedAt: Date | null
     completedAt: Date | null
@@ -10758,6 +10766,10 @@ export namespace Prisma {
     disasterType: $Enums.DisasterType | null
     note: string | null
     searchRadiusUsed: number | null
+    etaMinMinutes: number | null
+    etaMaxMinutes: number | null
+    etaConfidence: string | null
+    etaFactors: string | null
     escalatedAt: Date | null
     assignedAt: Date | null
     completedAt: Date | null
@@ -10777,6 +10789,10 @@ export namespace Prisma {
     disasterType: number
     note: number
     searchRadiusUsed: number
+    etaMinMinutes: number
+    etaMaxMinutes: number
+    etaConfidence: number
+    etaFactors: number
     escalatedAt: number
     assignedAt: number
     completedAt: number
@@ -10790,12 +10806,16 @@ export namespace Prisma {
     latitude?: true
     longitude?: true
     searchRadiusUsed?: true
+    etaMinMinutes?: true
+    etaMaxMinutes?: true
   }
 
   export type RescueRequestSumAggregateInputType = {
     latitude?: true
     longitude?: true
     searchRadiusUsed?: true
+    etaMinMinutes?: true
+    etaMaxMinutes?: true
   }
 
   export type RescueRequestMinAggregateInputType = {
@@ -10810,6 +10830,10 @@ export namespace Prisma {
     disasterType?: true
     note?: true
     searchRadiusUsed?: true
+    etaMinMinutes?: true
+    etaMaxMinutes?: true
+    etaConfidence?: true
+    etaFactors?: true
     escalatedAt?: true
     assignedAt?: true
     completedAt?: true
@@ -10829,6 +10853,10 @@ export namespace Prisma {
     disasterType?: true
     note?: true
     searchRadiusUsed?: true
+    etaMinMinutes?: true
+    etaMaxMinutes?: true
+    etaConfidence?: true
+    etaFactors?: true
     escalatedAt?: true
     assignedAt?: true
     completedAt?: true
@@ -10848,6 +10876,10 @@ export namespace Prisma {
     disasterType?: true
     note?: true
     searchRadiusUsed?: true
+    etaMinMinutes?: true
+    etaMaxMinutes?: true
+    etaConfidence?: true
+    etaFactors?: true
     escalatedAt?: true
     assignedAt?: true
     completedAt?: true
@@ -10954,6 +10986,10 @@ export namespace Prisma {
     disasterType: $Enums.DisasterType | null
     note: string | null
     searchRadiusUsed: number | null
+    etaMinMinutes: number | null
+    etaMaxMinutes: number | null
+    etaConfidence: string | null
+    etaFactors: string | null
     escalatedAt: Date | null
     assignedAt: Date | null
     completedAt: Date | null
@@ -10992,6 +11028,10 @@ export namespace Prisma {
     disasterType?: boolean
     note?: boolean
     searchRadiusUsed?: boolean
+    etaMinMinutes?: boolean
+    etaMaxMinutes?: boolean
+    etaConfidence?: boolean
+    etaFactors?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
     completedAt?: boolean
@@ -11013,6 +11053,10 @@ export namespace Prisma {
     disasterType?: boolean
     note?: boolean
     searchRadiusUsed?: boolean
+    etaMinMinutes?: boolean
+    etaMaxMinutes?: boolean
+    etaConfidence?: boolean
+    etaFactors?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
     completedAt?: boolean
@@ -11034,6 +11078,10 @@ export namespace Prisma {
     disasterType?: boolean
     note?: boolean
     searchRadiusUsed?: boolean
+    etaMinMinutes?: boolean
+    etaMaxMinutes?: boolean
+    etaConfidence?: boolean
+    etaFactors?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
     completedAt?: boolean
@@ -11055,6 +11103,10 @@ export namespace Prisma {
     disasterType?: boolean
     note?: boolean
     searchRadiusUsed?: boolean
+    etaMinMinutes?: boolean
+    etaMaxMinutes?: boolean
+    etaConfidence?: boolean
+    etaFactors?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
     completedAt?: boolean
@@ -11062,7 +11114,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type RescueRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "volunteerId" | "status" | "message" | "location" | "latitude" | "longitude" | "disasterType" | "note" | "searchRadiusUsed" | "escalatedAt" | "assignedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rescueRequest"]>
+  export type RescueRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "volunteerId" | "status" | "message" | "location" | "latitude" | "longitude" | "disasterType" | "note" | "searchRadiusUsed" | "etaMinMinutes" | "etaMaxMinutes" | "etaConfidence" | "etaFactors" | "escalatedAt" | "assignedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rescueRequest"]>
   export type RescueRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
@@ -11094,6 +11146,10 @@ export namespace Prisma {
       disasterType: $Enums.DisasterType | null
       note: string | null
       searchRadiusUsed: number | null
+      etaMinMinutes: number | null
+      etaMaxMinutes: number | null
+      etaConfidence: string | null
+      etaFactors: string | null
       escalatedAt: Date | null
       assignedAt: Date | null
       completedAt: Date | null
@@ -11535,6 +11591,10 @@ export namespace Prisma {
     readonly disasterType: FieldRef<"RescueRequest", 'DisasterType'>
     readonly note: FieldRef<"RescueRequest", 'String'>
     readonly searchRadiusUsed: FieldRef<"RescueRequest", 'Float'>
+    readonly etaMinMinutes: FieldRef<"RescueRequest", 'Int'>
+    readonly etaMaxMinutes: FieldRef<"RescueRequest", 'Int'>
+    readonly etaConfidence: FieldRef<"RescueRequest", 'String'>
+    readonly etaFactors: FieldRef<"RescueRequest", 'String'>
     readonly escalatedAt: FieldRef<"RescueRequest", 'DateTime'>
     readonly assignedAt: FieldRef<"RescueRequest", 'DateTime'>
     readonly completedAt: FieldRef<"RescueRequest", 'DateTime'>
@@ -14361,6 +14421,10 @@ export namespace Prisma {
     disasterType: 'disasterType',
     note: 'note',
     searchRadiusUsed: 'searchRadiusUsed',
+    etaMinMinutes: 'etaMinMinutes',
+    etaMaxMinutes: 'etaMaxMinutes',
+    etaConfidence: 'etaConfidence',
+    etaFactors: 'etaFactors',
     escalatedAt: 'escalatedAt',
     assignedAt: 'assignedAt',
     completedAt: 'completedAt',
@@ -15103,6 +15167,10 @@ export namespace Prisma {
     disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
     note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
+    etaMinMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaMaxMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaConfidence?: StringNullableFilter<"RescueRequest"> | string | null
+    etaFactors?: StringNullableFilter<"RescueRequest"> | string | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -15124,6 +15192,10 @@ export namespace Prisma {
     disasterType?: SortOrderInput | SortOrder
     note?: SortOrderInput | SortOrder
     searchRadiusUsed?: SortOrderInput | SortOrder
+    etaMinMinutes?: SortOrderInput | SortOrder
+    etaMaxMinutes?: SortOrderInput | SortOrder
+    etaConfidence?: SortOrderInput | SortOrder
+    etaFactors?: SortOrderInput | SortOrder
     escalatedAt?: SortOrderInput | SortOrder
     assignedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -15148,6 +15220,10 @@ export namespace Prisma {
     disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
     note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
+    etaMinMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaMaxMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaConfidence?: StringNullableFilter<"RescueRequest"> | string | null
+    etaFactors?: StringNullableFilter<"RescueRequest"> | string | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -15169,6 +15245,10 @@ export namespace Prisma {
     disasterType?: SortOrderInput | SortOrder
     note?: SortOrderInput | SortOrder
     searchRadiusUsed?: SortOrderInput | SortOrder
+    etaMinMinutes?: SortOrderInput | SortOrder
+    etaMaxMinutes?: SortOrderInput | SortOrder
+    etaConfidence?: SortOrderInput | SortOrder
+    etaFactors?: SortOrderInput | SortOrder
     escalatedAt?: SortOrderInput | SortOrder
     assignedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -15196,6 +15276,10 @@ export namespace Prisma {
     disasterType?: EnumDisasterTypeNullableWithAggregatesFilter<"RescueRequest"> | $Enums.DisasterType | null
     note?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableWithAggregatesFilter<"RescueRequest"> | number | null
+    etaMinMinutes?: IntNullableWithAggregatesFilter<"RescueRequest"> | number | null
+    etaMaxMinutes?: IntNullableWithAggregatesFilter<"RescueRequest"> | number | null
+    etaConfidence?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
+    etaFactors?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     escalatedAt?: DateTimeNullableWithAggregatesFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableWithAggregatesFilter<"RescueRequest"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"RescueRequest"> | Date | string | null
@@ -15919,6 +16003,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15940,6 +16028,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -15957,6 +16049,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15978,6 +16074,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15997,6 +16097,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -16014,6 +16118,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16033,6 +16141,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16823,6 +16935,10 @@ export namespace Prisma {
     disasterType?: SortOrder
     note?: SortOrder
     searchRadiusUsed?: SortOrder
+    etaMinMinutes?: SortOrder
+    etaMaxMinutes?: SortOrder
+    etaConfidence?: SortOrder
+    etaFactors?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
     completedAt?: SortOrder
@@ -16834,6 +16950,8 @@ export namespace Prisma {
     latitude?: SortOrder
     longitude?: SortOrder
     searchRadiusUsed?: SortOrder
+    etaMinMinutes?: SortOrder
+    etaMaxMinutes?: SortOrder
   }
 
   export type RescueRequestMaxOrderByAggregateInput = {
@@ -16848,6 +16966,10 @@ export namespace Prisma {
     disasterType?: SortOrder
     note?: SortOrder
     searchRadiusUsed?: SortOrder
+    etaMinMinutes?: SortOrder
+    etaMaxMinutes?: SortOrder
+    etaConfidence?: SortOrder
+    etaFactors?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
     completedAt?: SortOrder
@@ -16867,6 +16989,10 @@ export namespace Prisma {
     disasterType?: SortOrder
     note?: SortOrder
     searchRadiusUsed?: SortOrder
+    etaMinMinutes?: SortOrder
+    etaMaxMinutes?: SortOrder
+    etaConfidence?: SortOrder
+    etaFactors?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
     completedAt?: SortOrder
@@ -16878,6 +17004,8 @@ export namespace Prisma {
     latitude?: SortOrder
     longitude?: SortOrder
     searchRadiusUsed?: SortOrder
+    etaMinMinutes?: SortOrder
+    etaMaxMinutes?: SortOrder
   }
 
   export type EnumRescueStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -18159,6 +18287,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18178,6 +18310,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18205,6 +18341,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18224,6 +18364,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -18441,6 +18585,10 @@ export namespace Prisma {
     disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
     note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
+    etaMinMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaMaxMinutes?: IntNullableFilter<"RescueRequest"> | number | null
+    etaConfidence?: StringNullableFilter<"RescueRequest"> | string | null
+    etaFactors?: StringNullableFilter<"RescueRequest"> | string | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -19193,6 +19341,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19211,6 +19363,10 @@ export namespace Prisma {
     disasterType?: $Enums.DisasterType | null
     note?: string | null
     searchRadiusUsed?: number | null
+    etaMinMinutes?: number | null
+    etaMaxMinutes?: number | null
+    etaConfidence?: string | null
+    etaFactors?: string | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
@@ -19347,6 +19503,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19366,6 +19526,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19384,6 +19548,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19401,6 +19569,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19420,6 +19592,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -19438,6 +19614,10 @@ export namespace Prisma {
     disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
     note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
+    etaMinMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaMaxMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    etaConfidence?: NullableStringFieldUpdateOperationsInput | string | null
+    etaFactors?: NullableStringFieldUpdateOperationsInput | string | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

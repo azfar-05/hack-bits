@@ -1,9 +1,85 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { predictResponseTime, type ETAInputs } from "~/lib/eta-prediction";
 
 // Search radius steps in kilometers
 const SEARCH_RADII = [2, 5, 10];
+
+/**
+ * Calculate and update ETA for assigned rescue request
+ */
+async function calculateAndUpdateETA(
+  db: any,
+  requestId: string,
+  volunteerLat?: number,
+  volunteerLon?: number,
+  userLat?: number,
+  userLon?: number,
+  disasterType?: string
+): Promise<void> {
+  try {
+    // Get current system load (active rescues)
+    const activeRescues = await db.rescueRequest.count({
+      where: {
+        status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+      },
+    });
+
+    // Get volunteer status
+    const volunteer = await db.rescueRequest.findUnique({
+      where: { id: requestId },
+      include: {
+        volunteer: {
+          include: {
+            volunteerProfile: true,
+            volunteerAssignments: {
+              where: {
+                status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+                id: { not: requestId }, // Exclude current request
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!volunteer?.volunteer) return;
+
+    // Calculate distance if both locations available
+    let distance = 5; // Default 5km if no location data
+    if (volunteerLat && volunteerLon && userLat && userLon) {
+      distance = haversineDistance(userLat, userLon, volunteerLat, volunteerLon);
+    }
+
+    // Prepare ETA inputs
+    const etaInputs: ETAInputs = {
+      distance,
+      volunteerBusy: volunteer.volunteer.volunteerAssignments.length > 0,
+      activeRescues,
+      disasterType: disasterType as any,
+      volunteerAvailable: volunteer.volunteer.volunteerProfile?.available ?? true,
+    };
+
+    // Calculate ETA using ML-assisted prediction
+    const etaResult = predictResponseTime(etaInputs);
+
+    // Update rescue request with ETA data
+    await db.rescueRequest.update({
+      where: { id: requestId },
+      data: {
+        etaMinMinutes: etaResult.minMinutes,
+        etaMaxMinutes: etaResult.maxMinutes,
+        etaConfidence: etaResult.confidence,
+        etaFactors: JSON.stringify(etaResult.factors),
+      },
+    });
+
+    console.log(`[ETA] Calculated for request ${requestId}: ${etaResult.minMinutes}-${etaResult.maxMinutes}min (${etaResult.confidence} confidence)`);
+  } catch (error) {
+    console.error(`[ETA] Failed to calculate ETA for request ${requestId}:`, error);
+  }
+}
 
 /**
  * Haversine formula to calculate distance between two points
@@ -112,7 +188,27 @@ export const rescueRouter = createTRPCRouter({
 
     const requests = await ctx.db.rescueRequest.findMany({
       where: { userId: ctx.session.user.id },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         volunteer: {
           select: { id: true, name: true, email: true },
         },
@@ -188,7 +284,27 @@ export const rescueRouter = createTRPCRouter({
         volunteerId,
         status: { in: ["ASSIGNED", "IN_PROGRESS"] },
       },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: { id: true, name: true, email: true },
         },
@@ -201,7 +317,27 @@ export const rescueRouter = createTRPCRouter({
       where: {
         status: "PENDING",
       },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: { id: true, name: true, email: true },
         },
@@ -214,7 +350,27 @@ export const rescueRouter = createTRPCRouter({
       where: {
         status: "NO_VOLUNTEER",
       },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: { id: true, name: true, email: true },
         },
@@ -332,7 +488,27 @@ export const rescueRouter = createTRPCRouter({
 
     const requests = await ctx.db.rescueRequest.findMany({
       where: { status: "NO_VOLUNTEER" },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: { id: true, name: true, email: true },
         },
@@ -353,7 +529,27 @@ export const rescueRouter = createTRPCRouter({
     }
 
     const requests = await ctx.db.rescueRequest.findMany({
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        volunteerId: true,
+        status: true,
+        message: true,
+        location: true,
+        latitude: true,
+        longitude: true,
+        disasterType: true,
+        note: true,
+        searchRadiusUsed: true,
+        etaMinMinutes: true,
+        etaMaxMinutes: true,
+        etaConfidence: true,
+        etaFactors: true,
+        escalatedAt: true,
+        assignedAt: true,
+        completedAt: true,
+        createdAt: true,
+        updatedAt: true,
         user: {
           select: { id: true, name: true, email: true },
         },
@@ -410,13 +606,24 @@ export const rescueRouter = createTRPCRouter({
         },
         include: {
           user: {
-            select: { id: true, name: true, email: true },
+            select: { id: true, name: true, email: true, latitude: true, longitude: true },
           },
           volunteer: {
             select: { id: true, name: true, email: true },
           },
         },
       });
+
+      // Calculate ETA for manual assignment
+      await calculateAndUpdateETA(
+        ctx.db,
+        input.requestId,
+        volunteer.volunteerProfile?.latitude ?? undefined,
+        volunteer.volunteerProfile?.longitude ?? undefined,
+        updatedRequest.user.latitude ?? undefined,
+        updatedRequest.user.longitude ?? undefined,
+        updatedRequest.disasterType ?? undefined
+      );
 
       console.log(`[RESCUE] Authority manually assigned volunteer ${volunteer.email} to request ${input.requestId}`);
       mockSendSMS(volunteer.email, "You have been assigned to a rescue request by authorities!");
@@ -559,6 +766,16 @@ async function autoAssignVolunteerWithRadius(
         },
       });
 
+      // Calculate ETA using ML-assisted prediction
+      await calculateAndUpdateETA(
+        db,
+        requestId,
+        nearbyVolunteer.latitude,
+        nearbyVolunteer.longitude,
+        userLat,
+        userLon
+      );
+
       console.log(
         `[RESCUE] Volunteer ${nearbyVolunteer.user.email} assigned (${nearbyVolunteer.distance.toFixed(2)}km away, radius: ${radius}km)`
       );
@@ -642,6 +859,9 @@ async function simpleAssignment(
         assignedAt: new Date(),
       },
     });
+
+    // Calculate ETA (no location data available)
+    await calculateAndUpdateETA(db, requestId);
 
     console.log(`[RESCUE] Volunteer ${availableVolunteer.email} assigned (no location data)`);
     mockSendSMS(availableVolunteer.email, "New rescue request assigned to you!");

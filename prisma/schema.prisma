@@ -165,6 +165,11 @@ model RescueRequest {
   disasterType    DisasterType? // Optional post-SOS detail
   note            String?      // Optional post-SOS note
   searchRadiusUsed Float?      // km radius that found the volunteer (2, 5, or 10)
+  // ML-assisted ETA prediction fields
+  etaMinMinutes   Int?         // Minimum estimated arrival time
+  etaMaxMinutes   Int?         // Maximum estimated arrival time
+  etaConfidence   String?      // HIGH, MEDIUM, LOW
+  etaFactors      String?      // JSON array of factors affecting ETA
   escalatedAt     DateTime?
   assignedAt      DateTime?
   completedAt     DateTime?

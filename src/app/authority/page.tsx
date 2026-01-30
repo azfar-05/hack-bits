@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import AuthorityCommandMap from "~/app/components/authority-command-map";
+import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 type RescueStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "NO_VOLUNTEER";
@@ -498,6 +499,22 @@ export default function AuthorityDashboard() {
                           <strong>Location:</strong> {request.location}
                         </p>
                       )}
+                      {/* Show ETA if request gets assigned */}
+                      {request.etaMinMinutes && request.etaMaxMinutes && (
+                        <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+                          <p className="text-xs text-blue-900">
+                            🤖 <strong>ML-Predicted ETA:</strong> {formatETA({
+                              minMinutes: request.etaMinMinutes,
+                              maxMinutes: request.etaMaxMinutes,
+                              confidence: request.etaConfidence as any,
+                              factors: request.etaFactors ? JSON.parse(request.etaFactors) : []
+                            })}
+                            <span className={`ml-2 ${getConfidenceColor(request.etaConfidence as any)}`}>
+                              ({request.etaConfidence} confidence)
+                            </span>
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div className="ml-4 text-right">
                       <p className="text-xs text-gray-500">
@@ -566,6 +583,85 @@ export default function AuthorityDashboard() {
             </div>
           </div>
         </div>
+
+        {/* ML-Assisted ETA Priority Board */}
+        {allRequestsQuery.data && allRequestsQuery.data.filter(r => r.status === "ASSIGNED" && r.etaMinMinutes).length > 0 && (
+          <div className="mb-8 rounded-lg bg-white p-6 shadow-md border-2 border-blue-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="rounded-full bg-blue-500 p-2">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-blue-800">
+                  🤖 ML-Assisted Response Priority Board
+                </h2>
+                <p className="text-sm text-blue-700">
+                  Assigned rescues sorted by estimated arrival time for optimal coordination
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {allRequestsQuery.data
+                ?.filter(r => r.status === "ASSIGNED" && r.etaMinMinutes)
+                .sort((a, b) => (a.etaMinMinutes || 999) - (b.etaMinMinutes || 999))
+                .map((request, index) => (
+                  <div
+                    key={request.id}
+                    className={`flex items-center justify-between rounded-lg p-4 border-2 ${
+                      index === 0 ? 'bg-green-50 border-green-300' : 
+                      index === 1 ? 'bg-yellow-50 border-yellow-300' : 
+                      'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                          index === 0 ? 'bg-green-500 text-white' :
+                          index === 1 ? 'bg-yellow-500 text-white' :
+                          'bg-gray-500 text-white'
+                        }`}>
+                          #{index + 1} PRIORITY
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {new Date(request.createdAt).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="font-medium text-gray-900">
+                        {request.user.name || request.user.email}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">{request.message}</p>
+                      {request.volunteer && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          <strong>Volunteer:</strong> {request.volunteer.name || request.volunteer.email}
+                        </p>
+                      )}
+                    </div>
+                    <div className="ml-4 text-right">
+                      <div className="p-3 bg-blue-100 rounded-lg border border-blue-200">
+                        <p className="text-lg font-bold text-blue-900">
+                          {formatETA({
+                            minMinutes: request.etaMinMinutes!,
+                            maxMinutes: request.etaMaxMinutes!,
+                            confidence: request.etaConfidence as any,
+                            factors: request.etaFactors ? JSON.parse(request.etaFactors) : []
+                          })}
+                        </p>
+                        <p className={`text-xs ${getConfidenceColor(request.etaConfidence as any)}`}>
+                          {request.etaConfidence} confidence
+                        </p>
+                        <p className="text-xs text-blue-700 mt-1">
+                          ML-predicted ETA
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-8 md:grid-cols-2">
           {/* Disaster Alert Form */}

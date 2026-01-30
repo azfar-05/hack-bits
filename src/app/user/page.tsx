@@ -10,6 +10,7 @@ import {
   getCachedGuide,
   type CachedGuide,
 } from "~/lib/offline";
+import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 
@@ -325,6 +326,25 @@ export default function UserDashboard() {
                     {currentRescue.volunteer &&
                       ` - Volunteer: ${currentRescue.volunteer.name || currentRescue.volunteer.email}`}
                   </p>
+                  {/* ML-assisted ETA Display for User */}
+                  {currentRescue.etaMinMinutes && currentRescue.etaMaxMinutes && (
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-sm font-medium text-blue-900">
+                        🤖 <strong>Estimated Help Arrival:</strong> {formatETA({
+                          minMinutes: currentRescue.etaMinMinutes,
+                          maxMinutes: currentRescue.etaMaxMinutes,
+                          confidence: currentRescue.etaConfidence as any,
+                          factors: currentRescue.etaFactors ? JSON.parse(currentRescue.etaFactors) : []
+                        })}
+                      </p>
+                      <p className={`text-xs ${getConfidenceColor(currentRescue.etaConfidence as any)}`}>
+                        ML-assisted prediction ({currentRescue.etaConfidence} confidence)
+                      </p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        Based on real-time signals: distance, volunteer status, system load
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

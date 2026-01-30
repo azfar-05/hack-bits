@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
 import { CreateShelterForm } from "~/app/components/create-shelter-form";
+import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 
 // Dynamically import the map component (client-side only)
 const RescueMap = dynamic(() => import("~/app/components/rescue-map"), {
@@ -593,7 +594,7 @@ export default function VolunteerDashboard() {
                   )}
 
                   {request.latitude && myLocation && (
-                    <p className="text-xs mb-3 text-gray-600">
+                    <p className="text-xs mb-2 text-gray-600">
                       <strong>Distance:</strong>{" "}
                       {calculateDistance(
                         myLocation.lat,
@@ -603,6 +604,39 @@ export default function VolunteerDashboard() {
                       ).toFixed(2)}{" "}
                       km away
                     </p>
+                  )}
+
+                  {/* ML-assisted ETA Display */}
+                  {request.etaMinMinutes && request.etaMaxMinutes && (
+                    <div className="mb-3 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-900">
+                            🤖 ML-Assisted ETA: {formatETA({
+                              minMinutes: request.etaMinMinutes,
+                              maxMinutes: request.etaMaxMinutes,
+                              confidence: request.etaConfidence as any,
+                              factors: request.etaFactors ? JSON.parse(request.etaFactors) : []
+                            })}
+                          </p>
+                          <p className={`text-xs ${getConfidenceColor(request.etaConfidence as any)}`}>
+                            Confidence: {request.etaConfidence}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-blue-700">
+                            Based on real-time signals
+                          </p>
+                        </div>
+                      </div>
+                      {request.etaFactors && (
+                        <div className="mt-2">
+                          <p className="text-xs text-blue-700">
+                            <strong>Factors:</strong> {JSON.parse(request.etaFactors).join(', ')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   <div className="flex gap-2">
