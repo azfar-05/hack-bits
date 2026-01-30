@@ -77,7 +77,100 @@ The system improves disaster preparedness and response by enabling faster commun
 ---
 
 ## Setup Instructions
-Setup instructions will be added during the implementation phase to include dependency installation, environment configuration, and local execution steps for both frontend and backend components.
+
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL database
+- npm or pnpm
+
+### Environment Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update the `.env` file with your database URL:
+   ```
+   DATABASE_URL="postgresql://postgres:password@localhost:5432/hack-bits"
+   AUTH_SECRET="your-secret-key-here"
+   ```
+
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+4. Generate Prisma client and push schema to database:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Demo Login
+
+The system uses a credentials-based login for demo purposes:
+- Enter any email address
+- Select a role (User, Volunteer, or Authority)
+- Click "Sign In"
+
+New users are automatically created on first login.
+
+### User Roles
+
+| Role | Access |
+|------|--------|
+| **USER** | View disaster alerts, access offline safety guides |
+| **VOLUNTEER** | Placeholder dashboard (SOS features coming soon) |
+| **AUTHORITY** | Create/send disaster alerts, manage safety guides |
+
+### Key Features (MVP)
+
+- **Authentication**: Role-based access control with NextAuth
+- **Disaster Alerts**: Authorities can broadcast alerts (Flood, Earthquake, Fire)
+- **Safety Guides**: Authorities can create safety instructions per disaster type
+- **Offline Support**: Safety guides are cached in localStorage for offline access
+- **Real-time Updates**: Alert feed auto-refreshes every 30 seconds
+
+### File Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/[...nextauth]/   # NextAuth API route
+│   │   └── trpc/[trpc]/          # tRPC API route
+│   ├── authority/                # Authority dashboard
+│   ├── components/               # Shared components
+│   ├── dashboard/                # Role-based redirect
+│   ├── user/                     # User dashboard
+│   ├── volunteer/                # Volunteer dashboard
+│   ├── layout.tsx
+│   └── page.tsx                  # Login page
+├── lib/
+│   └── offline.ts                # localStorage caching utilities
+├── server/
+│   ├── api/
+│   │   ├── routers/
+│   │   │   ├── alert.ts          # Alert CRUD operations
+│   │   │   └── guide.ts          # Safety guide CRUD
+│   │   ├── root.ts               # tRPC router
+│   │   └── trpc.ts               # tRPC context & procedures
+│   ├── auth/                     # NextAuth configuration
+│   └── db.ts                     # Prisma client
+├── trpc/                         # tRPC client setup
+├── middleware.ts                 # Route protection
+└── styles/
+prisma/
+└── schema.prisma                 # Database schema
+```
 
 ---
 
