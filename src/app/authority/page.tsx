@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
+import AuthorityCommandMap from "~/app/components/authority-command-map";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 type RescueStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "NO_VOLUNTEER";
@@ -80,6 +81,18 @@ export default function AuthorityDashboard() {
   const volunteersQuery = api.volunteer.getAllWithLocations.useQuery(undefined, {
     enabled: shouldQuery,
     refetchInterval: shouldQuery ? 30000 : false,
+  });
+
+  // Fetch danger zones
+  const dangerZonesQuery = api.dangerZone.getAll.useQuery(undefined, {
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 30000 : false,
+  });
+
+  // Fetch safe zones
+  const safeZonesQuery = api.safeZone.getAll.useQuery(undefined, {
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 60000 : false,
   });
 
   // Manual assign mutation
@@ -198,6 +211,245 @@ export default function AuthorityDashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Live Command Map Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                </div>
+                 Command Center
+              </h2>
+              <p className="text-gray-600 mt-1">Real-time disaster monitoring and response coordination</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+                Live Updates
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-white font-semibold flex items-center gap-2">
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Karnataka State Command Map
+                </h3>
+                <div className="text-red-100 text-sm">
+                  Last updated: {new Date().toLocaleTimeString()}
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ height: "600px" }}>
+              <AuthorityCommandMap className="h-full" />
+            </div>
+          </div>
+        </div>
+
+        {/* Comprehensive Status Dashboard */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Emergency Status Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-900">Emergency Status</h4>
+              <div className="p-2 bg-red-100 rounded-lg">
+                <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+            </div>
+            {allRequestsQuery.isLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Critical (No Volunteer)</span>
+                  <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                    {allRequestsQuery.data?.filter(r => r.status === "NO_VOLUNTEER").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Pending</span>
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                    {allRequestsQuery.data?.filter(r => r.status === "PENDING").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">In Progress</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {allRequestsQuery.data?.filter(r => r.status === "IN_PROGRESS").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Completed Today</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {allRequestsQuery.data?.filter(r => 
+                      r.status === "COMPLETED" && 
+                      new Date(r.completedAt || r.createdAt).toDateString() === new Date().toDateString()
+                    ).length || 0}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Volunteer Status Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-900">Volunteer Force</h4>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+            </div>
+            {volunteersQuery.isLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Available</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {volunteersQuery.data?.filter(v => v.available && v.activeAssignments === 0).length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">On Mission</span>
+                  <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+                    {volunteersQuery.data?.filter(v => v.activeAssignments > 0).length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Offline</span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">
+                    {volunteersQuery.data?.filter(v => !v.available).length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Registered</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {volunteersQuery.data?.length || 0}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Risk Assessment Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-900">Risk Assessment</h4>
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <svg className="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
+            {dangerZonesQuery.isLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">High Risk Zones</span>
+                  <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                    {dangerZonesQuery.data?.filter(z => z.riskLevel === "HIGH").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Medium Risk Zones</span>
+                  <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                    {dangerZonesQuery.data?.filter(z => z.riskLevel === "MEDIUM").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Low Risk Zones</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {dangerZonesQuery.data?.filter(z => z.riskLevel === "LOW").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Monitored</span>
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                    {dangerZonesQuery.data?.length || 0}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Infrastructure Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-900">Safe Infrastructure</h4>
+              <div className="p-2 bg-green-100 rounded-lg">
+                <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+            </div>
+            {safeZonesQuery.isLoading ? (
+              <div className="animate-pulse space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 flex items-center gap-1">
+                    <span>🏕</span> Shelters
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {safeZonesQuery.data?.filter(z => z.type === "SHELTER").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 flex items-center gap-1">
+                    <span>⛺</span> Camps
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {safeZonesQuery.data?.filter(z => z.type === "CAMP").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 flex items-center gap-1">
+                    <span>🏥</span> Hospitals
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {safeZonesQuery.data?.filter(z => z.type === "HOSPITAL").length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Capacity</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    {safeZonesQuery.data?.reduce((total, zone) => total + (zone.capacity || 0), 0).toLocaleString() || 0}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         {/* Escalated Requests Section - NO_VOLUNTEER */}
         {escalatedQuery.data && escalatedQuery.data.length > 0 && (
           <div className="mb-8 rounded-lg border-2 border-orange-400 bg-orange-50 p-6 shadow-lg">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
+import { CreateShelterForm } from "~/app/components/create-shelter-form";
 
 // Dynamically import the map component (client-side only)
 const RescueMap = dynamic(() => import("~/app/components/rescue-map"), {
@@ -51,6 +52,9 @@ export default function VolunteerDashboard() {
   const [showNewAlert, setShowNewAlert] = useState(false);
   const [newAlertCount, setNewAlertCount] = useState(0);
   const previousAlertCount = useRef(0);
+  
+  // Shelter creation state
+  const [showCreateShelter, setShowCreateShelter] = useState(false);
 
   // Check authentication and role before making queries
   const isAuthenticated = status === "authenticated";
@@ -115,6 +119,12 @@ export default function VolunteerDashboard() {
   // Fetch my profile
   const myProfileQuery = api.volunteer.getMyProfile.useQuery(undefined, {
     enabled: shouldQuery, // Only run when authenticated and is volunteer
+  });
+
+  // Fetch my safe zones
+  const mySafeZonesQuery = api.safeZone.getMyZones.useQuery(undefined, {
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 60000 : false, // Refresh every minute
   });
 
   // Location update mutation
@@ -780,6 +790,117 @@ export default function VolunteerDashboard() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Shelter Management Section */}
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+          {/* Create Shelter */}
+          <div>
+            {!showCreateShelter ? (
+              <div className="rounded-lg bg-white p-6 shadow-md border-2 border-dashed border-green-300">
+                <div className="text-center">
+                  <svg className="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <h3 className="mt-2 text-lg font-medium text-gray-900">Create Safe Zone</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Set up shelters, camps, or hospitals for people in need
+                  </p>
+                  <button
+                    onClick={() => setShowCreateShelter(true)}
+                    className="mt-4 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+                  >
+                    Create Safe Zone
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <CreateShelterForm
+                onSuccess={() => {
+                  setShowCreateShelter(false);
+                  mySafeZonesQuery.refetch();
+                }}
+                onCancel={() => setShowCreateShelter(false)}
+              />
+            )}
+          </div>
+
+          {/* My Safe Zones */}
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              My Safe Zones
+              {mySafeZonesQuery.data && mySafeZonesQuery.data.length > 0 && (
+                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">
+                  {mySafeZonesQuery.data.length} created
+                </span>
+              )}
+            </h2>
+
+            {mySafeZonesQuery.isLoading && (
+              <div className="text-center text-gray-500 py-8">Loading...</div>
+            )}
+
+            {mySafeZonesQuery.data && mySafeZonesQuery.data.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                <svg
+                  className="h-12 w-12 mx-auto text-gray-300 mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+                No safe zones created yet.
+              </div>
+            )}
+
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {mySafeZonesQuery.data?.map((safeZone) => (
+                <div key={safeZone.id} className="rounded-lg border-2 border-blue-200 bg-blue-50 p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">
+                          {safeZone.type === "SHELTER" ? "🏕" : 
+                           safeZone.type === "CAMP" ? "⛺" : "🏥"}
+                        </span>
+                        <span className="inline-block rounded-full bg-blue-200 px-2 py-1 text-xs font-medium text-blue-800">
+                          {safeZone.type}
+                        </span>
+                      </div>
+                      <p className="font-medium text-gray-900">{safeZone.name}</p>
+                    </div>
+                    <span className="text-xs text-blue-700">
+                      {new Date(safeZone.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {safeZone.capacity && (
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Capacity:</strong> {safeZone.capacity} people
+                    </p>
+                  )}
+
+                  <p className="text-xs text-gray-600 mb-3">
+                    <strong>Location:</strong> {safeZone.latitude.toFixed(4)}, {safeZone.longitude.toFixed(4)}
+                  </p>
+
+                  <div className="text-xs text-green-600">
+                    ✅ Visible to authorities on live map
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Stats Section */}

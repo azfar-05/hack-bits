@@ -4,6 +4,8 @@ import { emergencyRouter } from "~/server/api/routers/emergency";
 import { rescueRouter } from "~/server/api/routers/rescue";
 import { volunteerRouter } from "~/server/api/routers/volunteer";
 import { profileRouter } from "~/server/api/routers/profile";
+import { safeZoneRouter } from "~/server/api/routers/safeZone";
+import { dangerZoneRouter } from "~/server/api/routers/dangerZone";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -18,6 +20,8 @@ export const appRouter = createTRPCRouter({
   rescue: rescueRouter,
   volunteer: volunteerRouter,
   profile: profileRouter,
+  safeZone: safeZoneRouter,
+  dangerZone: dangerZoneRouter,
 });
 
 // export type definition of API

@@ -226,6 +226,18 @@ exports.Prisma.VolunteerProfileScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SafeZoneScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  capacity: 'capacity',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -268,6 +280,12 @@ exports.RescueStatus = exports.$Enums.RescueStatus = {
   NO_VOLUNTEER: 'NO_VOLUNTEER'
 };
 
+exports.SafeZoneType = exports.$Enums.SafeZoneType = {
+  SHELTER: 'SHELTER',
+  CAMP: 'CAMP',
+  HOSPITAL: 'HOSPITAL'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
@@ -278,7 +296,8 @@ exports.Prisma.ModelName = {
   EmergencyRequest: 'EmergencyRequest',
   SafetyConfirmation: 'SafetyConfirmation',
   RescueRequest: 'RescueRequest',
-  VolunteerProfile: 'VolunteerProfile'
+  VolunteerProfile: 'VolunteerProfile',
+  SafeZone: 'SafeZone'
 };
 
 /**

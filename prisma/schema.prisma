@@ -60,6 +60,8 @@ model User {
   volunteerAssignments RescueRequest[]      @relation("VolunteerAssignments")
   // Volunteer profile for location tracking
   volunteerProfile     VolunteerProfile?
+  // Safe zones created by this user
+  createdSafeZones     SafeZone[]
 }
 
 model VerificationToken {
@@ -134,6 +136,20 @@ enum RescueStatus {
   NO_VOLUNTEER
 }
 
+// Safe zone types for shelters
+enum SafeZoneType {
+  SHELTER
+  CAMP
+  HOSPITAL
+}
+
+// Risk levels for danger zones
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 // Rescue requests (SOS) from users in danger
 model RescueRequest {
   id              String        @id @default(cuid())
@@ -168,4 +184,20 @@ model VolunteerProfile {
   longitude  Float?
   available  Boolean  @default(true)
   updatedAt  DateTime @updatedAt
+}
+
+// Safe zones (shelters, camps, hospitals) created by volunteers or authorities
+model SafeZone {
+  id        String       @id @default(cuid())
+  name      String
+  type      SafeZoneType
+  latitude  Float
+  longitude Float
+  capacity  Int?
+  createdBy String       // User ID who created this zone
+  creator   User         @relation(fields: [createdBy], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([latitude, longitude])
 }

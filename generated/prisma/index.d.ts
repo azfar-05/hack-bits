@@ -63,6 +63,11 @@ export type RescueRequest = $Result.DefaultSelection<Prisma.$RescueRequestPayloa
  * 
  */
 export type VolunteerProfile = $Result.DefaultSelection<Prisma.$VolunteerProfilePayload>
+/**
+ * Model SafeZone
+ * 
+ */
+export type SafeZone = $Result.DefaultSelection<Prisma.$SafeZonePayload>
 
 /**
  * Enums
@@ -107,6 +112,24 @@ export const RescueStatus: {
 
 export type RescueStatus = (typeof RescueStatus)[keyof typeof RescueStatus]
 
+
+export const SafeZoneType: {
+  SHELTER: 'SHELTER',
+  CAMP: 'CAMP',
+  HOSPITAL: 'HOSPITAL'
+};
+
+export type SafeZoneType = (typeof SafeZoneType)[keyof typeof SafeZoneType]
+
+
+export const RiskLevel: {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+};
+
+export type RiskLevel = (typeof RiskLevel)[keyof typeof RiskLevel]
+
 }
 
 export type Role = $Enums.Role
@@ -124,6 +147,14 @@ export const EmergencyStatus: typeof $Enums.EmergencyStatus
 export type RescueStatus = $Enums.RescueStatus
 
 export const RescueStatus: typeof $Enums.RescueStatus
+
+export type SafeZoneType = $Enums.SafeZoneType
+
+export const SafeZoneType: typeof $Enums.SafeZoneType
+
+export type RiskLevel = $Enums.RiskLevel
+
+export const RiskLevel: typeof $Enums.RiskLevel
 
 /**
  * ##  Prisma Client ʲˢ
@@ -342,6 +373,16 @@ export class PrismaClient<
     * ```
     */
   get volunteerProfile(): Prisma.VolunteerProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.safeZone`: Exposes CRUD operations for the **SafeZone** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SafeZones
+    * const safeZones = await prisma.safeZone.findMany()
+    * ```
+    */
+  get safeZone(): Prisma.SafeZoneDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -792,7 +833,8 @@ export namespace Prisma {
     EmergencyRequest: 'EmergencyRequest',
     SafetyConfirmation: 'SafetyConfirmation',
     RescueRequest: 'RescueRequest',
-    VolunteerProfile: 'VolunteerProfile'
+    VolunteerProfile: 'VolunteerProfile',
+    SafeZone: 'SafeZone'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -811,7 +853,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "account" | "session" | "user" | "verificationToken" | "alert" | "safetyGuide" | "emergencyRequest" | "safetyConfirmation" | "rescueRequest" | "volunteerProfile"
+      modelProps: "account" | "session" | "user" | "verificationToken" | "alert" | "safetyGuide" | "emergencyRequest" | "safetyConfirmation" | "rescueRequest" | "volunteerProfile" | "safeZone"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1555,6 +1597,80 @@ export namespace Prisma {
           }
         }
       }
+      SafeZone: {
+        payload: Prisma.$SafeZonePayload<ExtArgs>
+        fields: Prisma.SafeZoneFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SafeZoneFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SafeZoneFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          findFirst: {
+            args: Prisma.SafeZoneFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SafeZoneFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          findMany: {
+            args: Prisma.SafeZoneFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>[]
+          }
+          create: {
+            args: Prisma.SafeZoneCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          createMany: {
+            args: Prisma.SafeZoneCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SafeZoneCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>[]
+          }
+          delete: {
+            args: Prisma.SafeZoneDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          update: {
+            args: Prisma.SafeZoneUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          deleteMany: {
+            args: Prisma.SafeZoneDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SafeZoneUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SafeZoneUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>[]
+          }
+          upsert: {
+            args: Prisma.SafeZoneUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SafeZonePayload>
+          }
+          aggregate: {
+            args: Prisma.SafeZoneAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSafeZone>
+          }
+          groupBy: {
+            args: Prisma.SafeZoneGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SafeZoneGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SafeZoneCountArgs<ExtArgs>
+            result: $Utils.Optional<SafeZoneCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1661,6 +1777,7 @@ export namespace Prisma {
     safetyConfirmation?: SafetyConfirmationOmit
     rescueRequest?: RescueRequestOmit
     volunteerProfile?: VolunteerProfileOmit
+    safeZone?: SafeZoneOmit
   }
 
   /* Types for Logging */
@@ -1747,6 +1864,7 @@ export namespace Prisma {
     sessions: number
     rescueRequests: number
     volunteerAssignments: number
+    createdSafeZones: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1756,6 +1874,7 @@ export namespace Prisma {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     rescueRequests?: boolean | UserCountOutputTypeCountRescueRequestsArgs
     volunteerAssignments?: boolean | UserCountOutputTypeCountVolunteerAssignmentsArgs
+    createdSafeZones?: boolean | UserCountOutputTypeCountCreatedSafeZonesArgs
   }
 
   // Custom InputTypes
@@ -1809,6 +1928,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountVolunteerAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RescueRequestWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCreatedSafeZonesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SafeZoneWhereInput
   }
 
 
@@ -4326,6 +4452,7 @@ export namespace Prisma {
     rescueRequests?: boolean | User$rescueRequestsArgs<ExtArgs>
     volunteerAssignments?: boolean | User$volunteerAssignmentsArgs<ExtArgs>
     volunteerProfile?: boolean | User$volunteerProfileArgs<ExtArgs>
+    createdSafeZones?: boolean | User$createdSafeZonesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4383,6 +4510,7 @@ export namespace Prisma {
     rescueRequests?: boolean | User$rescueRequestsArgs<ExtArgs>
     volunteerAssignments?: boolean | User$volunteerAssignmentsArgs<ExtArgs>
     volunteerProfile?: boolean | User$volunteerProfileArgs<ExtArgs>
+    createdSafeZones?: boolean | User$createdSafeZonesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4398,6 +4526,7 @@ export namespace Prisma {
       rescueRequests: Prisma.$RescueRequestPayload<ExtArgs>[]
       volunteerAssignments: Prisma.$RescueRequestPayload<ExtArgs>[]
       volunteerProfile: Prisma.$VolunteerProfilePayload<ExtArgs> | null
+      createdSafeZones: Prisma.$SafeZonePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4813,6 +4942,7 @@ export namespace Prisma {
     rescueRequests<T extends User$rescueRequestsArgs<ExtArgs> = {}>(args?: Subset<T, User$rescueRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RescueRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     volunteerAssignments<T extends User$volunteerAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$volunteerAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RescueRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     volunteerProfile<T extends User$volunteerProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$volunteerProfileArgs<ExtArgs>>): Prisma__VolunteerProfileClient<$Result.GetResult<Prisma.$VolunteerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    createdSafeZones<T extends User$createdSafeZonesArgs<ExtArgs> = {}>(args?: Subset<T, User$createdSafeZonesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5402,6 +5532,30 @@ export namespace Prisma {
      */
     include?: VolunteerProfileInclude<ExtArgs> | null
     where?: VolunteerProfileWhereInput
+  }
+
+  /**
+   * User.createdSafeZones
+   */
+  export type User$createdSafeZonesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    where?: SafeZoneWhereInput
+    orderBy?: SafeZoneOrderByWithRelationInput | SafeZoneOrderByWithRelationInput[]
+    cursor?: SafeZoneWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SafeZoneScalarFieldEnum | SafeZoneScalarFieldEnum[]
   }
 
   /**
@@ -12929,6 +13083,1158 @@ export namespace Prisma {
 
 
   /**
+   * Model SafeZone
+   */
+
+  export type AggregateSafeZone = {
+    _count: SafeZoneCountAggregateOutputType | null
+    _avg: SafeZoneAvgAggregateOutputType | null
+    _sum: SafeZoneSumAggregateOutputType | null
+    _min: SafeZoneMinAggregateOutputType | null
+    _max: SafeZoneMaxAggregateOutputType | null
+  }
+
+  export type SafeZoneAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    capacity: number | null
+  }
+
+  export type SafeZoneSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    capacity: number | null
+  }
+
+  export type SafeZoneMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    type: $Enums.SafeZoneType | null
+    latitude: number | null
+    longitude: number | null
+    capacity: number | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SafeZoneMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    type: $Enums.SafeZoneType | null
+    latitude: number | null
+    longitude: number | null
+    capacity: number | null
+    createdBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SafeZoneCountAggregateOutputType = {
+    id: number
+    name: number
+    type: number
+    latitude: number
+    longitude: number
+    capacity: number
+    createdBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SafeZoneAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    capacity?: true
+  }
+
+  export type SafeZoneSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    capacity?: true
+  }
+
+  export type SafeZoneMinAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    latitude?: true
+    longitude?: true
+    capacity?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SafeZoneMaxAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    latitude?: true
+    longitude?: true
+    capacity?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SafeZoneCountAggregateInputType = {
+    id?: true
+    name?: true
+    type?: true
+    latitude?: true
+    longitude?: true
+    capacity?: true
+    createdBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SafeZoneAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SafeZone to aggregate.
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafeZones to fetch.
+     */
+    orderBy?: SafeZoneOrderByWithRelationInput | SafeZoneOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SafeZoneWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafeZones from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafeZones.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SafeZones
+    **/
+    _count?: true | SafeZoneCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SafeZoneAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SafeZoneSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SafeZoneMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SafeZoneMaxAggregateInputType
+  }
+
+  export type GetSafeZoneAggregateType<T extends SafeZoneAggregateArgs> = {
+        [P in keyof T & keyof AggregateSafeZone]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSafeZone[P]>
+      : GetScalarType<T[P], AggregateSafeZone[P]>
+  }
+
+
+
+
+  export type SafeZoneGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SafeZoneWhereInput
+    orderBy?: SafeZoneOrderByWithAggregationInput | SafeZoneOrderByWithAggregationInput[]
+    by: SafeZoneScalarFieldEnum[] | SafeZoneScalarFieldEnum
+    having?: SafeZoneScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SafeZoneCountAggregateInputType | true
+    _avg?: SafeZoneAvgAggregateInputType
+    _sum?: SafeZoneSumAggregateInputType
+    _min?: SafeZoneMinAggregateInputType
+    _max?: SafeZoneMaxAggregateInputType
+  }
+
+  export type SafeZoneGroupByOutputType = {
+    id: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity: number | null
+    createdBy: string
+    createdAt: Date
+    updatedAt: Date
+    _count: SafeZoneCountAggregateOutputType | null
+    _avg: SafeZoneAvgAggregateOutputType | null
+    _sum: SafeZoneSumAggregateOutputType | null
+    _min: SafeZoneMinAggregateOutputType | null
+    _max: SafeZoneMaxAggregateOutputType | null
+  }
+
+  type GetSafeZoneGroupByPayload<T extends SafeZoneGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SafeZoneGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SafeZoneGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SafeZoneGroupByOutputType[P]>
+            : GetScalarType<T[P], SafeZoneGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SafeZoneSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    capacity?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safeZone"]>
+
+  export type SafeZoneSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    capacity?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safeZone"]>
+
+  export type SafeZoneSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    capacity?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["safeZone"]>
+
+  export type SafeZoneSelectScalar = {
+    id?: boolean
+    name?: boolean
+    type?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    capacity?: boolean
+    createdBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SafeZoneOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "type" | "latitude" | "longitude" | "capacity" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["safeZone"]>
+  export type SafeZoneInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SafeZoneIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SafeZoneIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SafeZonePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SafeZone"
+    objects: {
+      creator: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      type: $Enums.SafeZoneType
+      latitude: number
+      longitude: number
+      capacity: number | null
+      createdBy: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["safeZone"]>
+    composites: {}
+  }
+
+  type SafeZoneGetPayload<S extends boolean | null | undefined | SafeZoneDefaultArgs> = $Result.GetResult<Prisma.$SafeZonePayload, S>
+
+  type SafeZoneCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SafeZoneFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SafeZoneCountAggregateInputType | true
+    }
+
+  export interface SafeZoneDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SafeZone'], meta: { name: 'SafeZone' } }
+    /**
+     * Find zero or one SafeZone that matches the filter.
+     * @param {SafeZoneFindUniqueArgs} args - Arguments to find a SafeZone
+     * @example
+     * // Get one SafeZone
+     * const safeZone = await prisma.safeZone.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SafeZoneFindUniqueArgs>(args: SelectSubset<T, SafeZoneFindUniqueArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SafeZone that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SafeZoneFindUniqueOrThrowArgs} args - Arguments to find a SafeZone
+     * @example
+     * // Get one SafeZone
+     * const safeZone = await prisma.safeZone.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SafeZoneFindUniqueOrThrowArgs>(args: SelectSubset<T, SafeZoneFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SafeZone that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneFindFirstArgs} args - Arguments to find a SafeZone
+     * @example
+     * // Get one SafeZone
+     * const safeZone = await prisma.safeZone.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SafeZoneFindFirstArgs>(args?: SelectSubset<T, SafeZoneFindFirstArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SafeZone that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneFindFirstOrThrowArgs} args - Arguments to find a SafeZone
+     * @example
+     * // Get one SafeZone
+     * const safeZone = await prisma.safeZone.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SafeZoneFindFirstOrThrowArgs>(args?: SelectSubset<T, SafeZoneFindFirstOrThrowArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SafeZones that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SafeZones
+     * const safeZones = await prisma.safeZone.findMany()
+     * 
+     * // Get first 10 SafeZones
+     * const safeZones = await prisma.safeZone.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const safeZoneWithIdOnly = await prisma.safeZone.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SafeZoneFindManyArgs>(args?: SelectSubset<T, SafeZoneFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SafeZone.
+     * @param {SafeZoneCreateArgs} args - Arguments to create a SafeZone.
+     * @example
+     * // Create one SafeZone
+     * const SafeZone = await prisma.safeZone.create({
+     *   data: {
+     *     // ... data to create a SafeZone
+     *   }
+     * })
+     * 
+     */
+    create<T extends SafeZoneCreateArgs>(args: SelectSubset<T, SafeZoneCreateArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SafeZones.
+     * @param {SafeZoneCreateManyArgs} args - Arguments to create many SafeZones.
+     * @example
+     * // Create many SafeZones
+     * const safeZone = await prisma.safeZone.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SafeZoneCreateManyArgs>(args?: SelectSubset<T, SafeZoneCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SafeZones and returns the data saved in the database.
+     * @param {SafeZoneCreateManyAndReturnArgs} args - Arguments to create many SafeZones.
+     * @example
+     * // Create many SafeZones
+     * const safeZone = await prisma.safeZone.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SafeZones and only return the `id`
+     * const safeZoneWithIdOnly = await prisma.safeZone.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SafeZoneCreateManyAndReturnArgs>(args?: SelectSubset<T, SafeZoneCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SafeZone.
+     * @param {SafeZoneDeleteArgs} args - Arguments to delete one SafeZone.
+     * @example
+     * // Delete one SafeZone
+     * const SafeZone = await prisma.safeZone.delete({
+     *   where: {
+     *     // ... filter to delete one SafeZone
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SafeZoneDeleteArgs>(args: SelectSubset<T, SafeZoneDeleteArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SafeZone.
+     * @param {SafeZoneUpdateArgs} args - Arguments to update one SafeZone.
+     * @example
+     * // Update one SafeZone
+     * const safeZone = await prisma.safeZone.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SafeZoneUpdateArgs>(args: SelectSubset<T, SafeZoneUpdateArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SafeZones.
+     * @param {SafeZoneDeleteManyArgs} args - Arguments to filter SafeZones to delete.
+     * @example
+     * // Delete a few SafeZones
+     * const { count } = await prisma.safeZone.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SafeZoneDeleteManyArgs>(args?: SelectSubset<T, SafeZoneDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SafeZones.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SafeZones
+     * const safeZone = await prisma.safeZone.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SafeZoneUpdateManyArgs>(args: SelectSubset<T, SafeZoneUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SafeZones and returns the data updated in the database.
+     * @param {SafeZoneUpdateManyAndReturnArgs} args - Arguments to update many SafeZones.
+     * @example
+     * // Update many SafeZones
+     * const safeZone = await prisma.safeZone.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SafeZones and only return the `id`
+     * const safeZoneWithIdOnly = await prisma.safeZone.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SafeZoneUpdateManyAndReturnArgs>(args: SelectSubset<T, SafeZoneUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SafeZone.
+     * @param {SafeZoneUpsertArgs} args - Arguments to update or create a SafeZone.
+     * @example
+     * // Update or create a SafeZone
+     * const safeZone = await prisma.safeZone.upsert({
+     *   create: {
+     *     // ... data to create a SafeZone
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SafeZone we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SafeZoneUpsertArgs>(args: SelectSubset<T, SafeZoneUpsertArgs<ExtArgs>>): Prisma__SafeZoneClient<$Result.GetResult<Prisma.$SafeZonePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SafeZones.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneCountArgs} args - Arguments to filter SafeZones to count.
+     * @example
+     * // Count the number of SafeZones
+     * const count = await prisma.safeZone.count({
+     *   where: {
+     *     // ... the filter for the SafeZones we want to count
+     *   }
+     * })
+    **/
+    count<T extends SafeZoneCountArgs>(
+      args?: Subset<T, SafeZoneCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SafeZoneCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SafeZone.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SafeZoneAggregateArgs>(args: Subset<T, SafeZoneAggregateArgs>): Prisma.PrismaPromise<GetSafeZoneAggregateType<T>>
+
+    /**
+     * Group by SafeZone.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SafeZoneGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SafeZoneGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SafeZoneGroupByArgs['orderBy'] }
+        : { orderBy?: SafeZoneGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SafeZoneGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSafeZoneGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SafeZone model
+   */
+  readonly fields: SafeZoneFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SafeZone.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SafeZoneClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    creator<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SafeZone model
+   */
+  interface SafeZoneFieldRefs {
+    readonly id: FieldRef<"SafeZone", 'String'>
+    readonly name: FieldRef<"SafeZone", 'String'>
+    readonly type: FieldRef<"SafeZone", 'SafeZoneType'>
+    readonly latitude: FieldRef<"SafeZone", 'Float'>
+    readonly longitude: FieldRef<"SafeZone", 'Float'>
+    readonly capacity: FieldRef<"SafeZone", 'Int'>
+    readonly createdBy: FieldRef<"SafeZone", 'String'>
+    readonly createdAt: FieldRef<"SafeZone", 'DateTime'>
+    readonly updatedAt: FieldRef<"SafeZone", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SafeZone findUnique
+   */
+  export type SafeZoneFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter, which SafeZone to fetch.
+     */
+    where: SafeZoneWhereUniqueInput
+  }
+
+  /**
+   * SafeZone findUniqueOrThrow
+   */
+  export type SafeZoneFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter, which SafeZone to fetch.
+     */
+    where: SafeZoneWhereUniqueInput
+  }
+
+  /**
+   * SafeZone findFirst
+   */
+  export type SafeZoneFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter, which SafeZone to fetch.
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafeZones to fetch.
+     */
+    orderBy?: SafeZoneOrderByWithRelationInput | SafeZoneOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SafeZones.
+     */
+    cursor?: SafeZoneWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafeZones from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafeZones.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SafeZones.
+     */
+    distinct?: SafeZoneScalarFieldEnum | SafeZoneScalarFieldEnum[]
+  }
+
+  /**
+   * SafeZone findFirstOrThrow
+   */
+  export type SafeZoneFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter, which SafeZone to fetch.
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafeZones to fetch.
+     */
+    orderBy?: SafeZoneOrderByWithRelationInput | SafeZoneOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SafeZones.
+     */
+    cursor?: SafeZoneWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafeZones from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafeZones.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SafeZones.
+     */
+    distinct?: SafeZoneScalarFieldEnum | SafeZoneScalarFieldEnum[]
+  }
+
+  /**
+   * SafeZone findMany
+   */
+  export type SafeZoneFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter, which SafeZones to fetch.
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SafeZones to fetch.
+     */
+    orderBy?: SafeZoneOrderByWithRelationInput | SafeZoneOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SafeZones.
+     */
+    cursor?: SafeZoneWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SafeZones from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SafeZones.
+     */
+    skip?: number
+    distinct?: SafeZoneScalarFieldEnum | SafeZoneScalarFieldEnum[]
+  }
+
+  /**
+   * SafeZone create
+   */
+  export type SafeZoneCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SafeZone.
+     */
+    data: XOR<SafeZoneCreateInput, SafeZoneUncheckedCreateInput>
+  }
+
+  /**
+   * SafeZone createMany
+   */
+  export type SafeZoneCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SafeZones.
+     */
+    data: SafeZoneCreateManyInput | SafeZoneCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SafeZone createManyAndReturn
+   */
+  export type SafeZoneCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * The data used to create many SafeZones.
+     */
+    data: SafeZoneCreateManyInput | SafeZoneCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SafeZone update
+   */
+  export type SafeZoneUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SafeZone.
+     */
+    data: XOR<SafeZoneUpdateInput, SafeZoneUncheckedUpdateInput>
+    /**
+     * Choose, which SafeZone to update.
+     */
+    where: SafeZoneWhereUniqueInput
+  }
+
+  /**
+   * SafeZone updateMany
+   */
+  export type SafeZoneUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SafeZones.
+     */
+    data: XOR<SafeZoneUpdateManyMutationInput, SafeZoneUncheckedUpdateManyInput>
+    /**
+     * Filter which SafeZones to update
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * Limit how many SafeZones to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SafeZone updateManyAndReturn
+   */
+  export type SafeZoneUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * The data used to update SafeZones.
+     */
+    data: XOR<SafeZoneUpdateManyMutationInput, SafeZoneUncheckedUpdateManyInput>
+    /**
+     * Filter which SafeZones to update
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * Limit how many SafeZones to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SafeZone upsert
+   */
+  export type SafeZoneUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SafeZone to update in case it exists.
+     */
+    where: SafeZoneWhereUniqueInput
+    /**
+     * In case the SafeZone found by the `where` argument doesn't exist, create a new SafeZone with this data.
+     */
+    create: XOR<SafeZoneCreateInput, SafeZoneUncheckedCreateInput>
+    /**
+     * In case the SafeZone was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SafeZoneUpdateInput, SafeZoneUncheckedUpdateInput>
+  }
+
+  /**
+   * SafeZone delete
+   */
+  export type SafeZoneDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+    /**
+     * Filter which SafeZone to delete.
+     */
+    where: SafeZoneWhereUniqueInput
+  }
+
+  /**
+   * SafeZone deleteMany
+   */
+  export type SafeZoneDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SafeZones to delete
+     */
+    where?: SafeZoneWhereInput
+    /**
+     * Limit how many SafeZones to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SafeZone without action
+   */
+  export type SafeZoneDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SafeZone
+     */
+    select?: SafeZoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SafeZone
+     */
+    omit?: SafeZoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SafeZoneInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -13077,6 +14383,21 @@ export namespace Prisma {
   export type VolunteerProfileScalarFieldEnum = (typeof VolunteerProfileScalarFieldEnum)[keyof typeof VolunteerProfileScalarFieldEnum]
 
 
+  export const SafeZoneScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    type: 'type',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    capacity: 'capacity',
+    createdBy: 'createdBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SafeZoneScalarFieldEnum = (typeof SafeZoneScalarFieldEnum)[keyof typeof SafeZoneScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -13222,6 +14543,20 @@ export namespace Prisma {
    * Reference to a field of type 'RescueStatus[]'
    */
   export type ListEnumRescueStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RescueStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SafeZoneType'
+   */
+  export type EnumSafeZoneTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SafeZoneType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SafeZoneType[]'
+   */
+  export type ListEnumSafeZoneTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SafeZoneType[]'>
     
   /**
    * Deep Input Types
@@ -13399,6 +14734,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestListRelationFilter
     volunteerAssignments?: RescueRequestListRelationFilter
     volunteerProfile?: XOR<VolunteerProfileNullableScalarRelationFilter, VolunteerProfileWhereInput> | null
+    createdSafeZones?: SafeZoneListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -13421,6 +14757,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestOrderByRelationAggregateInput
     volunteerAssignments?: RescueRequestOrderByRelationAggregateInput
     volunteerProfile?: VolunteerProfileOrderByWithRelationInput
+    createdSafeZones?: SafeZoneOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -13446,6 +14783,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestListRelationFilter
     volunteerAssignments?: RescueRequestListRelationFilter
     volunteerProfile?: XOR<VolunteerProfileNullableScalarRelationFilter, VolunteerProfileWhereInput> | null
+    createdSafeZones?: SafeZoneListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -13927,6 +15265,83 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"VolunteerProfile"> | Date | string
   }
 
+  export type SafeZoneWhereInput = {
+    AND?: SafeZoneWhereInput | SafeZoneWhereInput[]
+    OR?: SafeZoneWhereInput[]
+    NOT?: SafeZoneWhereInput | SafeZoneWhereInput[]
+    id?: StringFilter<"SafeZone"> | string
+    name?: StringFilter<"SafeZone"> | string
+    type?: EnumSafeZoneTypeFilter<"SafeZone"> | $Enums.SafeZoneType
+    latitude?: FloatFilter<"SafeZone"> | number
+    longitude?: FloatFilter<"SafeZone"> | number
+    capacity?: IntNullableFilter<"SafeZone"> | number | null
+    createdBy?: StringFilter<"SafeZone"> | string
+    createdAt?: DateTimeFilter<"SafeZone"> | Date | string
+    updatedAt?: DateTimeFilter<"SafeZone"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SafeZoneOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    creator?: UserOrderByWithRelationInput
+  }
+
+  export type SafeZoneWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SafeZoneWhereInput | SafeZoneWhereInput[]
+    OR?: SafeZoneWhereInput[]
+    NOT?: SafeZoneWhereInput | SafeZoneWhereInput[]
+    name?: StringFilter<"SafeZone"> | string
+    type?: EnumSafeZoneTypeFilter<"SafeZone"> | $Enums.SafeZoneType
+    latitude?: FloatFilter<"SafeZone"> | number
+    longitude?: FloatFilter<"SafeZone"> | number
+    capacity?: IntNullableFilter<"SafeZone"> | number | null
+    createdBy?: StringFilter<"SafeZone"> | string
+    createdAt?: DateTimeFilter<"SafeZone"> | Date | string
+    updatedAt?: DateTimeFilter<"SafeZone"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type SafeZoneOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrderInput | SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SafeZoneCountOrderByAggregateInput
+    _avg?: SafeZoneAvgOrderByAggregateInput
+    _max?: SafeZoneMaxOrderByAggregateInput
+    _min?: SafeZoneMinOrderByAggregateInput
+    _sum?: SafeZoneSumOrderByAggregateInput
+  }
+
+  export type SafeZoneScalarWhereWithAggregatesInput = {
+    AND?: SafeZoneScalarWhereWithAggregatesInput | SafeZoneScalarWhereWithAggregatesInput[]
+    OR?: SafeZoneScalarWhereWithAggregatesInput[]
+    NOT?: SafeZoneScalarWhereWithAggregatesInput | SafeZoneScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SafeZone"> | string
+    name?: StringWithAggregatesFilter<"SafeZone"> | string
+    type?: EnumSafeZoneTypeWithAggregatesFilter<"SafeZone"> | $Enums.SafeZoneType
+    latitude?: FloatWithAggregatesFilter<"SafeZone"> | number
+    longitude?: FloatWithAggregatesFilter<"SafeZone"> | number
+    capacity?: IntNullableWithAggregatesFilter<"SafeZone"> | number | null
+    createdBy?: StringWithAggregatesFilter<"SafeZone"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SafeZone"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SafeZone"> | Date | string
+  }
+
   export type AccountCreateInput = {
     id?: string
     type: string
@@ -14106,6 +15521,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -14128,6 +15544,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUpdateInput = {
@@ -14150,6 +15567,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -14172,6 +15590,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -14683,6 +16102,89 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SafeZoneCreateInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutCreatedSafeZonesInput
+  }
+
+  export type SafeZoneUncheckedCreateInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SafeZoneUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutCreatedSafeZonesNestedInput
+  }
+
+  export type SafeZoneUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafeZoneCreateManyInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
+    createdBy: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SafeZoneUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafeZoneUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdBy?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -14964,6 +16466,12 @@ export namespace Prisma {
     isNot?: VolunteerProfileWhereInput | null
   }
 
+  export type SafeZoneListRelationFilter = {
+    every?: SafeZoneWhereInput
+    some?: SafeZoneWhereInput
+    none?: SafeZoneWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -14981,6 +16489,10 @@ export namespace Prisma {
   }
 
   export type RescueRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SafeZoneOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15425,6 +16937,71 @@ export namespace Prisma {
     longitude?: SortOrder
   }
 
+  export type EnumSafeZoneTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SafeZoneType | EnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSafeZoneTypeFilter<$PrismaModel> | $Enums.SafeZoneType
+  }
+
+  export type SafeZoneCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SafeZoneAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrder
+  }
+
+  export type SafeZoneMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SafeZoneMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    type?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrder
+    createdBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SafeZoneSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    capacity?: SortOrder
+  }
+
+  export type EnumSafeZoneTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SafeZoneType | EnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSafeZoneTypeWithAggregatesFilter<$PrismaModel> | $Enums.SafeZoneType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSafeZoneTypeFilter<$PrismaModel>
+    _max?: NestedEnumSafeZoneTypeFilter<$PrismaModel>
+  }
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
@@ -15521,6 +17098,13 @@ export namespace Prisma {
     connect?: VolunteerProfileWhereUniqueInput
   }
 
+  export type SafeZoneCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput> | SafeZoneCreateWithoutCreatorInput[] | SafeZoneUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: SafeZoneCreateOrConnectWithoutCreatorInput | SafeZoneCreateOrConnectWithoutCreatorInput[]
+    createMany?: SafeZoneCreateManyCreatorInputEnvelope
+    connect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -15567,6 +17151,13 @@ export namespace Prisma {
     create?: XOR<VolunteerProfileCreateWithoutUserInput, VolunteerProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: VolunteerProfileCreateOrConnectWithoutUserInput
     connect?: VolunteerProfileWhereUniqueInput
+  }
+
+  export type SafeZoneUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput> | SafeZoneCreateWithoutCreatorInput[] | SafeZoneUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: SafeZoneCreateOrConnectWithoutCreatorInput | SafeZoneCreateOrConnectWithoutCreatorInput[]
+    createMany?: SafeZoneCreateManyCreatorInputEnvelope
+    connect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -15683,6 +17274,20 @@ export namespace Prisma {
     update?: XOR<XOR<VolunteerProfileUpdateToOneWithWhereWithoutUserInput, VolunteerProfileUpdateWithoutUserInput>, VolunteerProfileUncheckedUpdateWithoutUserInput>
   }
 
+  export type SafeZoneUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput> | SafeZoneCreateWithoutCreatorInput[] | SafeZoneUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: SafeZoneCreateOrConnectWithoutCreatorInput | SafeZoneCreateOrConnectWithoutCreatorInput[]
+    upsert?: SafeZoneUpsertWithWhereUniqueWithoutCreatorInput | SafeZoneUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: SafeZoneCreateManyCreatorInputEnvelope
+    set?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    disconnect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    delete?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    connect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    update?: SafeZoneUpdateWithWhereUniqueWithoutCreatorInput | SafeZoneUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: SafeZoneUpdateManyWithWhereWithoutCreatorInput | SafeZoneUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: SafeZoneScalarWhereInput | SafeZoneScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -15775,6 +17380,20 @@ export namespace Prisma {
     delete?: VolunteerProfileWhereInput | boolean
     connect?: VolunteerProfileWhereUniqueInput
     update?: XOR<XOR<VolunteerProfileUpdateToOneWithWhereWithoutUserInput, VolunteerProfileUpdateWithoutUserInput>, VolunteerProfileUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput> | SafeZoneCreateWithoutCreatorInput[] | SafeZoneUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: SafeZoneCreateOrConnectWithoutCreatorInput | SafeZoneCreateOrConnectWithoutCreatorInput[]
+    upsert?: SafeZoneUpsertWithWhereUniqueWithoutCreatorInput | SafeZoneUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: SafeZoneCreateManyCreatorInputEnvelope
+    set?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    disconnect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    delete?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    connect?: SafeZoneWhereUniqueInput | SafeZoneWhereUniqueInput[]
+    update?: SafeZoneUpdateWithWhereUniqueWithoutCreatorInput | SafeZoneUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: SafeZoneUpdateManyWithWhereWithoutCreatorInput | SafeZoneUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: SafeZoneScalarWhereInput | SafeZoneScalarWhereInput[]
   }
 
   export type EnumDisasterTypeFieldUpdateOperationsInput = {
@@ -15871,6 +17490,24 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutVolunteerProfileInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutVolunteerProfileInput, UserUpdateWithoutVolunteerProfileInput>, UserUncheckedUpdateWithoutVolunteerProfileInput>
+  }
+
+  export type UserCreateNestedOneWithoutCreatedSafeZonesInput = {
+    create?: XOR<UserCreateWithoutCreatedSafeZonesInput, UserUncheckedCreateWithoutCreatedSafeZonesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedSafeZonesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumSafeZoneTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SafeZoneType
+  }
+
+  export type UserUpdateOneRequiredWithoutCreatedSafeZonesNestedInput = {
+    create?: XOR<UserCreateWithoutCreatedSafeZonesInput, UserUncheckedCreateWithoutCreatedSafeZonesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedSafeZonesInput
+    upsert?: UserUpsertWithoutCreatedSafeZonesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCreatedSafeZonesInput, UserUpdateWithoutCreatedSafeZonesInput>, UserUncheckedUpdateWithoutCreatedSafeZonesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -16175,6 +17812,23 @@ export namespace Prisma {
     _max?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumSafeZoneTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SafeZoneType | EnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSafeZoneTypeFilter<$PrismaModel> | $Enums.SafeZoneType
+  }
+
+  export type NestedEnumSafeZoneTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SafeZoneType | EnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SafeZoneType[] | ListEnumSafeZoneTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSafeZoneTypeWithAggregatesFilter<$PrismaModel> | $Enums.SafeZoneType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSafeZoneTypeFilter<$PrismaModel>
+    _max?: NestedEnumSafeZoneTypeFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -16194,6 +17848,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -16215,6 +17870,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -16252,6 +17908,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -16273,6 +17930,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -16294,6 +17952,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -16315,6 +17974,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -16352,6 +18012,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -16373,6 +18034,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -16600,6 +18262,38 @@ export namespace Prisma {
     create: XOR<VolunteerProfileCreateWithoutUserInput, VolunteerProfileUncheckedCreateWithoutUserInput>
   }
 
+  export type SafeZoneCreateWithoutCreatorInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SafeZoneUncheckedCreateWithoutCreatorInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SafeZoneCreateOrConnectWithoutCreatorInput = {
+    where: SafeZoneWhereUniqueInput
+    create: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type SafeZoneCreateManyCreatorInputEnvelope = {
+    data: SafeZoneCreateManyCreatorInput | SafeZoneCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
     update: XOR<AccountUpdateWithoutUserInput, AccountUncheckedUpdateWithoutUserInput>
@@ -16797,6 +18491,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SafeZoneUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: SafeZoneWhereUniqueInput
+    update: XOR<SafeZoneUpdateWithoutCreatorInput, SafeZoneUncheckedUpdateWithoutCreatorInput>
+    create: XOR<SafeZoneCreateWithoutCreatorInput, SafeZoneUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type SafeZoneUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: SafeZoneWhereUniqueInput
+    data: XOR<SafeZoneUpdateWithoutCreatorInput, SafeZoneUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type SafeZoneUpdateManyWithWhereWithoutCreatorInput = {
+    where: SafeZoneScalarWhereInput
+    data: XOR<SafeZoneUpdateManyMutationInput, SafeZoneUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type SafeZoneScalarWhereInput = {
+    AND?: SafeZoneScalarWhereInput | SafeZoneScalarWhereInput[]
+    OR?: SafeZoneScalarWhereInput[]
+    NOT?: SafeZoneScalarWhereInput | SafeZoneScalarWhereInput[]
+    id?: StringFilter<"SafeZone"> | string
+    name?: StringFilter<"SafeZone"> | string
+    type?: EnumSafeZoneTypeFilter<"SafeZone"> | $Enums.SafeZoneType
+    latitude?: FloatFilter<"SafeZone"> | number
+    longitude?: FloatFilter<"SafeZone"> | number
+    capacity?: IntNullableFilter<"SafeZone"> | number | null
+    createdBy?: StringFilter<"SafeZone"> | string
+    createdAt?: DateTimeFilter<"SafeZone"> | Date | string
+    updatedAt?: DateTimeFilter<"SafeZone"> | Date | string
+  }
+
   export type UserCreateWithoutEmergencyRequestsInput = {
     id?: string
     name?: string | null
@@ -16816,6 +18541,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutEmergencyRequestsInput = {
@@ -16837,6 +18563,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutEmergencyRequestsInput = {
@@ -16874,6 +18601,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmergencyRequestsInput = {
@@ -16895,6 +18623,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserCreateWithoutSafetyConfirmationsInput = {
@@ -16916,6 +18645,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutSafetyConfirmationsInput = {
@@ -16937,6 +18667,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutSafetyConfirmationsInput = {
@@ -16974,6 +18705,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSafetyConfirmationsInput = {
@@ -16995,6 +18727,7 @@ export namespace Prisma {
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserCreateWithoutRescueRequestsInput = {
@@ -17016,6 +18749,7 @@ export namespace Prisma {
     sessions?: SessionCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutRescueRequestsInput = {
@@ -17037,6 +18771,7 @@ export namespace Prisma {
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutRescueRequestsInput = {
@@ -17063,6 +18798,7 @@ export namespace Prisma {
     sessions?: SessionCreateNestedManyWithoutUserInput
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutVolunteerAssignmentsInput = {
@@ -17084,6 +18820,7 @@ export namespace Prisma {
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutVolunteerAssignmentsInput = {
@@ -17121,6 +18858,7 @@ export namespace Prisma {
     sessions?: SessionUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRescueRequestsInput = {
@@ -17142,6 +18880,7 @@ export namespace Prisma {
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUpsertWithoutVolunteerAssignmentsInput = {
@@ -17174,6 +18913,7 @@ export namespace Prisma {
     sessions?: SessionUpdateManyWithoutUserNestedInput
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVolunteerAssignmentsInput = {
@@ -17195,6 +18935,7 @@ export namespace Prisma {
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserCreateWithoutVolunteerProfileInput = {
@@ -17216,6 +18957,7 @@ export namespace Prisma {
     sessions?: SessionCreateNestedManyWithoutUserInput
     rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
+    createdSafeZones?: SafeZoneCreateNestedManyWithoutCreatorInput
   }
 
   export type UserUncheckedCreateWithoutVolunteerProfileInput = {
@@ -17237,6 +18979,7 @@ export namespace Prisma {
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
     volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
+    createdSafeZones?: SafeZoneUncheckedCreateNestedManyWithoutCreatorInput
   }
 
   export type UserCreateOrConnectWithoutVolunteerProfileInput = {
@@ -17274,6 +19017,7 @@ export namespace Prisma {
     sessions?: SessionUpdateManyWithoutUserNestedInput
     rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
+    createdSafeZones?: SafeZoneUpdateManyWithoutCreatorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVolunteerProfileInput = {
@@ -17295,6 +19039,111 @@ export namespace Prisma {
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
     volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
+    createdSafeZones?: SafeZoneUncheckedUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type UserCreateWithoutCreatedSafeZonesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    rescueRequests?: RescueRequestCreateNestedManyWithoutUserInput
+    volunteerAssignments?: RescueRequestCreateNestedManyWithoutVolunteerInput
+    volunteerProfile?: VolunteerProfileCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutCreatedSafeZonesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    role?: $Enums.Role
+    phoneNumber?: string | null
+    password?: string | null
+    latitude?: number | null
+    longitude?: number | null
+    address?: string | null
+    profileCompleted?: boolean
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    emergencyRequests?: EmergencyRequestUncheckedCreateNestedManyWithoutUserInput
+    safetyConfirmations?: SafetyConfirmationUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    rescueRequests?: RescueRequestUncheckedCreateNestedManyWithoutUserInput
+    volunteerAssignments?: RescueRequestUncheckedCreateNestedManyWithoutVolunteerInput
+    volunteerProfile?: VolunteerProfileUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutCreatedSafeZonesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCreatedSafeZonesInput, UserUncheckedCreateWithoutCreatedSafeZonesInput>
+  }
+
+  export type UserUpsertWithoutCreatedSafeZonesInput = {
+    update: XOR<UserUpdateWithoutCreatedSafeZonesInput, UserUncheckedUpdateWithoutCreatedSafeZonesInput>
+    create: XOR<UserCreateWithoutCreatedSafeZonesInput, UserUncheckedCreateWithoutCreatedSafeZonesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCreatedSafeZonesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCreatedSafeZonesInput, UserUncheckedUpdateWithoutCreatedSafeZonesInput>
+  }
+
+  export type UserUpdateWithoutCreatedSafeZonesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    rescueRequests?: RescueRequestUpdateManyWithoutUserNestedInput
+    volunteerAssignments?: RescueRequestUpdateManyWithoutVolunteerNestedInput
+    volunteerProfile?: VolunteerProfileUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCreatedSafeZonesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    phoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    profileCompleted?: BoolFieldUpdateOperationsInput | boolean
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    emergencyRequests?: EmergencyRequestUncheckedUpdateManyWithoutUserNestedInput
+    safetyConfirmations?: SafetyConfirmationUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    rescueRequests?: RescueRequestUncheckedUpdateManyWithoutUserNestedInput
+    volunteerAssignments?: RescueRequestUncheckedUpdateManyWithoutVolunteerNestedInput
+    volunteerProfile?: VolunteerProfileUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -17365,6 +19214,17 @@ export namespace Prisma {
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
     completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SafeZoneCreateManyCreatorInput = {
+    id?: string
+    name: string
+    type: $Enums.SafeZoneType
+    latitude: number
+    longitude: number
+    capacity?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17581,6 +19441,39 @@ export namespace Prisma {
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafeZoneUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafeZoneUncheckedUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SafeZoneUncheckedUpdateManyWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumSafeZoneTypeFieldUpdateOperationsInput | $Enums.SafeZoneType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    capacity?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
