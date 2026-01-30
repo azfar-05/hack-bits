@@ -109,6 +109,9 @@ enum DisasterType {
   FLOOD
   EARTHQUAKE
   FIRE
+  MEDICAL
+  BUILDING_COLLAPSE
+  OTHER
 }
 
 enum EmergencyStatus {
@@ -127,22 +130,24 @@ enum RescueStatus {
 
 // Rescue requests (SOS) from users in danger
 model RescueRequest {
-  id               String       @id @default(cuid())
+  id               String        @id @default(cuid())
   userId           String
-  user             User         @relation("UserRescueRequests", fields: [userId], references: [id])
+  user             User          @relation("UserRescueRequests", fields: [userId], references: [id])
   volunteerId      String?
-  volunteer        User?        @relation("VolunteerAssignments", fields: [volunteerId], references: [id])
-  status           RescueStatus @default(PENDING)
+  volunteer        User?         @relation("VolunteerAssignments", fields: [volunteerId], references: [id])
+  status           RescueStatus  @default(PENDING)
   message          String?
   location         String?
   latitude         Float?
   longitude        Float?
+  disasterType     DisasterType? // Optional post-SOS detail
+  note             String? // Optional post-SOS note
   searchRadiusUsed Float? // km radius that found the volunteer (2, 5, or 10)
   escalatedAt      DateTime?
   assignedAt       DateTime?
   completedAt      DateTime?
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@index([status])
   @@index([volunteerId])

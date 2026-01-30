@@ -424,6 +424,45 @@ export const rescueRouter = createTRPCRouter({
       return updatedRequest;
     }),
 
+  // Update optional post-SOS details (disaster type, note) - request owner only
+  updateDetails: protectedProcedure
+    .input(
+      z.object({
+        requestId: z.string(),
+        disasterType: z.enum(["FLOOD", "EARTHQUAKE", "FIRE", "MEDICAL", "BUILDING_COLLAPSE", "OTHER"]).optional(),
+        note: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const request = await ctx.db.rescueRequest.findUnique({
+        where: { id: input.requestId },
+      });
+
+      if (!request) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Rescue request not found",
+        });
+      }
+
+      if (request.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only update your own requests",
+        });
+      }
+
+      const updated = await ctx.db.rescueRequest.update({
+        where: { id: input.requestId },
+        data: {
+          ...(input.disasterType != null && { disasterType: input.disasterType }),
+          ...(input.note != null && { note: input.note }),
+        },
+      });
+
+      return updated;
+    }),
+
   // Cancel a rescue request - USER only
   cancel: protectedProcedure
     .input(z.object({ requestId: z.string() }))

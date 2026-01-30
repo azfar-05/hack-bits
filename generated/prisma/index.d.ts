@@ -80,7 +80,10 @@ export type Role = (typeof Role)[keyof typeof Role]
 export const DisasterType: {
   FLOOD: 'FLOOD',
   EARTHQUAKE: 'EARTHQUAKE',
-  FIRE: 'FIRE'
+  FIRE: 'FIRE',
+  MEDICAL: 'MEDICAL',
+  BUILDING_COLLAPSE: 'BUILDING_COLLAPSE',
+  OTHER: 'OTHER'
 };
 
 export type DisasterType = (typeof DisasterType)[keyof typeof DisasterType]
@@ -10489,6 +10492,8 @@ export namespace Prisma {
     location: string | null
     latitude: number | null
     longitude: number | null
+    disasterType: $Enums.DisasterType | null
+    note: string | null
     searchRadiusUsed: number | null
     escalatedAt: Date | null
     assignedAt: Date | null
@@ -10506,6 +10511,8 @@ export namespace Prisma {
     location: string | null
     latitude: number | null
     longitude: number | null
+    disasterType: $Enums.DisasterType | null
+    note: string | null
     searchRadiusUsed: number | null
     escalatedAt: Date | null
     assignedAt: Date | null
@@ -10523,6 +10530,8 @@ export namespace Prisma {
     location: number
     latitude: number
     longitude: number
+    disasterType: number
+    note: number
     searchRadiusUsed: number
     escalatedAt: number
     assignedAt: number
@@ -10554,6 +10563,8 @@ export namespace Prisma {
     location?: true
     latitude?: true
     longitude?: true
+    disasterType?: true
+    note?: true
     searchRadiusUsed?: true
     escalatedAt?: true
     assignedAt?: true
@@ -10571,6 +10582,8 @@ export namespace Prisma {
     location?: true
     latitude?: true
     longitude?: true
+    disasterType?: true
+    note?: true
     searchRadiusUsed?: true
     escalatedAt?: true
     assignedAt?: true
@@ -10588,6 +10601,8 @@ export namespace Prisma {
     location?: true
     latitude?: true
     longitude?: true
+    disasterType?: true
+    note?: true
     searchRadiusUsed?: true
     escalatedAt?: true
     assignedAt?: true
@@ -10692,6 +10707,8 @@ export namespace Prisma {
     location: string | null
     latitude: number | null
     longitude: number | null
+    disasterType: $Enums.DisasterType | null
+    note: string | null
     searchRadiusUsed: number | null
     escalatedAt: Date | null
     assignedAt: Date | null
@@ -10728,6 +10745,8 @@ export namespace Prisma {
     location?: boolean
     latitude?: boolean
     longitude?: boolean
+    disasterType?: boolean
+    note?: boolean
     searchRadiusUsed?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
@@ -10747,6 +10766,8 @@ export namespace Prisma {
     location?: boolean
     latitude?: boolean
     longitude?: boolean
+    disasterType?: boolean
+    note?: boolean
     searchRadiusUsed?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
@@ -10766,6 +10787,8 @@ export namespace Prisma {
     location?: boolean
     latitude?: boolean
     longitude?: boolean
+    disasterType?: boolean
+    note?: boolean
     searchRadiusUsed?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
@@ -10785,6 +10808,8 @@ export namespace Prisma {
     location?: boolean
     latitude?: boolean
     longitude?: boolean
+    disasterType?: boolean
+    note?: boolean
     searchRadiusUsed?: boolean
     escalatedAt?: boolean
     assignedAt?: boolean
@@ -10793,7 +10818,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type RescueRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "volunteerId" | "status" | "message" | "location" | "latitude" | "longitude" | "searchRadiusUsed" | "escalatedAt" | "assignedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rescueRequest"]>
+  export type RescueRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "volunteerId" | "status" | "message" | "location" | "latitude" | "longitude" | "disasterType" | "note" | "searchRadiusUsed" | "escalatedAt" | "assignedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["rescueRequest"]>
   export type RescueRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     volunteer?: boolean | RescueRequest$volunteerArgs<ExtArgs>
@@ -10822,6 +10847,8 @@ export namespace Prisma {
       location: string | null
       latitude: number | null
       longitude: number | null
+      disasterType: $Enums.DisasterType | null
+      note: string | null
       searchRadiusUsed: number | null
       escalatedAt: Date | null
       assignedAt: Date | null
@@ -11261,6 +11288,8 @@ export namespace Prisma {
     readonly location: FieldRef<"RescueRequest", 'String'>
     readonly latitude: FieldRef<"RescueRequest", 'Float'>
     readonly longitude: FieldRef<"RescueRequest", 'Float'>
+    readonly disasterType: FieldRef<"RescueRequest", 'DisasterType'>
+    readonly note: FieldRef<"RescueRequest", 'String'>
     readonly searchRadiusUsed: FieldRef<"RescueRequest", 'Float'>
     readonly escalatedAt: FieldRef<"RescueRequest", 'DateTime'>
     readonly assignedAt: FieldRef<"RescueRequest", 'DateTime'>
@@ -12929,6 +12958,8 @@ export namespace Prisma {
     location: 'location',
     latitude: 'latitude',
     longitude: 'longitude',
+    disasterType: 'disasterType',
+    note: 'note',
     searchRadiusUsed: 'searchRadiusUsed',
     escalatedAt: 'escalatedAt',
     assignedAt: 'assignedAt',
@@ -13615,6 +13646,8 @@ export namespace Prisma {
     location?: StringNullableFilter<"RescueRequest"> | string | null
     latitude?: FloatNullableFilter<"RescueRequest"> | number | null
     longitude?: FloatNullableFilter<"RescueRequest"> | number | null
+    disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
+    note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -13634,6 +13667,8 @@ export namespace Prisma {
     location?: SortOrderInput | SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
+    disasterType?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
     searchRadiusUsed?: SortOrderInput | SortOrder
     escalatedAt?: SortOrderInput | SortOrder
     assignedAt?: SortOrderInput | SortOrder
@@ -13656,6 +13691,8 @@ export namespace Prisma {
     location?: StringNullableFilter<"RescueRequest"> | string | null
     latitude?: FloatNullableFilter<"RescueRequest"> | number | null
     longitude?: FloatNullableFilter<"RescueRequest"> | number | null
+    disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
+    note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -13675,6 +13712,8 @@ export namespace Prisma {
     location?: SortOrderInput | SortOrder
     latitude?: SortOrderInput | SortOrder
     longitude?: SortOrderInput | SortOrder
+    disasterType?: SortOrderInput | SortOrder
+    note?: SortOrderInput | SortOrder
     searchRadiusUsed?: SortOrderInput | SortOrder
     escalatedAt?: SortOrderInput | SortOrder
     assignedAt?: SortOrderInput | SortOrder
@@ -13700,6 +13739,8 @@ export namespace Prisma {
     location?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     latitude?: FloatNullableWithAggregatesFilter<"RescueRequest"> | number | null
     longitude?: FloatNullableWithAggregatesFilter<"RescueRequest"> | number | null
+    disasterType?: EnumDisasterTypeNullableWithAggregatesFilter<"RescueRequest"> | $Enums.DisasterType | null
+    note?: StringNullableWithAggregatesFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableWithAggregatesFilter<"RescueRequest"> | number | null
     escalatedAt?: DateTimeNullableWithAggregatesFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableWithAggregatesFilter<"RescueRequest"> | Date | string | null
@@ -14312,6 +14353,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -14331,6 +14374,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -14346,6 +14391,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14365,6 +14412,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14382,6 +14431,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -14397,6 +14448,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14414,6 +14467,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15037,6 +15092,13 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type EnumDisasterTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumDisasterTypeNullableFilter<$PrismaModel> | $Enums.DisasterType | null
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -15051,6 +15113,8 @@ export namespace Prisma {
     location?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    disasterType?: SortOrder
+    note?: SortOrder
     searchRadiusUsed?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
@@ -15074,6 +15138,8 @@ export namespace Prisma {
     location?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    disasterType?: SortOrder
+    note?: SortOrder
     searchRadiusUsed?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
@@ -15091,6 +15157,8 @@ export namespace Prisma {
     location?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    disasterType?: SortOrder
+    note?: SortOrder
     searchRadiusUsed?: SortOrder
     escalatedAt?: SortOrder
     assignedAt?: SortOrder
@@ -15129,6 +15197,16 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type EnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.DisasterType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -15589,6 +15667,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableEnumDisasterTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DisasterType | null
+  }
+
   export type UserUpdateOneRequiredWithoutRescueRequestsNestedInput = {
     create?: XOR<UserCreateWithoutRescueRequestsInput, UserUncheckedCreateWithoutRescueRequestsInput>
     connectOrCreate?: UserCreateOrConnectWithoutRescueRequestsInput
@@ -15871,6 +15953,13 @@ export namespace Prisma {
     not?: NestedEnumRescueStatusFilter<$PrismaModel> | $Enums.RescueStatus
   }
 
+  export type NestedEnumDisasterTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumDisasterTypeNullableFilter<$PrismaModel> | $Enums.DisasterType | null
+  }
+
   export type NestedEnumRescueStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.RescueStatus | EnumRescueStatusFieldRefInput<$PrismaModel>
     in?: $Enums.RescueStatus[] | ListEnumRescueStatusFieldRefInput<$PrismaModel>
@@ -15895,6 +15984,16 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumDisasterTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.DisasterType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumDisasterTypeNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -16197,6 +16296,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -16214,6 +16315,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -16239,6 +16342,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -16256,6 +16361,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -16439,6 +16546,8 @@ export namespace Prisma {
     location?: StringNullableFilter<"RescueRequest"> | string | null
     latitude?: FloatNullableFilter<"RescueRequest"> | number | null
     longitude?: FloatNullableFilter<"RescueRequest"> | number | null
+    disasterType?: EnumDisasterTypeNullableFilter<"RescueRequest"> | $Enums.DisasterType | null
+    note?: StringNullableFilter<"RescueRequest"> | string | null
     searchRadiusUsed?: FloatNullableFilter<"RescueRequest"> | number | null
     escalatedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
     assignedAt?: DateTimeNullableFilter<"RescueRequest"> | Date | string | null
@@ -16954,6 +17063,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -16970,6 +17081,8 @@ export namespace Prisma {
     location?: string | null
     latitude?: number | null
     longitude?: number | null
+    disasterType?: $Enums.DisasterType | null
+    note?: string | null
     searchRadiusUsed?: number | null
     escalatedAt?: Date | string | null
     assignedAt?: Date | string | null
@@ -17093,6 +17206,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17110,6 +17225,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17126,6 +17243,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17141,6 +17260,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17158,6 +17279,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17174,6 +17297,8 @@ export namespace Prisma {
     location?: NullableStringFieldUpdateOperationsInput | string | null
     latitude?: NullableFloatFieldUpdateOperationsInput | number | null
     longitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    disasterType?: NullableEnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType | null
+    note?: NullableStringFieldUpdateOperationsInput | string | null
     searchRadiusUsed?: NullableFloatFieldUpdateOperationsInput | number | null
     escalatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

@@ -203,6 +203,8 @@ exports.Prisma.RescueRequestScalarFieldEnum = {
   location: 'location',
   latitude: 'latitude',
   longitude: 'longitude',
+  disasterType: 'disasterType',
+  note: 'note',
   searchRadiusUsed: 'searchRadiusUsed',
   escalatedAt: 'escalatedAt',
   assignedAt: 'assignedAt',
@@ -243,7 +245,10 @@ exports.Role = exports.$Enums.Role = {
 exports.DisasterType = exports.$Enums.DisasterType = {
   FLOOD: 'FLOOD',
   EARTHQUAKE: 'EARTHQUAKE',
-  FIRE: 'FIRE'
+  FIRE: 'FIRE',
+  MEDICAL: 'MEDICAL',
+  BUILDING_COLLAPSE: 'BUILDING_COLLAPSE',
+  OTHER: 'OTHER'
 };
 
 exports.EmergencyStatus = exports.$Enums.EmergencyStatus = {
