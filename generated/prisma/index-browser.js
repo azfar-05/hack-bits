@@ -259,6 +259,202 @@ exports.Prisma.ResourceNodeScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  senderId: 'senderId',
+  receiverId: 'receiverId',
+  content: 'content',
+  messageType: 'messageType',
+  status: 'status',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CommunityGroupScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  type: 'type',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  radiusKm: 'radiusKm',
+  ownerId: 'ownerId',
+  isPublic: 'isPublic',
+  maxMembers: 'maxMembers',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GroupMembershipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  groupId: 'groupId',
+  role: 'role',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.CommunityPostScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  authorId: 'authorId',
+  title: 'title',
+  content: 'content',
+  postType: 'postType',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TrainingModuleScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  content: 'content',
+  difficulty: 'difficulty',
+  duration: 'duration',
+  category: 'category',
+  isRequired: 'isRequired',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TrainingProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  moduleId: 'moduleId',
+  status: 'status',
+  progress: 'progress',
+  score: 'score',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  expiresAt: 'expiresAt'
+};
+
+exports.Prisma.RiskAssessmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  disasterType: 'disasterType',
+  riskScore: 'riskScore',
+  confidence: 'confidence',
+  factors: 'factors',
+  recommendations: 'recommendations',
+  validUntil: 'validUntil',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RealtimeChannelScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  description: 'description',
+  isActive: 'isActive',
+  priority: 'priority',
+  isPublic: 'isPublic',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChannelMembershipScalarFieldEnum = {
+  id: 'id',
+  channelId: 'channelId',
+  userId: 'userId',
+  role: 'role',
+  canRead: 'canRead',
+  canWrite: 'canWrite',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.DirectConversationScalarFieldEnum = {
+  id: 'id',
+  participant1: 'participant1',
+  participant2: 'participant2',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DirectMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderId: 'senderId',
+  content: 'content',
+  messageType: 'messageType',
+  priority: 'priority',
+  location: 'location',
+  metadata: 'metadata',
+  isRead: 'isRead',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RealtimeMessageScalarFieldEnum = {
+  id: 'id',
+  channelId: 'channelId',
+  senderId: 'senderId',
+  content: 'content',
+  messageType: 'messageType',
+  priority: 'priority',
+  location: 'location',
+  metadata: 'metadata',
+  isSystemMessage: 'isSystemMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChannelAccessScalarFieldEnum = {
+  id: 'id',
+  channelId: 'channelId',
+  userId: 'userId',
+  role: 'role',
+  canRead: 'canRead',
+  canWrite: 'canWrite',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.EmergencyBroadcastScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  priority: 'priority',
+  senderId: 'senderId',
+  affectedArea: 'affectedArea',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+};
+
+exports.Prisma.PointOfInterestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category: 'category',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  address: 'address',
+  phoneNumber: 'phoneNumber',
+  capacity: 'capacity',
+  isActive: 'isActive',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DangerZoneScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  radiusKm: 'radiusKm',
+  riskLevel: 'riskLevel',
+  isActive: 'isActive',
+  validUntil: 'validUntil',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -322,6 +518,69 @@ exports.CreatorType = exports.$Enums.CreatorType = {
   AUTHORITY: 'AUTHORITY'
 };
 
+exports.MessageType = exports.$Enums.MessageType = {
+  TEXT: 'TEXT',
+  LOCATION: 'LOCATION',
+  RESOURCE_SHARE: 'RESOURCE_SHARE',
+  EMERGENCY_UPDATE: 'EMERGENCY_UPDATE',
+  SYSTEM: 'SYSTEM'
+};
+
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ'
+};
+
+exports.CommunityGroupType = exports.$Enums.CommunityGroupType = {
+  NEIGHBORHOOD: 'NEIGHBORHOOD',
+  DISASTER_RESPONSE: 'DISASTER_RESPONSE',
+  TRAINING: 'TRAINING',
+  GENERAL: 'GENERAL'
+};
+
+exports.TrainingDifficulty = exports.$Enums.TrainingDifficulty = {
+  BEGINNER: 'BEGINNER',
+  INTERMEDIATE: 'INTERMEDIATE',
+  ADVANCED: 'ADVANCED'
+};
+
+exports.TrainingStatus = exports.$Enums.TrainingStatus = {
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  EXPIRED: 'EXPIRED'
+};
+
+exports.RealtimeChannelType = exports.$Enums.RealtimeChannelType = {
+  EMERGENCY: 'EMERGENCY',
+  AUTHORITY: 'AUTHORITY',
+  VOLUNTEER: 'VOLUNTEER',
+  COMMAND: 'COMMAND',
+  GENERAL: 'GENERAL'
+};
+
+exports.RealtimeMessageType = exports.$Enums.RealtimeMessageType = {
+  TEXT: 'TEXT',
+  LOCATION: 'LOCATION',
+  ALERT: 'ALERT',
+  STATUS: 'STATUS',
+  BROADCAST: 'BROADCAST'
+};
+
+exports.MessagePriority = exports.$Enums.MessagePriority = {
+  LOW: 'LOW',
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
+exports.RiskLevel = exports.$Enums.RiskLevel = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
@@ -334,7 +593,23 @@ exports.Prisma.ModelName = {
   RescueRequest: 'RescueRequest',
   VolunteerProfile: 'VolunteerProfile',
   SafeZone: 'SafeZone',
-  ResourceNode: 'ResourceNode'
+  ResourceNode: 'ResourceNode',
+  Message: 'Message',
+  CommunityGroup: 'CommunityGroup',
+  GroupMembership: 'GroupMembership',
+  CommunityPost: 'CommunityPost',
+  TrainingModule: 'TrainingModule',
+  TrainingProgress: 'TrainingProgress',
+  RiskAssessment: 'RiskAssessment',
+  RealtimeChannel: 'RealtimeChannel',
+  ChannelMembership: 'ChannelMembership',
+  DirectConversation: 'DirectConversation',
+  DirectMessage: 'DirectMessage',
+  RealtimeMessage: 'RealtimeMessage',
+  ChannelAccess: 'ChannelAccess',
+  EmergencyBroadcast: 'EmergencyBroadcast',
+  PointOfInterest: 'PointOfInterest',
+  DangerZone: 'DangerZone'
 };
 
 /**

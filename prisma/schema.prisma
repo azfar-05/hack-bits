@@ -64,6 +64,26 @@ model User {
   createdSafeZones     SafeZone[]
   // Resource nodes created by this user
   createdResourceNodes ResourceNode[]
+  // Messaging system
+  sentMessages         Message[]            @relation("SentMessages")
+  receivedMessages     Message[]            @relation("ReceivedMessages")
+  // Community groups
+  ownedGroups          CommunityGroup[]     @relation("GroupOwner")
+  groupMemberships     GroupMembership[]
+  communityPosts       CommunityPost[]
+  // Training progress
+  trainingProgress     TrainingProgress[]
+  // AI/ML features
+  riskAssessments      RiskAssessment[]
+  // Real-time communication
+  realtimeMessages     RealtimeMessage[]
+  channelAccess        ChannelAccess[]
+  channelMemberships   ChannelMembership[]
+  emergencyBroadcasts  EmergencyBroadcast[]
+  // Direct messaging
+  directConversations1 DirectConversation[] @relation("Participant1")
+  directConversations2 DirectConversation[] @relation("Participant2")
+  directMessages       DirectMessage[]
 }
 
 model VerificationToken {
@@ -174,6 +194,45 @@ enum CreatorType {
   AUTHORITY
 }
 
+// Message types for in-app messaging
+enum MessageType {
+  TEXT
+  LOCATION
+  RESOURCE_SHARE
+  EMERGENCY_UPDATE
+  SYSTEM
+}
+
+// Message status
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+// Training module status
+enum TrainingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+// Training module difficulty
+enum TrainingDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+// Community group types
+enum CommunityGroupType {
+  NEIGHBORHOOD
+  DISASTER_RESPONSE
+  TRAINING
+  GENERAL
+}
+
 // Rescue requests (SOS) from users in danger
 model RescueRequest {
   id              String        @id @default(cuid())
@@ -248,4 +307,325 @@ model ResourceNode {
 
   @@index([latitude, longitude])
   @@index([resourceType])
+}
+
+// In-app messaging system
+model Message {
+  id          String        @id @default(cuid())
+  senderId    String
+  receiverId  String
+  content     String
+  messageType MessageType   @default(TEXT)
+  status      MessageStatus @default(SENT)
+  metadata    String?       // JSON for location, resource info, etc.
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  sender      User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User          @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+// Community groups for neighborhood watch, disaster response teams, etc.
+model CommunityGroup {
+  id          String              @id @default(cuid())
+  name        String
+  description String?
+  type        CommunityGroupType
+  latitude    Float?              // Optional location for location-based groups
+  longitude   Float?
+  radiusKm    Float?              // For neighborhood groups
+  ownerId     String
+  isPublic    Boolean             @default(true)
+  maxMembers  Int?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  owner       User                @relation("GroupOwner", fields: [ownerId], references: [id])
+  members     GroupMembership[]
+  posts       CommunityPost[]
+
+  @@index([type])
+  @@index([latitude, longitude])
+}
+
+model GroupMembership {
+  id      String         @id @default(cuid())
+  userId  String
+  groupId String
+  role    String         @default("MEMBER") // MEMBER, MODERATOR, ADMIN
+  joinedAt DateTime      @default(now())
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   CommunityGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+}
+
+model CommunityPost {
+  id        String         @id @default(cuid())
+  groupId   String
+  authorId  String
+  title     String?
+  content   String
+  postType  String         @default("TEXT") // TEXT, ALERT, RESOURCE, EVENT
+  metadata  String?        // JSON for additional data
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  group     CommunityGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([createdAt])
+}
+
+// Training modules for volunteers and community members
+model TrainingModule {
+  id          String             @id @default(cuid())
+  title       String
+  description String
+  content     String             // Rich text content
+  difficulty  TrainingDifficulty
+  duration    Int                // Minutes
+  category    String             // "First Aid", "Disaster Response", etc.
+  isRequired  Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  progress    TrainingProgress[]
+
+  @@index([category])
+  @@index([difficulty])
+}
+
+model TrainingProgress {
+  id         String          @id @default(cuid())
+  userId     String
+  moduleId   String
+  status     TrainingStatus  @default(NOT_STARTED)
+  progress   Int             @default(0) // Percentage 0-100
+  score      Int?            // Quiz score if applicable
+  startedAt  DateTime?
+  completedAt DateTime?
+  expiresAt  DateTime?       // For certifications that expire
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module     TrainingModule  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@index([status])
+}
+
+// AI/ML Risk Assessment for predictive analytics
+model RiskAssessment {
+  id              String   @id @default(cuid())
+  userId          String
+  latitude        Float
+  longitude       Float
+  disasterType    DisasterType
+  riskScore       Float    // 0.0 to 1.0
+  confidence      Float    // 0.0 to 1.0
+  factors         String   // JSON array of risk factors
+  recommendations String   // JSON array of recommendations
+  validUntil      DateTime
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([latitude, longitude])
+  @@index([disasterType])
+  @@index([validUntil])
+}
+
+// Real-time communication channels
+model RealtimeChannel {
+  id          String              @id @default(cuid())
+  name        String
+  type        RealtimeChannelType
+  description String?
+  isActive    Boolean             @default(true)
+  priority    Int                 @default(1)
+  isPublic    Boolean             @default(false) // Public channels vs private/role-based
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  messages    RealtimeMessage[]
+  members     ChannelMembership[]
+
+  @@index([type])
+  @@index([isActive])
+}
+
+// Channel membership for access control
+model ChannelMembership {
+  id        String          @id @default(cuid())
+  channelId String
+  userId    String
+  role      Role
+  canRead   Boolean         @default(true)
+  canWrite  Boolean         @default(true)
+  joinedAt  DateTime        @default(now())
+  channel   RealtimeChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([channelId])
+  @@index([userId])
+}
+
+// Direct message conversations
+model DirectConversation {
+  id           String                @id @default(cuid())
+  participant1 String                // User ID
+  participant2 String                // Authority/Volunteer ID
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  user1        User                  @relation("Participant1", fields: [participant1], references: [id], onDelete: Cascade)
+  user2        User                  @relation("Participant2", fields: [participant2], references: [id], onDelete: Cascade)
+  messages     DirectMessage[]
+
+  @@unique([participant1, participant2])
+  @@index([participant1])
+  @@index([participant2])
+}
+
+// Direct messages between users
+model DirectMessage {
+  id             String             @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  messageType    RealtimeMessageType @default(TEXT)
+  priority       MessagePriority     @default(NORMAL)
+  location       String?             // JSON for lat/lng
+  metadata       String?             // JSON for additional data
+  isRead         Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  conversation   DirectConversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User                @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@index([isRead])
+}
+
+// Real-time messages for emergency communication
+model RealtimeMessage {
+  id            String              @id @default(cuid())
+  channelId     String
+  senderId      String
+  content       String
+  messageType   RealtimeMessageType @default(TEXT)
+  priority      MessagePriority     @default(NORMAL)
+  location      String?             // JSON for lat/lng
+  metadata      String?             // JSON for additional data
+  isSystemMessage Boolean           @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  channel       RealtimeChannel     @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender        User                @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([channelId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@index([priority])
+}
+
+// Channel access control (legacy - keeping for compatibility)
+model ChannelAccess {
+  id        String   @id @default(cuid())
+  channelId String
+  userId    String
+  role      Role
+  canRead   Boolean  @default(true)
+  canWrite  Boolean  @default(true)
+  joinedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([channelId])
+  @@index([userId])
+}
+
+// Emergency broadcasts for authorities
+model EmergencyBroadcast {
+  id           String          @id @default(cuid())
+  title        String
+  message      String
+  priority     MessagePriority
+  senderId     String
+  affectedArea String?         // JSON for lat/lng/radius
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  expiresAt    DateTime?
+  sender       User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([priority])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+// Advanced mapping features - Points of Interest
+model PointOfInterest {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // "Hospital", "Police", "Fire Station", "Shelter", etc.
+  latitude    Float
+  longitude   Float
+  address     String?
+  phoneNumber String?
+  capacity    Int?
+  isActive    Boolean  @default(true)
+  metadata    String?  // JSON for additional info
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([latitude, longitude])
+  @@index([isActive])
+}
+
+// Message priority levels
+enum MessagePriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+// Real-time channel types
+enum RealtimeChannelType {
+  EMERGENCY
+  AUTHORITY
+  VOLUNTEER
+  COMMAND
+  GENERAL
+}
+
+// Real-time message types
+enum RealtimeMessageType {
+  TEXT
+  LOCATION
+  ALERT
+  STATUS
+  BROADCAST
+}
+
+// Route optimization and danger zone avoidance
+model DangerZone {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  latitude    Float
+  longitude   Float
+  radiusKm    Float
+  riskLevel   RiskLevel
+  isActive    Boolean   @default(true)
+  validUntil  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([latitude, longitude])
+  @@index([isActive])
+  @@index([validUntil])
 }

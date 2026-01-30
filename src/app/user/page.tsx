@@ -12,6 +12,7 @@ import {
 } from "~/lib/offline";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 import AlertsMap from "~/app/components/alerts-map";
+import { RealTimeCommunication } from "~/app/components/real-time-communication";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 
@@ -39,6 +40,7 @@ export default function UserDashboard() {
   const [showingCached, setShowingCached] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [showRealTimeComms, setShowRealTimeComms] = useState(false);
 
   // Check authentication and role
   const isAuthenticated = status === "authenticated";
@@ -288,6 +290,16 @@ export default function UserDashboard() {
                 <span className="font-medium">{online ? "Online" : "Offline"}</span>
               </div>
 
+              {/* Quick Access Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/training")}
+                  className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                >
+                  Training
+                </button>
+              </div>
+
               {/* Emergency action buttons */}
               <div className="flex items-center gap-2">
                 <button
@@ -325,6 +337,16 @@ export default function UserDashboard() {
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
+              </button>
+
+              <button
+                onClick={() => setShowRealTimeComms(true)}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium flex items-center gap-2"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                🚨 Emergency Chat
               </button>
 
               <button
@@ -663,6 +685,12 @@ export default function UserDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Real-Time Emergency Communication */}
+      <RealTimeCommunication 
+        isOpen={showRealTimeComms} 
+        onClose={() => setShowRealTimeComms(false)} 
+      />
     </div>
   );
 }

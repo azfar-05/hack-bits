@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
 import { CreateShelterForm } from "~/app/components/create-shelter-form";
 import { AddResourceForm } from "~/app/components/add-resource-form";
+import { TrainingDashboard } from "~/app/components/training-dashboard";
+import { RealTimeCommunication } from "~/app/components/real-time-communication";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 
 // Dynamically import the map component (client-side only)
@@ -60,6 +62,10 @@ export default function VolunteerDashboard() {
   
   // Resource creation state
   const [showAddResource, setShowAddResource] = useState(false);
+  
+  // UI state
+  const [showTraining, setShowTraining] = useState(false);
+  const [showRealTimeComms, setShowRealTimeComms] = useState(false);
 
   // Check authentication and role before making queries
   const isAuthenticated = status === "authenticated";
@@ -382,6 +388,16 @@ export default function VolunteerDashboard() {
                 </span>
               </div>
 
+              {/* Quick Access Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/training")}
+                  className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                >
+                  Training
+                </button>
+              </div>
+
               {/* Availability Toggle */}
               <button
                 onClick={() => setAvailability.mutate({ available: !isAvailable })}
@@ -392,6 +408,27 @@ export default function VolunteerDashboard() {
                 }`}
               >
                 {isAvailable ? "Available" : "Unavailable"}
+              </button>
+
+              <button
+                onClick={() => setShowTraining(true)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Training"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </button>
+
+              <button
+                onClick={() => setShowRealTimeComms(true)}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium flex items-center gap-2"
+                title="Emergency Communication"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                🚨 Emergency Chat
               </button>
 
               <button
@@ -1171,6 +1208,34 @@ export default function VolunteerDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Real-Time Emergency Communication */}
+      <RealTimeCommunication 
+        isOpen={showRealTimeComms} 
+        onClose={() => setShowRealTimeComms(false)} 
+      />
+
+      {/* Training Dashboard Modal */}
+      {showTraining && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Training Dashboard</h2>
+              <button
+                onClick={() => setShowTraining(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 h-full overflow-y-auto">
+              <TrainingDashboard />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

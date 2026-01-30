@@ -8,6 +8,10 @@ import { safeZoneRouter } from "~/server/api/routers/safeZone";
 import { dangerZoneRouter } from "~/server/api/routers/dangerZone";
 import { resourceNodeRouter } from "~/server/api/routers/resourceNode";
 import { userRouter } from "~/server/api/routers/user";
+import { trainingRouter } from "~/server/api/routers/training";
+import { mappingRouter } from "~/server/api/routers/mapping";
+import { aiRouter } from "~/server/api/routers/ai";
+import { realtimeRouter } from "~/server/api/routers/realtime";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -26,6 +30,10 @@ export const appRouter = createTRPCRouter({
   dangerZone: dangerZoneRouter,
   resourceNode: resourceNodeRouter,
   user: userRouter,
+  training: trainingRouter,
+  mapping: mappingRouter,
+  ai: aiRouter,
+  realtime: realtimeRouter,
 });
 
 // export type definition of API
