@@ -10,6 +10,7 @@ export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("USER");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,6 +23,7 @@ export function LoginForm() {
       const result = await signIn("credentials", {
         email,
         role,
+        phoneNumber: role === "USER" ? phoneNumber : undefined,
         redirect: false,
       });
 
@@ -82,6 +84,23 @@ export function LoginForm() {
               <option value="AUTHORITY">Authority - Manage alerts & guides</option>
             </select>
           </div>
+
+          {role === "USER" && (
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-300 mb-1">
+                Phone number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="block w-full rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g. +1234567890"
+              />
+            </div>
+          )}
 
           <button
             type="submit"

@@ -89,6 +89,59 @@ export default function UserDashboard() {
   // Determine what guide content to show
   const guideContent = showingCached ? cachedGuideData?.content : guideQuery.data?.content;
 
+  // Emergency mutations
+  const createEmergency = api.emergency.create.useMutation();
+  const resolveLatest = api.emergency.resolveLatest.useMutation();
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  // Handler for "I need help" — captures geolocation and creates SOS via tRPC
+  const handleNeedHelp = async () => {
+    setActionMessage(null);
+
+    if (!navigator.geolocation) {
+      setActionMessage("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setActionMessage("Obtaining location...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          setActionMessage("Sending emergency alert...");
+
+          await createEmergency.mutateAsync({ latitude, longitude });
+
+          setActionMessage("Emergency alert sent. Authorities will be notified.");
+        } catch (err: any) {
+          setActionMessage(err?.message ?? "Failed to send emergency alert.");
+        }
+      },
+      (error) => {
+        setActionMessage(`Location error: ${error.message}`);
+      },
+      { enableHighAccuracy: true, maximumAge: 10000 }
+    );
+  };
+
+  // Handler for "I am safe" — resolves latest open emergency or creates a safety confirmation
+  const handleIAmSafe = async () => {
+    setActionMessage(null);
+    try {
+      setActionMessage("Updating status...");
+      const res = await resolveLatest.mutateAsync();
+
+      if (res.resolved) {
+        setActionMessage("Marked latest emergency as RESOLVED.");
+      } else {
+        setActionMessage("Safety confirmation recorded.");
+      }
+    } catch (err: any) {
+      setActionMessage(err?.message ?? "Failed to update status.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -107,6 +160,21 @@ export default function UserDashboard() {
                 <span className={`h-2 w-2 rounded-full ${online ? "bg-green-200" : "bg-yellow-200"}`} />
                 {online ? "Online" : "Offline"}
               </div>
+              {/* Primary emergency action buttons (USER) */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleIAmSafe}
+                  className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700 transition-colors"
+                >
+                  I am safe
+                </button>
+                <button
+                  onClick={handleNeedHelp}
+                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 transition-colors"
+                >
+                  I need help
+                </button>
+              </div>
               <button
                 onClick={handleSignOut}
                 className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium hover:bg-blue-800 transition-colors"
@@ -117,6 +185,13 @@ export default function UserDashboard() {
           </div>
         </div>
       </header>
+
+      {/* Action message feedback */}
+      {actionMessage && (
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <div className="rounded-md bg-indigo-50 p-3 text-sm text-indigo-700">{actionMessage}</div>
+        </div>
+      )}
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">

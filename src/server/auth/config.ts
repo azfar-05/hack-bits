@@ -38,6 +38,7 @@ export const authConfig = {
       credentials: {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         role: { label: "Role", type: "text" },
+        phoneNumber: { label: "Phone", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email) return null;
@@ -55,11 +56,19 @@ export const authConfig = {
         });
 
         if (!user) {
+          // If role is USER, require phoneNumber at signup
+          const phoneNumber = (credentials.phoneNumber as string) || null;
+          if (role === "USER" && !phoneNumber) {
+            // Deny sign-in/create when USER does not provide phone number
+            return null;
+          }
+
           user = await db.user.create({
             data: {
               email,
               name: email.split("@")[0],
               role: role as Role,
+              phoneNumber: phoneNumber,
             },
           });
         }

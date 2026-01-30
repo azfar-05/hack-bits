@@ -54,15 +54,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    role          Role      @default(USER)
-    accounts      Account[]
-    sessions      Session[]
+  id            String   @id @default(cuid())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+
+  phoneNumber   String?  // 👈 ADD THIS
+
+  accounts Account[]
+  sessions Session[]
 }
+
 
 model VerificationToken {
     identifier String
@@ -88,4 +91,30 @@ model SafetyGuide {
     content      String
     createdAt    DateTime     @default(now())
     updatedAt    DateTime     @updatedAt
+}
+
+// Emergency request workflow for users signaling SOS
+enum EmergencyStatus {
+    OPEN
+    RESOLVED
+}
+
+model EmergencyRequest {
+    id          String          @id @default(cuid())
+    userId      String
+    user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    phoneNumber String
+    latitude    Float
+    longitude   Float
+    createdAt   DateTime        @default(now())
+    status      EmergencyStatus @default(OPEN)
+}
+
+// Simple safety confirmation when user marks themselves safe and no open emergency exists
+model SafetyConfirmation {
+    id          String   @id @default(cuid())
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    phoneNumber String
+    createdAt   DateTime @default(now())
 }
