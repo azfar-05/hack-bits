@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import {
   isOnline,
@@ -26,6 +27,7 @@ const disasterTypeColors: Record<DisasterType, string> = {
 
 export default function UserDashboard() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [online, setOnline] = useState(true);
   const [selectedDisasterType, setSelectedDisasterType] =
     useState<DisasterType>("FLOOD");
@@ -34,6 +36,26 @@ export default function UserDashboard() {
   );
   const [showingCached, setShowingCached] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  // Check authentication and role
+  const isAuthenticated = status === "authenticated";
+  const isUser = session?.user?.role === "USER";
+  const shouldQuery = isAuthenticated && isUser;
+
+  // Redirect if not authenticated or wrong role
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    
+    if (!isAuthenticated) {
+      router.push("/");
+      return;
+    }
+    
+    if (!isUser) {
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, isAuthenticated, isUser, router]);
 
   // Check online status
   useEffect(() => {
@@ -53,22 +75,23 @@ export default function UserDashboard() {
 
   // Fetch alerts
   const alertsQuery = api.alert.getAll.useQuery(undefined, {
-    enabled: online,
-    refetchInterval: online ? 30000 : false, // Refetch every 30s when online
+    enabled: online && shouldQuery,
+    refetchInterval: online && shouldQuery ? 30000 : false, // Refetch every 30s when online
   });
 
   // Fetch guide for selected disaster type
   const guideQuery = api.guide.getByDisaster.useQuery(
     { disasterType: selectedDisasterType },
     {
-      enabled: online,
+      enabled: online && shouldQuery,
       refetchOnWindowFocus: false,
     },
   );
 
   // Fetch my rescue requests to check status
   const myRequestsQuery = api.rescue.getMyRequests.useQuery(undefined, {
-    refetchInterval: 5000, // Poll for status updates
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 5000 : false, // Poll for status updates
   });
 
   // Find active request
@@ -109,6 +132,23 @@ export default function UserDashboard() {
   const guideContent = showingCached
     ? cachedGuideData?.content
     : guideQuery.data?.content;
+
+  // Show loading screen while session is loading
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if redirecting
+  if (!isAuthenticated || !isUser) {
+    return null;
+  }
 
   // Rescue mutations
   const createRescue = api.rescue.create.useMutation({

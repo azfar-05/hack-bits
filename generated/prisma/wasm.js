@@ -259,7 +259,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/azfar/Desktop/Hackathon/hack-bits/generated/prisma",
+      "value": "C:\\Users\\ADMIN\\hack-bits\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -268,12 +268,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "windows",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/azfar/Desktop/Hackathon/hack-bits/prisma/schema.prisma",
+    "sourceFilePath": "C:\\Users\\ADMIN\\hack-bits\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -287,7 +287,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { api } from "~/trpc/react";
 
@@ -39,6 +40,7 @@ const POLLING_INTERVAL = 5000;
 export default function VolunteerDashboard() {
   const router = useRouter();
   const utils = api.useUtils();
+  const { data: session, status } = useSession();
 
   // Location tracking state
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -50,10 +52,31 @@ export default function VolunteerDashboard() {
   const [newAlertCount, setNewAlertCount] = useState(0);
   const previousAlertCount = useRef(0);
 
+  // Check authentication and role before making queries
+  const isAuthenticated = status === "authenticated";
+  const isVolunteer = session?.user?.role === "VOLUNTEER";
+  const shouldQuery = isAuthenticated && isVolunteer;
+
+  // Redirect if not authenticated or wrong role
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    
+    if (!isAuthenticated) {
+      router.push("/");
+      return;
+    }
+    
+    if (!isVolunteer) {
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, isAuthenticated, isVolunteer, router]);
+
   // Main polling query - fetches all relevant requests for this volunteer
   const volunteerAlertsQuery = api.rescue.getForVolunteer.useQuery(undefined, {
-    refetchInterval: POLLING_INTERVAL, // Poll every 5 seconds
-    refetchIntervalInBackground: true, // Keep polling even when tab is not focused
+    enabled: shouldQuery, // Only run query when authenticated and is volunteer
+    refetchInterval: shouldQuery ? POLLING_INTERVAL : false, // Poll every 5 seconds only when enabled
+    refetchIntervalInBackground: shouldQuery, // Keep polling even when tab is not focused
   });
 
   // Extract data from the unified query
@@ -90,7 +113,9 @@ export default function VolunteerDashboard() {
   const assignedRequestsQuery = { data: assignedRequests, isLoading: volunteerAlertsQuery.isLoading };
 
   // Fetch my profile
-  const myProfileQuery = api.volunteer.getMyProfile.useQuery();
+  const myProfileQuery = api.volunteer.getMyProfile.useQuery(undefined, {
+    enabled: shouldQuery, // Only run when authenticated and is volunteer
+  });
 
   // Location update mutation
   const updateLocation = api.volunteer.updateLocation.useMutation();
@@ -233,6 +258,23 @@ export default function VolunteerDashboard() {
   const mapMarkers = getMapMarkers();
   const isAvailable = myProfileQuery.data?.available ?? true;
 
+  // Show loading screen while session is loading
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if redirecting
+  if (!isAuthenticated || !isVolunteer) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -315,14 +357,39 @@ export default function VolunteerDashboard() {
       <div className="bg-gray-800 text-white px-4 py-2 text-xs">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
-            Live polling active (every {POLLING_INTERVAL / 1000}s)
+            <span className={`h-2 w-2 rounded-full ${volunteerAlertsQuery.error ? 'bg-red-400' : 'bg-green-400'} animate-pulse`}></span>
+            {volunteerAlertsQuery.error ? 'Connection error' : `Live polling active (every ${POLLING_INTERVAL / 1000}s)`}
           </span>
           <span>
             Total alerts: {totalAlerts} | Assigned: {assignedRequests.length} | Pending: {pendingRequests.length}
           </span>
         </div>
       </div>
+
+      {/* Error Banner */}
+      {volunteerAlertsQuery.error && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="mx-auto max-w-7xl flex items-center gap-2 text-red-800">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span className="text-sm">
+              Error loading rescue data: {volunteerAlertsQuery.error.message}
+            </span>
+            <button
+              onClick={() => volunteerAlertsQuery.refetch()}
+              className="ml-auto text-sm bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Location Status Banner */}
       {locationError && (

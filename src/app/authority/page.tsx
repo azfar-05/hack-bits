@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
@@ -25,6 +26,27 @@ const rescueStatusColors: Record<RescueStatus, string> = {
 
 export default function AuthorityDashboard() {
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Check authentication and role
+  const isAuthenticated = status === "authenticated";
+  const isAuthority = session?.user?.role === "AUTHORITY";
+  const shouldQuery = isAuthenticated && isAuthority;
+
+  // Redirect if not authenticated or wrong role
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    
+    if (!isAuthenticated) {
+      router.push("/");
+      return;
+    }
+    
+    if (!isAuthority) {
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, isAuthenticated, isAuthority, router]);
 
   // Alert form state
   const [alertTitle, setAlertTitle] = useState("");
@@ -44,17 +66,20 @@ export default function AuthorityDashboard() {
 
   // Fetch escalated requests (NO_VOLUNTEER)
   const escalatedQuery = api.rescue.getEscalated.useQuery(undefined, {
-    refetchInterval: 10000, // Refresh every 10s
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 10000 : false, // Refresh every 10s
   });
 
   // Fetch all rescue requests for overview
   const allRequestsQuery = api.rescue.getAllRequests.useQuery(undefined, {
-    refetchInterval: 30000,
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 30000 : false,
   });
 
   // Fetch all volunteers with locations
   const volunteersQuery = api.volunteer.getAllWithLocations.useQuery(undefined, {
-    refetchInterval: 30000,
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 30000 : false,
   });
 
   // Manual assign mutation
@@ -126,6 +151,23 @@ export default function AuthorityDashboard() {
   const handleSignOut = async () => {
     router.push("/api/auth/signout");
   };
+
+  // Show loading screen while session is loading
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if redirecting
+  if (!isAuthenticated || !isAuthority) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
