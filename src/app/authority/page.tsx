@@ -5,6 +5,23 @@ import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
+type RescueStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "NO_VOLUNTEER";
+
+const rescueStatusLabels: Record<RescueStatus, string> = {
+  PENDING: "Pending",
+  ASSIGNED: "Assigned",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+  NO_VOLUNTEER: "No Volunteer",
+};
+
+const rescueStatusColors: Record<RescueStatus, string> = {
+  PENDING: "bg-yellow-100 text-yellow-800",
+  ASSIGNED: "bg-blue-100 text-blue-800",
+  IN_PROGRESS: "bg-purple-100 text-purple-800",
+  COMPLETED: "bg-green-100 text-green-800",
+  NO_VOLUNTEER: "bg-orange-100 text-orange-800 border-orange-300",
+};
 
 export default function AuthorityDashboard() {
   const router = useRouter();
@@ -19,6 +36,16 @@ export default function AuthorityDashboard() {
   const [guideDisasterType, setGuideDisasterType] = useState<DisasterType>("FLOOD");
   const [guideContent, setGuideContent] = useState("");
   const [guideSuccess, setGuideSuccess] = useState(false);
+
+  // Fetch escalated requests (NO_VOLUNTEER)
+  const escalatedQuery = api.rescue.getEscalated.useQuery(undefined, {
+    refetchInterval: 10000, // Refresh every 10s
+  });
+
+  // Fetch all rescue requests for overview
+  const allRequestsQuery = api.rescue.getAllRequests.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
 
   // tRPC mutations
   const createAlert = api.alert.create.useMutation({
@@ -80,6 +107,113 @@ export default function AuthorityDashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Escalated Requests Section - NO_VOLUNTEER */}
+        {escalatedQuery.data && escalatedQuery.data.length > 0 && (
+          <div className="mb-8 rounded-lg border-2 border-orange-400 bg-orange-50 p-6 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="rounded-full bg-orange-500 p-2">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-orange-800">
+                  Escalated Cases - No Volunteer Available
+                </h2>
+                <p className="text-sm text-orange-700">
+                  {escalatedQuery.data.length} user(s) in danger require immediate attention
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {escalatedQuery.data.map((request) => {
+                const timeSinceEscalation = request.escalatedAt
+                  ? Math.floor((new Date().getTime() - new Date(request.escalatedAt).getTime()) / 60000)
+                  : 0;
+
+                return (
+                  <div
+                    key={request.id}
+                    className="flex items-center justify-between rounded-lg bg-white p-4 border border-orange-200"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="inline-flex items-center rounded-full bg-orange-500 px-2 py-1 text-xs font-medium text-white">
+                          URGENT
+                        </span>
+                        <span className="text-sm text-orange-700">
+                          Escalated {timeSinceEscalation}m ago
+                        </span>
+                      </div>
+                      <p className="font-medium text-gray-900">
+                        {request.user.name || request.user.email}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">{request.message}</p>
+                      {request.location && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          <strong>Location:</strong> {request.location}
+                        </p>
+                      )}
+                    </div>
+                    <div className="ml-4 text-right">
+                      <p className="text-xs text-gray-500">
+                        SOS sent: {new Date(request.createdAt).toLocaleTimeString()}
+                      </p>
+                      <button
+                        className="mt-2 rounded-md bg-orange-600 px-3 py-1.5 text-sm text-white hover:bg-orange-700"
+                        onClick={() => {
+                          // Mock dispatch action
+                          alert(`Dispatching emergency services to: ${request.location || "Unknown location"}\nUser: ${request.user.name || request.user.email}`);
+                        }}
+                      >
+                        Dispatch Services
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Rescue Overview Stats */}
+        <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Rescue Operations Overview</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+            <div className="rounded-lg bg-yellow-50 p-4 text-center">
+              <p className="text-2xl font-bold text-yellow-600">
+                {allRequestsQuery.data?.filter(r => r.status === "PENDING").length || 0}
+              </p>
+              <p className="text-sm text-yellow-700">Pending</p>
+            </div>
+            <div className="rounded-lg bg-blue-50 p-4 text-center">
+              <p className="text-2xl font-bold text-blue-600">
+                {allRequestsQuery.data?.filter(r => r.status === "ASSIGNED").length || 0}
+              </p>
+              <p className="text-sm text-blue-700">Assigned</p>
+            </div>
+            <div className="rounded-lg bg-purple-50 p-4 text-center">
+              <p className="text-2xl font-bold text-purple-600">
+                {allRequestsQuery.data?.filter(r => r.status === "IN_PROGRESS").length || 0}
+              </p>
+              <p className="text-sm text-purple-700">In Progress</p>
+            </div>
+            <div className="rounded-lg bg-orange-50 p-4 text-center border-2 border-orange-200">
+              <p className="text-2xl font-bold text-orange-600">
+                {allRequestsQuery.data?.filter(r => r.status === "NO_VOLUNTEER").length || 0}
+              </p>
+              <p className="text-sm text-orange-700">No Volunteer</p>
+            </div>
+            <div className="rounded-lg bg-green-50 p-4 text-center">
+              <p className="text-2xl font-bold text-green-600">
+                {allRequestsQuery.data?.filter(r => r.status === "COMPLETED").length || 0}
+              </p>
+              <p className="text-sm text-green-700">Completed</p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid gap-8 md:grid-cols-2">
           {/* Disaster Alert Form */}
           <div className="rounded-lg bg-white p-6 shadow-md">
