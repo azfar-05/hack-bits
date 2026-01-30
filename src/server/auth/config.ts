@@ -3,7 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
-import { type Role } from "~/generated/prisma";
+import { type Role } from "../../../generated/prisma";
 import bcrypt from "bcryptjs";
 
 import { db } from "~/server/db";

@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
-import { isOnline, cacheGuide, getCachedGuide, type CachedGuide } from "~/lib/offline";
+import {
+  isOnline,
+  cacheGuide,
+  getCachedGuide,
+  type CachedGuide,
+} from "~/lib/offline";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 
@@ -22,8 +27,11 @@ const disasterTypeColors: Record<DisasterType, string> = {
 export default function UserDashboard() {
   const router = useRouter();
   const [online, setOnline] = useState(true);
-  const [selectedDisasterType, setSelectedDisasterType] = useState<DisasterType>("FLOOD");
-  const [cachedGuideData, setCachedGuideData] = useState<CachedGuide | null>(null);
+  const [selectedDisasterType, setSelectedDisasterType] =
+    useState<DisasterType>("FLOOD");
+  const [cachedGuideData, setCachedGuideData] = useState<CachedGuide | null>(
+    null,
+  );
   const [showingCached, setShowingCached] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
@@ -55,7 +63,7 @@ export default function UserDashboard() {
     {
       enabled: online,
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   // Fetch my rescue requests to check status
@@ -64,8 +72,8 @@ export default function UserDashboard() {
   });
 
   // Find active request
-  const currentRescue = myRequestsQuery.data?.find(req =>
-    ["PENDING", "ASSIGNED", "IN_PROGRESS", "NO_VOLUNTEER"].includes(req.status)
+  const currentRescue = myRequestsQuery.data?.find((req) =>
+    ["PENDING", "ASSIGNED", "IN_PROGRESS", "NO_VOLUNTEER"].includes(req.status),
   );
 
   // Cache guide when fetched
@@ -98,7 +106,9 @@ export default function UserDashboard() {
   };
 
   // Determine what guide content to show
-  const guideContent = showingCached ? cachedGuideData?.content : guideQuery.data?.content;
+  const guideContent = showingCached
+    ? cachedGuideData?.content
+    : guideQuery.data?.content;
 
   // Rescue mutations
   const createRescue = api.rescue.create.useMutation({
@@ -108,7 +118,7 @@ export default function UserDashboard() {
     },
     onError: (error) => {
       setActionMessage(`Failed to send alert: ${error.message}`);
-    }
+    },
   });
 
   const cancelRescue = api.rescue.cancel.useMutation({
@@ -118,7 +128,7 @@ export default function UserDashboard() {
     },
     onError: (error) => {
       setActionMessage(`Failed to cancel: ${error.message}`);
-    }
+    },
   });
 
   // Handler for "I need help" — captures geolocation and creates SOS via tRPC
@@ -148,7 +158,7 @@ export default function UserDashboard() {
             latitude,
             longitude,
             message: "Emergency Help Needed (Location Shared)", // Default message
-            location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+            location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
           });
         } catch (err: any) {
           // Handled in onError
@@ -157,7 +167,7 @@ export default function UserDashboard() {
       (error) => {
         setActionMessage(`Location error: ${error.message}`);
       },
-      { enableHighAccuracy: true, maximumAge: 10000 }
+      { enableHighAccuracy: true, maximumAge: 10000 },
     );
   };
 
@@ -184,13 +194,20 @@ export default function UserDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">User Dashboard</h1>
-              <p className="mt-1 text-blue-100">Disaster Alert & Rescue Coordination System</p>
+              <p className="mt-1 text-blue-100">
+                Disaster Alert & Rescue Coordination System
+              </p>
             </div>
             <div className="flex items-center gap-4">
               {/* Online/Offline indicator */}
-              <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${online ? "bg-green-500" : "bg-yellow-500"
-                }`}>
-                <span className={`h-2 w-2 rounded-full ${online ? "bg-green-200" : "bg-yellow-200"}`} />
+              <div
+                className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${
+                  online ? "bg-green-500" : "bg-yellow-500"
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${online ? "bg-green-200" : "bg-yellow-200"}`}
+                />
                 {online ? "Online" : "Offline"}
               </div>
               {/* Primary emergency action buttons (USER) */}
@@ -198,27 +215,33 @@ export default function UserDashboard() {
                 <button
                   onClick={handleIAmSafe}
                   disabled={!currentRescue}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${!currentRescue
-                      ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                      : "bg-green-600 hover:bg-green-700 text-white"
-                    }`}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    !currentRescue
+                      ? "cursor-not-allowed bg-gray-400 text-gray-200"
+                      : "bg-green-600 text-white hover:bg-green-700"
+                  }`}
                 >
                   I am safe
                 </button>
                 <button
                   onClick={handleNeedHelp}
                   disabled={!!currentRescue || createRescue.isPending}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentRescue || createRescue.isPending
-                      ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                      : "bg-red-600 hover:bg-red-700 text-white"
-                    }`}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    currentRescue || createRescue.isPending
+                      ? "cursor-not-allowed bg-gray-400 text-gray-200"
+                      : "bg-red-600 text-white hover:bg-red-700"
+                  }`}
                 >
-                  {createRescue.isPending ? "Sending..." : (currentRescue ? "Help Requested" : "I need help")}
+                  {createRescue.isPending
+                    ? "Sending..."
+                    : currentRescue
+                      ? "Help Requested"
+                      : "I need help"}
                 </button>
               </div>
               <button
                 onClick={handleSignOut}
-                className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium hover:bg-blue-800 transition-colors"
+                className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-800"
               >
                 Sign Out
               </button>
@@ -230,25 +253,31 @@ export default function UserDashboard() {
       {/* Action message feedback */}
       {actionMessage && (
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-          <div className="rounded-md bg-indigo-50 p-3 text-sm text-indigo-700">{actionMessage}</div>
+          <div className="rounded-md bg-indigo-50 p-3 text-sm text-indigo-700">
+            {actionMessage}
+          </div>
         </div>
       )}
 
       {/* Active Rescue Status Banner */}
       {currentRescue && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-4">
+        <div className="border-b border-red-200 bg-red-50 px-4 py-4">
           <div className="mx-auto max-w-7xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="flex h-3 w-3 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
                 </span>
                 <div>
-                  <h3 className="text-lg font-medium text-red-800">Active Rescue Request</h3>
+                  <h3 className="text-lg font-medium text-red-800">
+                    Active Rescue Request
+                  </h3>
                   <p className="text-sm text-red-600">
-                    Status: <span className="font-bold">{currentRescue.status}</span>
-                    {currentRescue.volunteer && ` - Volunteer: ${currentRescue.volunteer.name || currentRescue.volunteer.email}`}
+                    Status:{" "}
+                    <span className="font-bold">{currentRescue.status}</span>
+                    {currentRescue.volunteer &&
+                      ` - Volunteer: ${currentRescue.volunteer.name || currentRescue.volunteer.email}`}
                   </p>
                 </div>
               </div>
@@ -261,9 +290,19 @@ export default function UserDashboard() {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Alert Feed */}
           <div className="rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <svg
+                className="h-6 w-6 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
               </svg>
               Recent Alerts
             </h2>
@@ -275,7 +314,9 @@ export default function UserDashboard() {
             )}
 
             {alertsQuery.isLoading && (
-              <div className="text-center text-gray-500 py-8">Loading alerts...</div>
+              <div className="py-8 text-center text-gray-500">
+                Loading alerts...
+              </div>
             )}
 
             {alertsQuery.error && (
@@ -285,12 +326,12 @@ export default function UserDashboard() {
             )}
 
             {alertsQuery.data && alertsQuery.data.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
+              <div className="py-8 text-center text-gray-500">
                 No alerts at this time. Stay safe!
               </div>
             )}
 
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="max-h-96 space-y-4 overflow-y-auto">
               {alertsQuery.data?.map((alert) => (
                 <div
                   key={alert.id}
@@ -298,7 +339,7 @@ export default function UserDashboard() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="inline-block rounded-full px-2 py-1 text-xs font-medium mb-2">
+                      <span className="mb-2 inline-block rounded-full px-2 py-1 text-xs font-medium">
                         {disasterTypeLabels[alert.disasterType as DisasterType]}
                       </span>
                       <h3 className="font-semibold">{alert.title}</h3>
@@ -315,9 +356,19 @@ export default function UserDashboard() {
 
           {/* Safety Guide Viewer */}
           <div className="rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-6 text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <svg className="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <svg
+                className="h-6 w-6 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               Safety Guides
               {showingCached && (
@@ -329,14 +380,19 @@ export default function UserDashboard() {
 
             {/* Disaster Type Selector */}
             <div className="mb-4">
-              <label htmlFor="disaster-type" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="disaster-type"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
                 Select Disaster Type
               </label>
               <select
                 id="disaster-type"
                 value={selectedDisasterType}
-                onChange={(e) => setSelectedDisasterType(e.target.value as DisasterType)}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                onChange={(e) =>
+                  setSelectedDisasterType(e.target.value as DisasterType)
+                }
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="FLOOD">Flood</option>
                 <option value="EARTHQUAKE">Earthquake</option>
@@ -345,22 +401,26 @@ export default function UserDashboard() {
             </div>
 
             {/* Guide Content */}
-            <div className="rounded-lg bg-gray-50 p-4 min-h-48">
+            <div className="min-h-48 rounded-lg bg-gray-50 p-4">
               {guideQuery.isLoading && online && (
-                <div className="text-center text-gray-500">Loading guide...</div>
+                <div className="text-center text-gray-500">
+                  Loading guide...
+                </div>
               )}
 
               {guideContent ? (
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-3">
-                    {disasterTypeLabels[selectedDisasterType]} Safety Instructions
+                  <h3 className="mb-3 font-medium text-gray-900">
+                    {disasterTypeLabels[selectedDisasterType]} Safety
+                    Instructions
                   </h3>
-                  <div className="prose prose-sm text-gray-700 whitespace-pre-wrap">
+                  <div className="prose prose-sm whitespace-pre-wrap text-gray-700">
                     {guideContent}
                   </div>
                   {showingCached && cachedGuideData && (
                     <p className="mt-4 text-xs text-gray-500">
-                      Last cached: {new Date(cachedGuideData.cachedAt).toLocaleString()}
+                      Last cached:{" "}
+                      {new Date(cachedGuideData.savedAt).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -368,11 +428,19 @@ export default function UserDashboard() {
                 <div className="text-center text-gray-500">
                   {!online && !cachedGuideData ? (
                     <div>
-                      <p>No cached guide available for {disasterTypeLabels[selectedDisasterType]}.</p>
-                      <p className="text-sm mt-2">Connect to the internet to download guides.</p>
+                      <p>
+                        No cached guide available for{" "}
+                        {disasterTypeLabels[selectedDisasterType]}.
+                      </p>
+                      <p className="mt-2 text-sm">
+                        Connect to the internet to download guides.
+                      </p>
                     </div>
                   ) : (
-                    <p>No safety guide available for {disasterTypeLabels[selectedDisasterType]} yet.</p>
+                    <p>
+                      No safety guide available for{" "}
+                      {disasterTypeLabels[selectedDisasterType]} yet.
+                    </p>
                   )}
                 </div>
               )}
@@ -381,7 +449,8 @@ export default function UserDashboard() {
             {/* Offline Info */}
             {!online && (
               <div className="mt-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
-                <strong>Offline Mode:</strong> Viewing cached safety guides. Connect to the internet to get the latest updates.
+                <strong>Offline Mode:</strong> Viewing cached safety guides.
+                Connect to the internet to get the latest updates.
               </div>
             )}
           </div>

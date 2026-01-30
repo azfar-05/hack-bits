@@ -2,12 +2,12 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
-
-import { TRPCReactProvider } from "~/trpc/react";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Disaster Alert & Rescue System",
-  description: "Real-time disaster alerts, safety guides, and rescue coordination system",
+  description:
+    "Real-time disaster alerts, safety guides, and rescue coordination system",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body className="font-sans antialiased">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
