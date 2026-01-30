@@ -25,6 +25,7 @@ export default function UserDashboard() {
   const [selectedDisasterType, setSelectedDisasterType] = useState<DisasterType>("FLOOD");
   const [cachedGuideData, setCachedGuideData] = useState<CachedGuide | null>(null);
   const [showingCached, setShowingCached] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   // Check online status
   useEffect(() => {
@@ -55,6 +56,16 @@ export default function UserDashboard() {
       enabled: online,
       refetchOnWindowFocus: false,
     }
+  );
+
+  // Fetch my rescue requests to check status
+  const myRequestsQuery = api.rescue.getMyRequests.useQuery(undefined, {
+    refetchInterval: 5000, // Poll for status updates
+  });
+
+  // Find active request
+  const currentRescue = myRequestsQuery.data?.find(req =>
+    ["PENDING", "ASSIGNED", "IN_PROGRESS", "NO_VOLUNTEER"].includes(req.status)
   );
 
   // Cache guide when fetched
@@ -89,14 +100,36 @@ export default function UserDashboard() {
   // Determine what guide content to show
   const guideContent = showingCached ? cachedGuideData?.content : guideQuery.data?.content;
 
-  // Emergency mutations
-  const createEmergency = api.emergency.create.useMutation();
-  const resolveLatest = api.emergency.resolveLatest.useMutation();
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  // Rescue mutations
+  const createRescue = api.rescue.create.useMutation({
+    onSuccess: () => {
+      myRequestsQuery.refetch();
+      setActionMessage("Emergency alert sent! Help is being coordinated.");
+    },
+    onError: (error) => {
+      setActionMessage(`Failed to send alert: ${error.message}`);
+    }
+  });
+
+  const cancelRescue = api.rescue.cancel.useMutation({
+    onSuccess: () => {
+      myRequestsQuery.refetch();
+      setActionMessage("Rescue request cancelled. Glad you are safe.");
+    },
+    onError: (error) => {
+      setActionMessage(`Failed to cancel: ${error.message}`);
+    }
+  });
 
   // Handler for "I need help" — captures geolocation and creates SOS via tRPC
   const handleNeedHelp = async () => {
     setActionMessage(null);
+
+    // If already has active request
+    if (currentRescue) {
+      setActionMessage("You already have an active request.");
+      return;
+    }
 
     if (!navigator.geolocation) {
       setActionMessage("Geolocation is not supported by your browser.");
@@ -111,11 +144,14 @@ export default function UserDashboard() {
           const { latitude, longitude } = position.coords;
           setActionMessage("Sending emergency alert...");
 
-          await createEmergency.mutateAsync({ latitude, longitude });
-
-          setActionMessage("Emergency alert sent. Authorities will be notified.");
+          await createRescue.mutateAsync({
+            latitude,
+            longitude,
+            message: "Emergency Help Needed (Location Shared)", // Default message
+            location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+          });
         } catch (err: any) {
-          setActionMessage(err?.message ?? "Failed to send emergency alert.");
+          // Handled in onError
         }
       },
       (error) => {
@@ -125,20 +161,18 @@ export default function UserDashboard() {
     );
   };
 
-  // Handler for "I am safe" — resolves latest open emergency or creates a safety confirmation
+  // Handler for "I am safe" — cancels active rescue request
   const handleIAmSafe = async () => {
     setActionMessage(null);
     try {
-      setActionMessage("Updating status...");
-      const res = await resolveLatest.mutateAsync();
-
-      if (res.resolved) {
-        setActionMessage("Marked latest emergency as RESOLVED.");
+      if (currentRescue) {
+        setActionMessage("Cancelling rescue request...");
+        await cancelRescue.mutateAsync({ requestId: currentRescue.id });
       } else {
-        setActionMessage("Safety confirmation recorded.");
+        setActionMessage("No active rescue request found.");
       }
     } catch (err: any) {
-      setActionMessage(err?.message ?? "Failed to update status.");
+      // Handled in onError
     }
   };
 
@@ -154,9 +188,8 @@ export default function UserDashboard() {
             </div>
             <div className="flex items-center gap-4">
               {/* Online/Offline indicator */}
-              <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${
-                online ? "bg-green-500" : "bg-yellow-500"
-              }`}>
+              <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${online ? "bg-green-500" : "bg-yellow-500"
+                }`}>
                 <span className={`h-2 w-2 rounded-full ${online ? "bg-green-200" : "bg-yellow-200"}`} />
                 {online ? "Online" : "Offline"}
               </div>
@@ -164,15 +197,23 @@ export default function UserDashboard() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleIAmSafe}
-                  className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium hover:bg-green-700 transition-colors"
+                  disabled={!currentRescue}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${!currentRescue
+                      ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                      : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
                 >
                   I am safe
                 </button>
                 <button
                   onClick={handleNeedHelp}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700 transition-colors"
+                  disabled={!!currentRescue || createRescue.isPending}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentRescue || createRescue.isPending
+                      ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                      : "bg-red-600 hover:bg-red-700 text-white"
+                    }`}
                 >
-                  I need help
+                  {createRescue.isPending ? "Sending..." : (currentRescue ? "Help Requested" : "I need help")}
                 </button>
               </div>
               <button
@@ -190,6 +231,29 @@ export default function UserDashboard() {
       {actionMessage && (
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <div className="rounded-md bg-indigo-50 p-3 text-sm text-indigo-700">{actionMessage}</div>
+        </div>
+      )}
+
+      {/* Active Rescue Status Banner */}
+      {currentRescue && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-4">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="flex h-3 w-3 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <div>
+                  <h3 className="text-lg font-medium text-red-800">Active Rescue Request</h3>
+                  <p className="text-sm text-red-600">
+                    Status: <span className="font-bold">{currentRescue.status}</span>
+                    {currentRescue.volunteer && ` - Volunteer: ${currentRescue.volunteer.name || currentRescue.volunteer.email}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

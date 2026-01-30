@@ -492,7 +492,8 @@ async function autoAssignVolunteerWithRadius(
   });
 
   if (availableVolunteers.length === 0) {
-    return await escalateToAuthority(db, requestId, "No available volunteers with location tracking enabled");
+    console.log(`[RESCUE] No volunteers with location found, trying simple assignment...`);
+    return await simpleAssignment(db, requestId);
   }
 
   // Calculate distances and sort by closest
@@ -538,8 +539,9 @@ async function autoAssignVolunteerWithRadius(
     console.log(`[RESCUE] No volunteer found within ${radius}km, expanding search...`);
   }
 
-  // No volunteer found within 10km - escalate
-  return await escalateToAuthority(db, requestId, "No volunteer available within 10km radius");
+  // No volunteer found within 10km - try simple assignment as fallback
+  console.log(`[RESCUE] No volunteer within 10km, trying simple assignment...`);
+  return await simpleAssignment(db, requestId);
 }
 
 /**
@@ -549,7 +551,8 @@ async function simpleAssignment(
   db: any,
   requestId: string
 ): Promise<{ assigned: boolean; message: string }> {
-  const availableVolunteer = await db.user.findFirst({
+  // First try: Find volunteer with profile and available status
+  let availableVolunteer = await db.user.findFirst({
     where: {
       role: "VOLUNTEER",
       volunteerProfile: {
@@ -562,6 +565,34 @@ async function simpleAssignment(
       },
     },
   });
+
+  // Second try: Find any volunteer without active assignments (even without profile)
+  if (!availableVolunteer) {
+    console.log(`[RESCUE] No volunteers with profiles found, checking all volunteers...`);
+    availableVolunteer = await db.user.findFirst({
+      where: {
+        role: "VOLUNTEER",
+        volunteerAssignments: {
+          none: {
+            status: { in: ["ASSIGNED", "IN_PROGRESS"] },
+          },
+        },
+      },
+    });
+
+    // Create profile for this volunteer if they don't have one
+    if (availableVolunteer) {
+      await db.volunteerProfile.upsert({
+        where: { userId: availableVolunteer.id },
+        create: {
+          userId: availableVolunteer.id,
+          available: true,
+        },
+        update: {}, // No specific update needed if it already exists
+      });
+      console.log(`[RESCUE] Created volunteer profile for ${availableVolunteer.email}`);
+    }
+  }
 
   if (availableVolunteer) {
     await db.rescueRequest.update({
