@@ -39,6 +39,7 @@ export const rescueRouter = createTRPCRouter({
         location: z.string().optional(),
         latitude: z.number().optional(),
         longitude: z.number().optional(),
+        phoneNumber: z.string().optional(), // Added phone number support
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -154,7 +155,7 @@ export const rescueRouter = createTRPCRouter({
           await ctx.db.rescueRequest.update({
             where: { id: rescueRequest.id },
             data: {
-              volunteerId: assignedVolunteer.user.id,
+              volunteerId: assignedVolunteer!.user.id,
               status: "ASSIGNED",
               searchRadiusUsed: radius,
               assignedAt: new Date(),
@@ -163,18 +164,25 @@ export const rescueRouter = createTRPCRouter({
 
           // Update volunteer availability
           await ctx.db.volunteerProfile.update({
-            where: { userId: assignedVolunteer.user.id },
+            where: { userId: assignedVolunteer!.user.id },
             data: { available: false },
           });
 
           // Calculate and update ETA
           try {
+            // Get current active rescues count for better ETA prediction
+            const activeRescuesCount = await ctx.db.rescueRequest.count({
+              where: {
+                status: { in: ["ASSIGNED", "IN_PROGRESS"] }
+              }
+            });
+
             const etaInputs: ETAInputs = {
-              distance: assignedVolunteer.distance,
-              volunteerLoad: 1, // Default load
-              systemLoad: 1,    // Default load
+              distance: assignedVolunteer!.distance,
+              volunteerBusy: false, // Volunteer is being assigned, so not busy yet
+              activeRescues: activeRescuesCount + 1, // Include this new rescue
               disasterType: "OTHER",
-              timeOfDay: new Date().getHours(),
+              volunteerAvailable: true, // Volunteer is available since we just assigned them
             };
             
             const eta = predictResponseTime(etaInputs);
@@ -182,8 +190,8 @@ export const rescueRouter = createTRPCRouter({
             await ctx.db.rescueRequest.update({
               where: { id: rescueRequest.id },
               data: {
-                etaMinMinutes: Math.floor(eta.estimatedMinutes),
-                etaMaxMinutes: Math.ceil(eta.estimatedMinutes * 1.3),
+                etaMinMinutes: eta.minMinutes,
+                etaMaxMinutes: eta.maxMinutes,
                 etaConfidence: eta.confidence,
                 etaFactors: JSON.stringify(eta.factors),
               },
@@ -582,12 +590,19 @@ export const rescueRouter = createTRPCRouter({
               volunteerProfile.longitude
             );
 
+            // Get current active rescues count for better ETA prediction
+            const activeRescuesCount = await ctx.db.rescueRequest.count({
+              where: {
+                status: { in: ["ASSIGNED", "IN_PROGRESS"] }
+              }
+            });
+
             const etaInputs: ETAInputs = {
               distance,
-              volunteerLoad: activeAssignments + 1,
-              systemLoad: 1, // This would come from system metrics
+              volunteerBusy: activeAssignments > 0, // Volunteer is busy if they have other assignments
+              activeRescues: activeRescuesCount,
               disasterType: request.disasterType ?? "OTHER",
-              timeOfDay: new Date().getHours(),
+              volunteerAvailable: true, // Volunteer is accepting the request, so available
             };
             
             const eta = predictResponseTime(etaInputs);
@@ -595,8 +610,8 @@ export const rescueRouter = createTRPCRouter({
             await ctx.db.rescueRequest.update({
               where: { id: input.requestId },
               data: {
-                etaMinMinutes: Math.floor(eta.estimatedMinutes),
-                etaMaxMinutes: Math.ceil(eta.estimatedMinutes * 1.3),
+                etaMinMinutes: eta.minMinutes,
+                etaMaxMinutes: eta.maxMinutes,
                 etaConfidence: eta.confidence,
                 etaFactors: JSON.stringify(eta.factors),
               },
