@@ -257,57 +257,45 @@ export default function AuthorityCommandMap({
       });
     }
 
-    // Add safe zones
+    // Add safe zones with same style as user's alerts map
     if (safeZonesQuery.data) {
-      safeZonesQuery.data.forEach((safeZone) => {
-        const emoji = safeZone.type === "SHELTER" ? "🏕" : 
-                     safeZone.type === "CAMP" ? "⛺" : "🏥";
-
-        const icon = L.divIcon({
+      safeZonesQuery.data.forEach((zone) => {
+        const { icon, color } = getSafeZoneIcon(zone.type);
+        
+        const safeZoneIcon = L.divIcon({
           className: "custom-marker",
           html: `
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 border-3 border-white shadow-lg">
-              <span class="text-lg">${emoji}</span>
+            <div class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-white shadow-lg" style="background-color: ${color}">
+              <span class="text-white text-sm">${icon}</span>
             </div>
           `,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20],
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         });
 
-        const marker = L.marker([safeZone.latitude, safeZone.longitude], { icon })
+        const marker = L.marker([zone.latitude, zone.longitude], { icon: safeZoneIcon })
+          .bindPopup(`
+            <div class="p-3 min-w-[200px]">
+              <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <span class="text-lg">${icon}</span>
+                ${zone.name}
+              </h3>
+              <div class="space-y-1 text-sm">
+                <p><span class="font-medium">Type:</span> ${zone.type.toLowerCase().replace('_', ' ')}</p>
+                ${zone.capacity ? `<p><span class="font-medium">Capacity:</span> ${zone.capacity} people</p>` : ''}
+                <p><span class="font-medium">Verified by:</span> ${zone.creator.role}</p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-gray-200">
+                <button 
+                  onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${zone.latitude},${zone.longitude}', '_blank')"
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Get Directions →
+                </button>
+              </div>
+            </div>
+          `)
           .addTo(mapInstanceRef.current);
-
-        marker.bindPopup(`
-          <div class="p-3 min-w-[200px]">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-2xl">${emoji}</span>
-              <strong class="text-lg">${safeZone.name}</strong>
-            </div>
-            <div class="space-y-1 text-sm">
-              <div class="flex justify-between">
-                <span>Type:</span>
-                <strong>${safeZone.type}</strong>
-              </div>
-              ${safeZone.capacity ? `
-                <div class="flex justify-between">
-                  <span>Capacity:</span>
-                  <strong class="text-blue-600">${safeZone.capacity} people</strong>
-                </div>
-              ` : ''}
-              <div class="flex justify-between">
-                <span>Created by:</span>
-                <strong>${safeZone.creator.name || safeZone.creator.email}</strong>
-              </div>
-              <div class="flex justify-between">
-                <span>Role:</span>
-                <span class="px-2 py-1 rounded-full text-xs ${safeZone.creator.role === 'AUTHORITY' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${safeZone.creator.role}</span>
-              </div>
-              <div class="text-xs text-gray-500 mt-2 pt-2 border-t">
-                Created: ${new Date(safeZone.createdAt).toLocaleDateString('en-IN')}
-              </div>
-            </div>
-          </div>
-        `);
 
         markersRef.current.push(marker);
       });
@@ -670,3 +658,17 @@ export default function AuthorityCommandMap({
     </div>
   );
 }
+
+// Helper function for safe zone display (same as alerts map)
+const getSafeZoneIcon = (type: string) => {
+  switch (type) {
+    case 'SHELTER':
+      return { icon: '🏠', color: '#10b981' }; // Green
+    case 'CAMP':
+      return { icon: '⛺', color: '#f59e0b' }; // Orange
+    case 'HOSPITAL':
+      return { icon: '🏥', color: '#ef4444' }; // Red
+    default:
+      return { icon: '🏢', color: '#6b7280' }; // Gray
+  }
+};
