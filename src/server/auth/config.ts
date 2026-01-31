@@ -2,7 +2,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
+
 import { type Role } from "../../../generated/prisma";
 import bcrypt from "bcryptjs";
 
@@ -40,10 +40,6 @@ export const authConfig = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
     }),
     CredentialsProvider({
       name: "credentials",
@@ -122,7 +118,7 @@ export const authConfig = {
       },
     }),
     async signIn({ user, account, profile }) {
-      if (account?.provider === "google" || account?.provider === "github") {
+      if (account?.provider === "google") {
         // Auto-assign USER role for OAuth sign-ins
         if (!user.role) {
           user.role = "USER";
