@@ -211,5 +211,4 @@ prisma/
 
 ---
 
-## Presentation / Demo Link (Optional)
-To be added if available.
+
