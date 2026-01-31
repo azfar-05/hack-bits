@@ -562,13 +562,22 @@ export default function AuthorityCommandMap({
           background: white;
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        .leaflet-container {
+          z-index: 1 !important;
+        }
+        .leaflet-popup-pane {
+          z-index: 10 !important;
+        }
+        .leaflet-tooltip-pane {
+          z-index: 10 !important;
+        }
       `}</style>
       
-      <div ref={mapRef} className="h-full w-full min-h-[500px] rounded-lg bg-gray-100" />
+      <div ref={mapRef} className="h-full w-full min-h-[500px] rounded-lg bg-gray-100 z-0" />
       
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-20 rounded-lg">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-2"></div>
             <p className="text-gray-600 text-sm">Loading command data...</p>
@@ -577,7 +586,7 @@ export default function AuthorityCommandMap({
       )}
 
       {/* Map Legend */}
-      <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-10 max-w-xs">
+      <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-30 max-w-xs">
         <h4 className="font-semibold text-gray-900 mb-3 text-sm">Command Map Legend</h4>
         <div className="space-y-2 text-xs">
           <div className="flex items-center gap-2">
@@ -620,7 +629,7 @@ export default function AuthorityCommandMap({
       </div>
 
       {/* Status Summary */}
-      <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4 z-10">
+      <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4 z-30">
         <h4 className="font-semibold text-gray-900 mb-2 text-sm">Live Status</h4>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
