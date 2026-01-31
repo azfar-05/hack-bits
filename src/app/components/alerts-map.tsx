@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { api } from "~/trpc/react";
 
 interface Alert {
   id: string;
@@ -19,6 +20,7 @@ interface AlertsMapProps {
   alerts: Alert[];
   userLocation?: { latitude: number; longitude: number } | null;
   className?: string;
+  showSafeZones?: boolean; // New prop to control safe zones display
 }
 
 // Dynamic import for Leaflet (only runs on client)
@@ -34,11 +36,18 @@ export default function AlertsMap({
   alerts,
   userLocation,
   className = "",
+  showSafeZones = true, // Default to showing safe zones
 }: AlertsMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [mapReady, setMapReady] = useState(false);
+
+  // Fetch safe zones data
+  const safeZonesQuery = api.safeZone.getPublic.useQuery(undefined, {
+    enabled: showSafeZones,
+    refetchInterval: 60000, // Refresh every minute
+  });
 
   // Initialize map
   useEffect(() => {
@@ -92,7 +101,7 @@ export default function AlertsMap({
     };
   }, []);
 
-  // Update markers when alerts or user location changes
+  // Update markers when alerts, safe zones, or user location changes
   useEffect(() => {
     if (!mapInstanceRef.current || !L || !mapReady) return;
 
@@ -128,6 +137,55 @@ export default function AlertsMap({
       `);
 
       markersRef.current.push(userMarker);
+    }
+
+    // Add safe zones markers
+    if (showSafeZones && safeZonesQuery.data) {
+      safeZonesQuery.data.forEach((zone) => {
+        const { icon, color } = getSafeZoneIcon(zone.type);
+        
+        const safeZoneIcon = L.divIcon({
+          className: "custom-marker",
+          html: `
+            <div class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-white shadow-lg" style="background-color: ${color}">
+              <span class="text-white text-sm">${icon}</span>
+            </div>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+        });
+
+        const distance = userLocation ? 
+          calculateDistance(userLocation.latitude, userLocation.longitude, zone.latitude, zone.longitude) : 
+          null;
+
+        const marker = L.marker([zone.latitude, zone.longitude], { icon: safeZoneIcon })
+          .bindPopup(`
+            <div class="p-3 min-w-[200px]">
+              <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <span class="text-lg">${icon}</span>
+                ${zone.name}
+              </h3>
+              <div class="space-y-1 text-sm">
+                <p><span class="font-medium">Type:</span> ${zone.type.toLowerCase().replace('_', ' ')}</p>
+                ${zone.capacity ? `<p><span class="font-medium">Capacity:</span> ${zone.capacity} people</p>` : ''}
+                <p><span class="font-medium">Verified by:</span> ${zone.creator.role}</p>
+                ${distance ? `<p><span class="font-medium">Distance:</span> ${distance.toFixed(1)} km away</p>` : ''}
+              </div>
+              <div class="mt-2 pt-2 border-t border-gray-200">
+                <button 
+                  onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${zone.latitude},${zone.longitude}', '_blank')"
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Get Directions →
+                </button>
+              </div>
+            </div>
+          `)
+          .addTo(mapInstanceRef.current);
+
+        markersRef.current.push(marker);
+      });
     }
 
     // Add alert markers and circles
@@ -191,17 +249,20 @@ export default function AlertsMap({
       markersRef.current.push(marker);
     });
 
-    // Fit map to show all alerts if there are any
-    if (alerts.length > 0) {
-      const bounds = L.latLngBounds(
-        alerts.map((a) => [a.latitude, a.longitude])
-      );
+    // Fit map to show all alerts and safe zones if there are any
+    const allPoints = [...alerts.map((a) => [a.latitude, a.longitude])];
+    if (showSafeZones && safeZonesQuery.data) {
+      allPoints.push(...safeZonesQuery.data.map((z) => [z.latitude, z.longitude]));
+    }
+    
+    if (allPoints.length > 0) {
+      const bounds = L.latLngBounds(allPoints);
       if (userLocation) {
         bounds.extend([userLocation.latitude, userLocation.longitude]);
       }
       mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [alerts, userLocation, mapReady]);
+  }, [alerts, userLocation, mapReady, showSafeZones, safeZonesQuery.data]);
 
   return (
     <div className={`relative ${className}`}>
@@ -246,8 +307,55 @@ export default function AlertsMap({
             <div className="w-3 h-3 rounded-full bg-red-500 opacity-50"></div>
             <span>Fire Zone</span>
           </div>
+          {showSafeZones && (
+            <>
+              <div className="border-t border-gray-200 my-2"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span>🏠 Shelters</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                <span>⛺ Camps</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <span>🏥 Hospitals</span>
+              </div>
+            </>
+          )}
         </div>
+        {showSafeZones && safeZonesQuery.data && (
+          <div className="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-600">
+            {safeZonesQuery.data.length} safe zones available
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+// Helper functions
+const getSafeZoneIcon = (type: string) => {
+  switch (type) {
+    case 'SHELTER':
+      return { icon: '🏠', color: '#10b981' }; // Green
+    case 'CAMP':
+      return { icon: '⛺', color: '#f59e0b' }; // Orange
+    case 'HOSPITAL':
+      return { icon: '🏥', color: '#ef4444' }; // Red
+    default:
+      return { icon: '🏢', color: '#6b7280' }; // Gray
+  }
+};
+
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};

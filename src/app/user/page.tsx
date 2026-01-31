@@ -13,6 +13,8 @@ import {
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 import AlertsMap from "~/app/components/alerts-map";
 import { RealTimeCommunication } from "~/app/components/real-time-communication";
+import { SafeZonesMap } from "~/app/components/safe-zones-map";
+import { SafeZonesList } from "~/app/components/safe-zones-list";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 
@@ -431,7 +433,7 @@ export default function UserDashboard() {
       )}
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Disaster Alerts Map */}
+        {/* Disaster Alerts Map with Safe Zones */}
         {alertsQuery.data && alertsQuery.data.length > 0 && (
           <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-6">
@@ -441,11 +443,11 @@ export default function UserDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                   </svg>
                 </div>
-                Nearby Disaster Alerts
+                Emergency Map - Alerts & Safe Zones
               </h2>
               {userLocation && (
                 <span className="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg">
-                  Within {Math.max(...alertsQuery.data.map((a: any) => a.radiusKm + a.distance))?.toFixed(0) || '50'} km
+                  Showing alerts & safe zones near you
                 </span>
               )}
             </div>
@@ -454,10 +456,31 @@ export default function UserDashboard() {
                 alerts={alertsQuery.data}
                 userLocation={userLocation}
                 className="h-72"
+                showSafeZones={true}
               />
             </div>
           </div>
         )}
+
+        {/* Safe Zones Section - Now integrated into the alerts map above */}
+        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              Safe Zones Near You
+            </h2>
+          </div>
+          
+          <SafeZonesList
+            userLocation={userLocation}
+            maxDistance={25}
+          />
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Alert Feed */}

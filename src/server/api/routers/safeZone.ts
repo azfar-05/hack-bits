@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const safeZoneRouter = createTRPCRouter({
   // Create a new safe zone (VOLUNTEER or AUTHORITY only)
@@ -114,4 +114,79 @@ export const safeZoneRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  // Get nearby safe zones (public access for emergency situations)
+  getNearby: publicProcedure
+    .input(
+      z.object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+        radiusKm: z.number().min(1).max(50).default(10), // Default 10km radius
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Get all safe zones and calculate distance
+      const safeZones = await ctx.db.safeZone.findMany({
+        include: {
+          creator: {
+            select: { id: true, name: true, role: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      // Filter by distance (simple calculation for demo)
+      const nearbySafeZones = safeZones.filter((zone) => {
+        const distance = calculateDistance(
+          input.latitude,
+          input.longitude,
+          zone.latitude,
+          zone.longitude
+        );
+        return distance <= input.radiusKm;
+      });
+
+      return nearbySafeZones.map((zone) => ({
+        ...zone,
+        distance: calculateDistance(
+          input.latitude,
+          input.longitude,
+          zone.latitude,
+          zone.longitude
+        ),
+      })).sort((a, b) => a.distance - b.distance);
+    }),
+
+  // Get all safe zones for public viewing (for maps)
+  getPublic: publicProcedure.query(async ({ ctx }) => {
+    const safeZones = await ctx.db.safeZone.findMany({
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        latitude: true,
+        longitude: true,
+        capacity: true,
+        createdAt: true,
+        creator: {
+          select: { role: true }, // Only show creator role for verification
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return safeZones;
+  }),
 });
+
+// Helper function to calculate distance between two points
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}

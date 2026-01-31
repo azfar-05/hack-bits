@@ -9,6 +9,8 @@ import { CreateShelterForm } from "~/app/components/create-shelter-form";
 import { AddResourceForm } from "~/app/components/add-resource-form";
 import { TrainingDashboard } from "~/app/components/training-dashboard";
 import { RealTimeCommunication } from "~/app/components/real-time-communication";
+import { SafeZonesMap } from "~/app/components/safe-zones-map";
+import { SafeZonesList } from "~/app/components/safe-zones-list";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 
 // Dynamically import the map component (client-side only)
@@ -615,6 +617,28 @@ export default function VolunteerDashboard() {
             </div>
           </div>
         )}
+
+        {/* Safe Zones Overview Section */}
+        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              Safe Zones Network
+            </h2>
+          </div>
+          
+          <SafeZonesList
+            userLocation={myLocation ? { latitude: myLocation.lat, longitude: myLocation.lng } : null}
+            maxDistance={50}
+            showCreateButton={true}
+            onCreateClick={() => setShowCreateShelter(true)}
+          />
+        </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* My Assigned Requests */}
