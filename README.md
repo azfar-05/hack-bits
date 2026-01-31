@@ -41,8 +41,8 @@ The solution provides a unified, multi-role platform: real-time alerting, SOS cr
 - PostgreSQL with Prisma ORM
 
 **Authentication:**
-- NextAuth v5 with role-based access (USER, VOLUNTEER, AUTHORITY)
-- Google OAuth, GitHub OAuth, and credentials (email + password) providers
+- Firebase Authentication with role-based access (USER, VOLUNTEER, AUTHORITY) implemented using Firebase custom claims and backend authorization checks.
+- Google OAuth and credentials (email + password) providers
 - New users get USER role by default; VOLUNTEER and AUTHORITY roles are assigned via admin (e.g. promote API or database)
 
 **Maps & Location:**
