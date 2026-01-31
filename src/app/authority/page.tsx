@@ -727,7 +727,7 @@ export default function AuthorityDashboard() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-blue-900">
-                  🤖 ML-Assisted Response Priority Board
+                  🤖 Response Priority Board
                 </h2>
                 <p className="text-sm text-blue-700">
                   Assigned rescues sorted by estimated arrival time for optimal coordination

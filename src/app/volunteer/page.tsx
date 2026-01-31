@@ -712,16 +712,14 @@ export default function VolunteerDashboard() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-blue-900">
-                            🤖 ML-Assisted ETA: {formatETA({
+                            🤖 ETA: {formatETA({
                               minMinutes: request.etaMinMinutes,
                               maxMinutes: request.etaMaxMinutes,
                               confidence: request.etaConfidence as any,
                               factors: request.etaFactors ? JSON.parse(request.etaFactors) : []
                             })}
                           </p>
-                          <p className={`text-xs ${getConfidenceColor(request.etaConfidence as any)}`}>
-                            Confidence: {request.etaConfidence}
-                          </p>
+                
                         </div>
                         <div className="text-right">
                           <p className="text-xs text-blue-700">
@@ -729,13 +727,6 @@ export default function VolunteerDashboard() {
                           </p>
                         </div>
                       </div>
-                      {request.etaFactors && (
-                        <div className="mt-2">
-                          <p className="text-xs text-blue-700">
-                            <strong>Factors:</strong> {JSON.parse(request.etaFactors).join(', ')}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   )}
 

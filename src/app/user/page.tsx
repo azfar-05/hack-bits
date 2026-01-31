@@ -417,12 +417,6 @@ export default function UserDashboard() {
                           })}
                         </p>
                       </div>
-                      <p className={`text-xs ${getConfidenceColor(currentRescue.etaConfidence as any)}`}>
-                        ML-assisted prediction ({currentRescue.etaConfidence} confidence)
-                      </p>
-                      <p className="text-xs text-blue-700 mt-1">
-                        Based on real-time signals: distance, volunteer status, system load
-                      </p>
                     </div>
                   )}
                 </div>
