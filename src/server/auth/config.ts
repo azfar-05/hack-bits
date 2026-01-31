@@ -35,6 +35,7 @@ declare module "next-auth/jwt" {
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  */
 export const authConfig = {
+  trustHost: true, // Trust all hosts in development
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
