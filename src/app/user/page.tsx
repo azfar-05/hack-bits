@@ -11,6 +11,7 @@ import {
   type CachedGuide,
 } from "~/lib/offline";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
+import AlertsMap from "~/app/components/alerts-map";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 
@@ -37,6 +38,7 @@ export default function UserDashboard() {
   );
   const [showingCached, setShowingCached] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Check authentication and role
   const isAuthenticated = status === "authenticated";
@@ -58,6 +60,24 @@ export default function UserDashboard() {
     }
   }, [status, isAuthenticated, isUser, router]);
 
+  // Get user location for affected zone detection
+  useEffect(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.log("Could not get user location:", error.message);
+      },
+      { enableHighAccuracy: true, maximumAge: 300000 }
+    );
+  }, []);
+
   // Check online status
   useEffect(() => {
     setOnline(isOnline());
@@ -74,11 +94,17 @@ export default function UserDashboard() {
     };
   }, []);
 
-  // Fetch alerts
-  const alertsQuery = api.alert.getAll.useQuery(undefined, {
-    enabled: online && shouldQuery,
-    refetchInterval: online && shouldQuery ? 30000 : false, // Refetch every 30s when online
-  });
+  // Fetch alerts with user location for affected zone detection
+  const alertsQuery = api.alert.getAlertsForUser.useQuery(
+    { latitude: userLocation?.latitude ?? 0, longitude: userLocation?.longitude ?? 0 },
+    {
+      enabled: online && shouldQuery && userLocation !== null,
+      refetchInterval: online && shouldQuery ? 30000 : false,
+    }
+  );
+
+  // Show loading state specifically for location-based alerts
+  const showLocationLoading = userLocation === null && shouldQuery;
 
   // Fetch guide for selected disaster type
   const guideQuery = api.guide.getByDisaster.useQuery(
@@ -353,6 +379,38 @@ export default function UserDashboard() {
       )}
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Disaster Alerts Map */}
+        {alertsQuery.data && alertsQuery.data.length > 0 && (
+          <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <svg
+                className="h-6 w-6 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                />
+              </svg>
+              Nearby Disaster Alerts
+              {userLocation && (
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  (showing alerts within {Math.max(...alertsQuery.data.map((a: any) => a.radiusKm + a.distance))?.toFixed(0) || '50'} km)
+                </span>
+              )}
+            </h2>
+            <AlertsMap
+              alerts={alertsQuery.data}
+              userLocation={userLocation}
+              className="h-72"
+            />
+          </div>
+        )}
+
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Alert Feed */}
           <div className="rounded-lg bg-white p-6 shadow-md">
@@ -379,9 +437,16 @@ export default function UserDashboard() {
               </div>
             )}
 
-            {alertsQuery.isLoading && (
+            {showLocationLoading && (
               <div className="py-8 text-center text-gray-500">
-                Loading alerts...
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                <p>Getting your location to show nearby alerts...</p>
+              </div>
+            )}
+
+            {alertsQuery.isLoading && userLocation && (
+              <div className="py-8 text-center text-gray-500">
+                Loading nearby alerts...
               </div>
             )}
 
@@ -391,23 +456,51 @@ export default function UserDashboard() {
               </div>
             )}
 
-            {alertsQuery.data && alertsQuery.data.length === 0 && (
+            {alertsQuery.data && alertsQuery.data.length === 0 && userLocation && (
               <div className="py-8 text-center text-gray-500">
-                No alerts at this time. Stay safe!
+                No alerts near your location. Stay safe!
+              </div>
+            )}
+
+            {/* Show affected zone warning if user is in any affected area */}
+            {alertsQuery.data && alertsQuery.data.some((a: any) => a.isInAffectedZone) && (
+              <div className="mb-4 rounded-md bg-red-100 border-2 border-red-400 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex h-3 w-3 rounded-full bg-red-600"></span>
+                  </span>
+                  <span className="font-bold text-red-800">You are in an affected zone!</span>
+                </div>
+                <p className="text-sm text-red-700 mt-1">
+                  Follow safety instructions and stay alert. Check the alerts below for details.
+                </p>
               </div>
             )}
 
             <div className="max-h-96 space-y-4 overflow-y-auto">
-              {alertsQuery.data?.map((alert) => (
+              {alertsQuery.data?.map((alert: any) => (
                 <div
                   key={alert.id}
-                  className={`rounded-lg border p-4 ${disasterTypeColors[alert.disasterType as DisasterType]}`}
+                  className={`rounded-lg border p-4 ${
+                    alert.isInAffectedZone 
+                      ? "border-red-500 border-2 bg-red-50" 
+                      : disasterTypeColors[alert.disasterType as DisasterType]
+                  }`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="mb-2 inline-block rounded-full px-2 py-1 text-xs font-medium">
-                        {disasterTypeLabels[alert.disasterType as DisasterType]}
-                      </span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-block rounded-full px-2 py-1 text-xs font-medium bg-opacity-50">
+                          {disasterTypeLabels[alert.disasterType as DisasterType]}
+                        </span>
+                        {alert.isInAffectedZone && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white">
+                            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></span>
+                            IN AFFECTED ZONE
+                          </span>
+                        )}
+                      </div>
                       <h3 className="font-semibold">{alert.title}</h3>
                     </div>
                     <span className="text-xs opacity-75">
@@ -415,6 +508,17 @@ export default function UserDashboard() {
                     </span>
                   </div>
                   <p className="mt-2 text-sm">{alert.message}</p>
+                  {/* Show location info */}
+                  <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-600">
+                    <div className="flex items-center justify-between">
+                      <span>Affected radius: {alert.radiusKm} km</span>
+                      {alert.distance !== undefined && (
+                        <span className={alert.isInAffectedZone ? "text-red-700 font-medium" : ""}>
+                          Distance from you: {alert.distance.toFixed(1)} km
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

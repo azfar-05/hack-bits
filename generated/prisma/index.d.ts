@@ -6709,8 +6709,22 @@ export namespace Prisma {
 
   export type AggregateAlert = {
     _count: AlertCountAggregateOutputType | null
+    _avg: AlertAvgAggregateOutputType | null
+    _sum: AlertSumAggregateOutputType | null
     _min: AlertMinAggregateOutputType | null
     _max: AlertMaxAggregateOutputType | null
+  }
+
+  export type AlertAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    radiusKm: number | null
+  }
+
+  export type AlertSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    radiusKm: number | null
   }
 
   export type AlertMinAggregateOutputType = {
@@ -6718,6 +6732,9 @@ export namespace Prisma {
     title: string | null
     message: string | null
     disasterType: $Enums.DisasterType | null
+    latitude: number | null
+    longitude: number | null
+    radiusKm: number | null
     createdAt: Date | null
   }
 
@@ -6726,6 +6743,9 @@ export namespace Prisma {
     title: string | null
     message: string | null
     disasterType: $Enums.DisasterType | null
+    latitude: number | null
+    longitude: number | null
+    radiusKm: number | null
     createdAt: Date | null
   }
 
@@ -6734,16 +6754,34 @@ export namespace Prisma {
     title: number
     message: number
     disasterType: number
+    latitude: number
+    longitude: number
+    radiusKm: number
     createdAt: number
     _all: number
   }
 
+
+  export type AlertAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    radiusKm?: true
+  }
+
+  export type AlertSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    radiusKm?: true
+  }
 
   export type AlertMinAggregateInputType = {
     id?: true
     title?: true
     message?: true
     disasterType?: true
+    latitude?: true
+    longitude?: true
+    radiusKm?: true
     createdAt?: true
   }
 
@@ -6752,6 +6790,9 @@ export namespace Prisma {
     title?: true
     message?: true
     disasterType?: true
+    latitude?: true
+    longitude?: true
+    radiusKm?: true
     createdAt?: true
   }
 
@@ -6760,6 +6801,9 @@ export namespace Prisma {
     title?: true
     message?: true
     disasterType?: true
+    latitude?: true
+    longitude?: true
+    radiusKm?: true
     createdAt?: true
     _all?: true
   }
@@ -6802,6 +6846,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: AlertAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AlertSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: AlertMinAggregateInputType
@@ -6832,6 +6888,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: AlertCountAggregateInputType | true
+    _avg?: AlertAvgAggregateInputType
+    _sum?: AlertSumAggregateInputType
     _min?: AlertMinAggregateInputType
     _max?: AlertMaxAggregateInputType
   }
@@ -6841,8 +6899,13 @@ export namespace Prisma {
     title: string
     message: string
     disasterType: $Enums.DisasterType
+    latitude: number
+    longitude: number
+    radiusKm: number
     createdAt: Date
     _count: AlertCountAggregateOutputType | null
+    _avg: AlertAvgAggregateOutputType | null
+    _sum: AlertSumAggregateOutputType | null
     _min: AlertMinAggregateOutputType | null
     _max: AlertMaxAggregateOutputType | null
   }
@@ -6866,6 +6929,9 @@ export namespace Prisma {
     title?: boolean
     message?: boolean
     disasterType?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    radiusKm?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["alert"]>
 
@@ -6874,6 +6940,9 @@ export namespace Prisma {
     title?: boolean
     message?: boolean
     disasterType?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    radiusKm?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["alert"]>
 
@@ -6882,6 +6951,9 @@ export namespace Prisma {
     title?: boolean
     message?: boolean
     disasterType?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    radiusKm?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["alert"]>
 
@@ -6890,10 +6962,13 @@ export namespace Prisma {
     title?: boolean
     message?: boolean
     disasterType?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    radiusKm?: boolean
     createdAt?: boolean
   }
 
-  export type AlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "message" | "disasterType" | "createdAt", ExtArgs["result"]["alert"]>
+  export type AlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "message" | "disasterType" | "latitude" | "longitude" | "radiusKm" | "createdAt", ExtArgs["result"]["alert"]>
 
   export type $AlertPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Alert"
@@ -6903,6 +6978,9 @@ export namespace Prisma {
       title: string
       message: string
       disasterType: $Enums.DisasterType
+      latitude: number
+      longitude: number
+      radiusKm: number
       createdAt: Date
     }, ExtArgs["result"]["alert"]>
     composites: {}
@@ -7331,6 +7409,9 @@ export namespace Prisma {
     readonly title: FieldRef<"Alert", 'String'>
     readonly message: FieldRef<"Alert", 'String'>
     readonly disasterType: FieldRef<"Alert", 'DisasterType'>
+    readonly latitude: FieldRef<"Alert", 'Float'>
+    readonly longitude: FieldRef<"Alert", 'Float'>
+    readonly radiusKm: FieldRef<"Alert", 'Int'>
     readonly createdAt: FieldRef<"Alert", 'DateTime'>
   }
     
@@ -15704,6 +15785,9 @@ export namespace Prisma {
     title: 'title',
     message: 'message',
     disasterType: 'disasterType',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    radiusKm: 'radiusKm',
     createdAt: 'createdAt'
   };
 
@@ -16322,6 +16406,9 @@ export namespace Prisma {
     title?: StringFilter<"Alert"> | string
     message?: StringFilter<"Alert"> | string
     disasterType?: EnumDisasterTypeFilter<"Alert"> | $Enums.DisasterType
+    latitude?: FloatFilter<"Alert"> | number
+    longitude?: FloatFilter<"Alert"> | number
+    radiusKm?: IntFilter<"Alert"> | number
     createdAt?: DateTimeFilter<"Alert"> | Date | string
   }
 
@@ -16330,6 +16417,9 @@ export namespace Prisma {
     title?: SortOrder
     message?: SortOrder
     disasterType?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -16341,6 +16431,9 @@ export namespace Prisma {
     title?: StringFilter<"Alert"> | string
     message?: StringFilter<"Alert"> | string
     disasterType?: EnumDisasterTypeFilter<"Alert"> | $Enums.DisasterType
+    latitude?: FloatFilter<"Alert"> | number
+    longitude?: FloatFilter<"Alert"> | number
+    radiusKm?: IntFilter<"Alert"> | number
     createdAt?: DateTimeFilter<"Alert"> | Date | string
   }, "id">
 
@@ -16349,10 +16442,15 @@ export namespace Prisma {
     title?: SortOrder
     message?: SortOrder
     disasterType?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
     createdAt?: SortOrder
     _count?: AlertCountOrderByAggregateInput
+    _avg?: AlertAvgOrderByAggregateInput
     _max?: AlertMaxOrderByAggregateInput
     _min?: AlertMinOrderByAggregateInput
+    _sum?: AlertSumOrderByAggregateInput
   }
 
   export type AlertScalarWhereWithAggregatesInput = {
@@ -16363,6 +16461,9 @@ export namespace Prisma {
     title?: StringWithAggregatesFilter<"Alert"> | string
     message?: StringWithAggregatesFilter<"Alert"> | string
     disasterType?: EnumDisasterTypeWithAggregatesFilter<"Alert"> | $Enums.DisasterType
+    latitude?: FloatWithAggregatesFilter<"Alert"> | number
+    longitude?: FloatWithAggregatesFilter<"Alert"> | number
+    radiusKm?: IntWithAggregatesFilter<"Alert"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Alert"> | Date | string
   }
 
@@ -17243,6 +17344,9 @@ export namespace Prisma {
     title: string
     message: string
     disasterType: $Enums.DisasterType
+    latitude?: number
+    longitude?: number
+    radiusKm?: number
     createdAt?: Date | string
   }
 
@@ -17251,6 +17355,9 @@ export namespace Prisma {
     title: string
     message: string
     disasterType: $Enums.DisasterType
+    latitude?: number
+    longitude?: number
+    radiusKm?: number
     createdAt?: Date | string
   }
 
@@ -17259,6 +17366,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     disasterType?: EnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    radiusKm?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17267,6 +17377,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     disasterType?: EnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    radiusKm?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17275,6 +17388,9 @@ export namespace Prisma {
     title: string
     message: string
     disasterType: $Enums.DisasterType
+    latitude?: number
+    longitude?: number
+    radiusKm?: number
     createdAt?: Date | string
   }
 
@@ -17283,6 +17399,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     disasterType?: EnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    radiusKm?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17291,6 +17410,9 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     disasterType?: EnumDisasterTypeFieldUpdateOperationsInput | $Enums.DisasterType
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    radiusKm?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -18322,12 +18444,43 @@ export namespace Prisma {
     not?: NestedEnumDisasterTypeFilter<$PrismaModel> | $Enums.DisasterType
   }
 
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type AlertCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
     message?: SortOrder
     disasterType?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type AlertAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
   }
 
   export type AlertMaxOrderByAggregateInput = {
@@ -18335,6 +18488,9 @@ export namespace Prisma {
     title?: SortOrder
     message?: SortOrder
     disasterType?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -18343,7 +18499,16 @@ export namespace Prisma {
     title?: SortOrder
     message?: SortOrder
     disasterType?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type AlertSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    radiusKm?: SortOrder
   }
 
   export type EnumDisasterTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -18354,6 +18519,38 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDisasterTypeFilter<$PrismaModel>
     _max?: NestedEnumDisasterTypeFilter<$PrismaModel>
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type SafetyGuideCountOrderByAggregateInput = {
@@ -18378,17 +18575,6 @@ export namespace Prisma {
     content?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type EnumEmergencyStatusFilter<$PrismaModel = never> = {
@@ -18436,22 +18622,6 @@ export namespace Prisma {
   export type EmergencyRequestSumOrderByAggregateInput = {
     latitude?: SortOrder
     longitude?: SortOrder
-  }
-
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type EnumEmergencyStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -18718,17 +18888,6 @@ export namespace Prisma {
     not?: NestedEnumResourceTypeFilter<$PrismaModel> | $Enums.ResourceType
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type EnumCreatorTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.CreatorType | EnumCreatorTypeFieldRefInput<$PrismaModel>
     in?: $Enums.CreatorType[] | ListEnumCreatorTypeFieldRefInput<$PrismaModel>
@@ -18798,22 +18957,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumResourceTypeFilter<$PrismaModel>
     _max?: NestedEnumResourceTypeFilter<$PrismaModel>
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type EnumCreatorTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -19266,18 +19409,26 @@ export namespace Prisma {
     set?: $Enums.DisasterType
   }
 
-  export type UserCreateNestedOneWithoutEmergencyRequestsInput = {
-    create?: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutEmergencyRequestsInput
-    connect?: UserWhereUniqueInput
-  }
-
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type UserCreateNestedOneWithoutEmergencyRequestsInput = {
+    create?: XOR<UserCreateWithoutEmergencyRequestsInput, UserUncheckedCreateWithoutEmergencyRequestsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEmergencyRequestsInput
+    connect?: UserWhereUniqueInput
   }
 
   export type EnumEmergencyStatusFieldUpdateOperationsInput = {
@@ -19384,14 +19535,6 @@ export namespace Prisma {
 
   export type EnumResourceTypeFieldUpdateOperationsInput = {
     set?: $Enums.ResourceType
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type EnumCreatorTypeFieldUpdateOperationsInput = {
@@ -19620,16 +19763,6 @@ export namespace Prisma {
     not?: NestedEnumDisasterTypeFilter<$PrismaModel> | $Enums.DisasterType
   }
 
-  export type NestedEnumDisasterTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumDisasterTypeWithAggregatesFilter<$PrismaModel> | $Enums.DisasterType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumDisasterTypeFilter<$PrismaModel>
-    _max?: NestedEnumDisasterTypeFilter<$PrismaModel>
-  }
-
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -19641,11 +19774,14 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type NestedEnumEmergencyStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumEmergencyStatusFilter<$PrismaModel> | $Enums.EmergencyStatus
+  export type NestedEnumDisasterTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DisasterType | EnumDisasterTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DisasterType[] | ListEnumDisasterTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDisasterTypeWithAggregatesFilter<$PrismaModel> | $Enums.DisasterType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDisasterTypeFilter<$PrismaModel>
+    _max?: NestedEnumDisasterTypeFilter<$PrismaModel>
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -19662,6 +19798,29 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEmergencyStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmergencyStatus | EnumEmergencyStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmergencyStatus[] | ListEnumEmergencyStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmergencyStatusFilter<$PrismaModel> | $Enums.EmergencyStatus
   }
 
   export type NestedEnumEmergencyStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -19747,22 +19906,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumResourceTypeFilter<$PrismaModel>
     _max?: NestedEnumResourceTypeFilter<$PrismaModel>
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type NestedEnumCreatorTypeWithAggregatesFilter<$PrismaModel = never> = {

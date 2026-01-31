@@ -14,7 +14,7 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    if (!data || status === "loading") return;
+    if (!data || status !== "authenticated") return;
 
     // If profile is incomplete, the ProfileGuard will handle showing the completion modal
     // Just redirect to the appropriate role-based dashboard

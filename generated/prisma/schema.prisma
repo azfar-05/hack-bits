@@ -79,7 +79,12 @@ model Alert {
   title        String
   message      String
   disasterType DisasterType
+  latitude     Float        @default(15.3173)
+  longitude    Float        @default(75.7139)
+  radiusKm     Int          @default(5)
   createdAt    DateTime     @default(now())
+
+  @@index([latitude, longitude])
 }
 
 model SafetyGuide {

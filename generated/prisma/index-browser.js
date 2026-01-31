@@ -170,6 +170,9 @@ exports.Prisma.AlertScalarFieldEnum = {
   title: 'title',
   message: 'message',
   disasterType: 'disasterType',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  radiusKm: 'radiusKm',
   createdAt: 'createdAt'
 };
 

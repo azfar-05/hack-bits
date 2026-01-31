@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import AuthorityCommandMap from "~/app/components/authority-command-map";
+import { PredictiveAnalyticsMap } from "~/app/components/predictive-analytics-map";
+import { CreateDisasterForm } from "~/app/components/create-disaster-form";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
+import AlertLocationPicker from "~/app/components/alert-location-picker";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 type RescueStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "NO_VOLUNTEER";
@@ -54,6 +57,9 @@ export default function AuthorityDashboard() {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertDisasterType, setAlertDisasterType] = useState<DisasterType>("FLOOD");
+  const [alertLatitude, setAlertLatitude] = useState<number | null>(null);
+  const [alertLongitude, setAlertLongitude] = useState<number | null>(null);
+  const [alertRadiusKm, setAlertRadiusKm] = useState<number>(5);
   const [alertSuccess, setAlertSuccess] = useState(false);
 
   // Guide form state
@@ -132,6 +138,9 @@ export default function AuthorityDashboard() {
     onSuccess: () => {
       setAlertTitle("");
       setAlertMessage("");
+      setAlertLatitude(null);
+      setAlertLongitude(null);
+      setAlertRadiusKm(5);
       setAlertSuccess(true);
       setTimeout(() => setAlertSuccess(false), 3000);
     },
@@ -147,10 +156,20 @@ export default function AuthorityDashboard() {
 
   const handleAlertSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate location is selected
+    if (alertLatitude === null || alertLongitude === null) {
+      alert("Please select a location for the alert on the map or enter coordinates manually.");
+      return;
+    }
+    
     createAlert.mutate({
       title: alertTitle,
       message: alertMessage,
       disasterType: alertDisasterType,
+      latitude: alertLatitude,
+      longitude: alertLongitude,
+      radiusKm: alertRadiusKm,
     });
   };
 
@@ -254,6 +273,26 @@ export default function AuthorityDashboard() {
               <AuthorityCommandMap className="h-full" />
             </div>
           </div>
+        </div>
+
+        {/* Predictive Analytics Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                Advanced Geospatial Analytics
+              </h2>
+              <p className="text-gray-600 mt-1">Predictive flood/fire path analysis with safe zone intersection warnings</p>
+            </div>
+            <CreateDisasterForm />
+          </div>
+          
+          <PredictiveAnalyticsMap />
         </div>
 
         {/* Comprehensive Status Dashboard */}
@@ -729,9 +768,26 @@ export default function AuthorityDashboard() {
                 />
               </div>
 
+              {/* Location Selection */}
+              <div className="border-t border-gray-200 pt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Alert Location & Affected Area
+                </label>
+                <AlertLocationPicker
+                  latitude={alertLatitude}
+                  longitude={alertLongitude}
+                  radiusKm={alertRadiusKm}
+                  onLocationChange={(lat, lng) => {
+                    setAlertLatitude(lat);
+                    setAlertLongitude(lng);
+                  }}
+                  onRadiusChange={setAlertRadiusKm}
+                />
+              </div>
+
               <button
                 type="submit"
-                disabled={createAlert.isPending}
+                disabled={createAlert.isPending || alertLatitude === null || alertLongitude === null}
                 className="w-full rounded-md bg-red-600 px-4 py-2 text-white font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {createAlert.isPending ? "Sending..." : "Send Alert"}
