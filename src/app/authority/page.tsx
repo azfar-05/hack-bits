@@ -9,6 +9,9 @@ import { PredictiveAnalyticsMap } from "~/app/components/predictive-analytics-ma
 import { CreateDisasterForm } from "~/app/components/create-disaster-form";
 import { TrainingDashboard } from "~/app/components/training-dashboard";
 import { RealTimeCommunication } from "~/app/components/real-time-communication";
+import { DroneSwarmDashboard } from "~/app/components/drone-swarm-dashboard";
+import { SocialMediaDashboard } from "~/app/components/social-media-dashboard";
+import { quickDeployEmergencyDrone } from "~/lib/drone-swarm";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 import AlertLocationPicker from "~/app/components/alert-location-picker";
 import AuthorityDisasterManager from "~/app/components/authority-disaster-manager";
@@ -76,6 +79,19 @@ export default function AuthorityDashboard() {
   const [selectedVolunteerId, setSelectedVolunteerId] = useState("");
   const [showTraining, setShowTraining] = useState(false);
   const [showRealTimeComms, setShowRealTimeComms] = useState(false);
+  const [showDroneSwarm, setShowDroneSwarm] = useState(false);
+  const [showSocialScanner, setShowSocialScanner] = useState(false);
+  const [emergencyLocation, setEmergencyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Quick drone deployment function
+  const handleQuickDroneDeploy = async (location: { latitude: number; longitude: number }, type: 'SOS' | 'EMERGENCY_REQUEST' = 'SOS') => {
+    try {
+      const mission = await quickDeployEmergencyDrone(location, type);
+      alert(`🚁 Emergency surveillance drone deployed!\n\nMission ID: ${mission.id}\nETA: ${mission.estimatedDuration} minutes\nDrone: ${mission.assignedDrones.length} unit(s)\n\nDrone will provide real-time surveillance and report findings.`);
+    } catch (error) {
+      alert(`Failed to deploy drone: ${(error as Error).message}`);
+    }
+  };
 
   // Fetch all alerts for authority management
   const alertsQuery = api.alert.getAll.useQuery(undefined, {
@@ -244,6 +260,24 @@ export default function AuthorityDashboard() {
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
+              </button>
+
+              <button
+                onClick={() => setShowSocialScanner(true)}
+                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium flex items-center gap-2"
+                title="AI Social Media Scanner"
+              >
+                <span>🔍</span>
+                Social Scanner
+              </button>
+
+              <button
+                onClick={() => setShowDroneSwarm(true)}
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium flex items-center gap-2"
+                title="AI Drone Swarm"
+              >
+                <span>🚁</span>
+                AI Drone Swarm
               </button>
 
               <button
@@ -565,7 +599,7 @@ export default function AuthorityDashboard() {
                         </span>
                       </div>
                       <p className="font-semibold text-gray-900 mb-1">
-                        {request.user.name || request.user.email}
+                        {request.user?.name || request.user?.email || "Unknown User"}
                       </p>
                       <p className="text-sm text-gray-600 mb-2">{request.message}</p>
                       {request.location && (
@@ -605,9 +639,33 @@ export default function AuthorityDashboard() {
                           Assign Volunteer
                         </button>
                         <button
+                          className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 transition-colors"
+                          onClick={async () => {
+                            const location = {
+                              latitude: request.latitude || 0,
+                              longitude: request.longitude || 0
+                            };
+                            await handleQuickDroneDeploy(location, 'EMERGENCY_REQUEST');
+                          }}
+                        >
+                          🚁 Quick Deploy Drone
+                        </button>
+                        <button
+                          className="rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white hover:bg-purple-600 transition-colors"
+                          onClick={() => {
+                            setEmergencyLocation({
+                              latitude: request.latitude || 0,
+                              longitude: request.longitude || 0
+                            });
+                            setShowDroneSwarm(true);
+                          }}
+                        >
+                          🚁 Full Swarm Control
+                        </button>
+                        <button
                           className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
                           onClick={() => {
-                            alert(`Dispatching emergency services to: ${request.location || "Unknown location"}\nUser: ${request.user.name || request.user.email}`);
+                            alert(`Dispatching emergency services to: ${request.location || "Unknown location"}\nUser: ${request.user?.name || request.user?.email || "Unknown User"}`);
                           }}
                         >
                           Dispatch Services
@@ -704,7 +762,7 @@ export default function AuthorityDashboard() {
                         </span>
                       </div>
                       <p className="font-semibold text-gray-900 mb-1">
-                        {request.user.name || request.user.email}
+                        {request.user?.name || request.user?.email || "Unknown User"}
                       </p>
                       <p className="text-sm text-gray-600 mb-2">{request.message}</p>
                       {request.volunteer && (
@@ -714,7 +772,7 @@ export default function AuthorityDashboard() {
                       )}
                     </div>
                     <div className="ml-6 text-right">
-                      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-3">
                         <p className="text-lg font-bold text-blue-900">
                           {formatETA({
                             minMinutes: request.etaMinMinutes!,
@@ -730,6 +788,20 @@ export default function AuthorityDashboard() {
                           ML-predicted ETA
                         </p>
                       </div>
+                      
+                      {/* Quick Drone Deploy for Priority Cases */}
+                      <button
+                        onClick={async () => {
+                          const location = {
+                            latitude: request.latitude || 0,
+                            longitude: request.longitude || 0
+                          };
+                          await handleQuickDroneDeploy(location, 'EMERGENCY_REQUEST');
+                        }}
+                        className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs font-medium"
+                      >
+                        🚁 Deploy Surveillance
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -990,7 +1062,7 @@ export default function AuthorityDashboard() {
                 <div className="rounded-xl bg-red-50 p-4 border border-red-200">
                   <h3 className="font-semibold text-red-900 mb-2">Emergency Details</h3>
                   <div className="space-y-2 text-sm">
-                    <p><strong>User:</strong> {selectedRequest.user.name || selectedRequest.user.email}</p>
+                    <p><strong>User:</strong> {selectedRequest.user?.name || selectedRequest.user?.email || "Unknown User"}</p>
                     <p><strong>Message:</strong> {selectedRequest.message}</p>
                     {selectedRequest.location && (
                       <p><strong>Location:</strong> {selectedRequest.location}</p>
@@ -1163,6 +1235,63 @@ export default function AuthorityDashboard() {
             </div>
             <div className="p-6 h-full overflow-y-auto">
               <TrainingDashboard />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Drone Swarm Dashboard Modal */}
+      {showDroneSwarm && (
+        <div className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl h-[90vh] overflow-hidden relative z-[10000]">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🚁 AI Drone Swarm Command Center</h2>
+              <button
+                onClick={() => setShowDroneSwarm(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 h-full overflow-y-auto">
+              <DroneSwarmDashboard 
+                emergencyLocation={emergencyLocation || undefined}
+                onMissionDeployed={(mission) => {
+                  console.log('Mission deployed:', mission);
+                  alert(`🚁 Drone swarm mission "${mission.type}" deployed with ${mission.assignedDrones.length} drones!`);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Social Media Scanner Modal */}
+      {showSocialScanner && (
+        <div className="fixed inset-0 z-[9999] bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-7xl h-[90vh] overflow-hidden relative z-[10000]">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🔍 AI Social Media Emergency Scanner</h2>
+              <button
+                onClick={() => setShowSocialScanner(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 h-full overflow-y-auto">
+              <SocialMediaDashboard 
+                onEmergencyDetected={(post) => {
+                  console.log('Emergency detected:', post);
+                  if (post.severity === 'CRITICAL') {
+                    alert(`🚨 CRITICAL EMERGENCY DETECTED!\n\n${post.content}\n\nLocation: ${post.location?.name || 'Unknown'}\nSource: ${post.platform}`);
+                  }
+                }}
+              />
             </div>
           </div>
         </div>

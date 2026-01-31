@@ -234,10 +234,30 @@ export function SosButton() {
   const [initialSosSent, setInitialSosSent] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
 
+  // Request notification permission on component mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   // SOS mutation (unauthenticated)
   const createSos = api.rescue.createSOS.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       setInitialSosSent(true);
+      
+      // Show drone deployment notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🚁 Emergency Response Activated', {
+          body: 'SOS received! Authorities have been notified and surveillance drones may be deployed to your location for immediate assistance.',
+          icon: '/favicon.ico'
+        });
+      }
+      
+      // Show alert about drone deployment
+      setTimeout(() => {
+        alert(`🚨 EMERGENCY RESPONSE ACTIVATED\n\n✅ SOS Signal Sent Successfully\n🚔 Authorities Notified\n🚁 Surveillance drones may be deployed to your location\n📍 Location: ${data?.rescueRequest?.location || 'Captured'}\n\nHelp is on the way! Stay calm and stay visible.`);
+      }, 1000);
     },
     onError: (error) => {
       console.error("Failed to send SOS:", error);

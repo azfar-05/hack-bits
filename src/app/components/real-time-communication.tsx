@@ -57,8 +57,25 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
   const [activeChannel, setActiveChannel] = useState<string>("");
   const [newMessage, setNewMessage] = useState("");
   const [showUserList, setShowUserList] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number; name?: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const locationPickerRef = useRef<HTMLDivElement>(null);
   const utils = api.useUtils();
+
+  // Close location picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (locationPickerRef.current && !locationPickerRef.current.contains(event.target as Node)) {
+        setShowLocationPicker(false);
+      }
+    };
+
+    if (showLocationPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showLocationPicker]);
 
   // Lightweight API queries with faster polling
   const channelsQuery = api.realtime.getChannels.useQuery(undefined, {
@@ -175,14 +192,66 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
   }, [currentMessages, activeChannel]);
 
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !session || !activeChannel) return;
+    if ((!newMessage.trim() && !selectedLocation) || !session || !activeChannel) return;
+
+    const messageContent = selectedLocation 
+      ? `${newMessage.trim() || "📍 Location shared"}\n\nLocation: ${selectedLocation.name || `${selectedLocation.latitude.toFixed(4)}, ${selectedLocation.longitude.toFixed(4)}`}`
+      : newMessage.trim();
 
     sendMessageMutation.mutate({
       channelId: activeChannel,
-      content: newMessage.trim(),
+      content: messageContent,
       messageType: "TEXT",
       priority: "NORMAL",
+      location: selectedLocation ? {
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude
+      } : undefined
     });
+
+    setNewMessage("");
+    setSelectedLocation(null);
+  };
+
+  const handleShareCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setSelectedLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            name: "Current Location"
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Unable to get your current location. Please check your browser permissions.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleShareCustomLocation = () => {
+    const lat = prompt("Enter latitude:");
+    const lng = prompt("Enter longitude:");
+    const name = prompt("Enter location name (optional):");
+    
+    if (lat && lng) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lng);
+      
+      if (!isNaN(latitude) && !isNaN(longitude)) {
+        setSelectedLocation({
+          latitude,
+          longitude,
+          name: name || undefined
+        });
+      } else {
+        alert("Please enter valid coordinates.");
+      }
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -435,10 +504,21 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
                     
                     {message.location && (
                       <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
-                        <div className="flex items-center gap-2 text-xs text-blue-700">
-                          <span>📍 Location shared</span>
-                          <button className="text-blue-600 hover:text-blue-800 font-medium">
-                            View
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs text-blue-700">
+                            <span>📍 {message.location.name || "Location"}</span>
+                            <span className="text-blue-600">
+                              {message.location.latitude?.toFixed(4)}, {message.location.longitude?.toFixed(4)}
+                            </span>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              const url = `https://www.google.com/maps?q=${message.location.latitude},${message.location.longitude}`;
+                              window.open(url, '_blank');
+                            }}
+                            className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                          >
+                            View on Map
                           </button>
                         </div>
                       </div>
@@ -453,6 +533,31 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
 
           {/* Input */}
           <div className="p-4 border-t border-gray-200">
+            {/* Selected Location Preview */}
+            {selectedLocation && (
+              <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-600">📍</span>
+                    <div>
+                      <div className="text-sm font-medium text-blue-900">
+                        {selectedLocation.name || "Custom Location"}
+                      </div>
+                      <div className="text-xs text-blue-700">
+                        {selectedLocation.latitude.toFixed(4)}, {selectedLocation.longitude.toFixed(4)}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedLocation(null)}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <input
                 type="text"
@@ -465,9 +570,44 @@ export function RealTimeCommunication({ isOpen, onClose }: RealTimeCommunication
                 autoFocus
               />
               
+              {/* Location Share Button */}
+              <div className="relative" ref={locationPickerRef}>
+                <button
+                  onClick={() => setShowLocationPicker(!showLocationPicker)}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Share Location"
+                >
+                  📍
+                </button>
+                
+                {/* Location Options Dropdown */}
+                {showLocationPicker && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg p-2 min-w-48 z-10">
+                    <button
+                      onClick={() => {
+                        handleShareCurrentLocation();
+                        setShowLocationPicker(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                    >
+                      🎯 Current Location
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleShareCustomLocation();
+                        setShowLocationPicker(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded flex items-center gap-2"
+                    >
+                      📍 Custom Location
+                    </button>
+                  </div>
+                )}
+              </div>
+              
               <button
                 onClick={handleSendMessage}
-                disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                disabled={(!newMessage.trim() && !selectedLocation) || sendMessageMutation.isPending}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
               >
                 {sendMessageMutation.isPending ? "..." : "Send"}
