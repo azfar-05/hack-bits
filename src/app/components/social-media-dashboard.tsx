@@ -115,7 +115,6 @@ export function SocialMediaDashboard({ onEmergencyDetected }: SocialMediaDashboa
       case 'ACCIDENT': return '🚗';
       case 'MEDICAL': return '🏥';
       case 'WEATHER': return '⛈️';
-      case 'VIOLENCE': return '⚠️';
       default: return '🚨';
     }
   };

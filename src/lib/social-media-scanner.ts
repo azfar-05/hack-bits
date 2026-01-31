@@ -16,7 +16,7 @@ export interface EmergencyPost {
   };
   timestamp: number;
   url: string;
-  emergencyType: 'FIRE' | 'FLOOD' | 'EARTHQUAKE' | 'ACCIDENT' | 'VIOLENCE' | 'MEDICAL' | 'WEATHER' | 'UNKNOWN';
+  emergencyType: 'FIRE' | 'FLOOD' | 'EARTHQUAKE' | 'ACCIDENT' | 'MEDICAL' | 'WEATHER' | 'UNKNOWN';
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   confidence: number; // 0-1
   keywords: string[];
@@ -67,11 +67,6 @@ const EMERGENCY_KEYWORDS = {
     critical: ['tornado', 'hurricane', 'cyclone', 'severe storm', 'hail damage'],
     high: ['storm', 'heavy winds', 'power outage', 'trees down'],
     medium: ['bad weather', 'windy', 'cloudy', 'light rain']
-  },
-  VIOLENCE: {
-    critical: ['shooting', 'attack', 'bomb', 'terrorist', 'active shooter'],
-    high: ['violence', 'fight', 'assault', 'robbery', 'threat'],
-    medium: ['argument', 'dispute', 'police called']
   }
 };
 
@@ -457,7 +452,6 @@ export function getEmergencyStats(posts: EmergencyPost[]) {
       ACCIDENT: posts.filter(p => p.emergencyType === 'ACCIDENT').length,
       MEDICAL: posts.filter(p => p.emergencyType === 'MEDICAL').length,
       WEATHER: posts.filter(p => p.emergencyType === 'WEATHER').length,
-      VIOLENCE: posts.filter(p => p.emergencyType === 'VIOLENCE').length,
     },
     bySeverity: {
       CRITICAL: posts.filter(p => p.severity === 'CRITICAL').length,
