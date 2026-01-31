@@ -32,7 +32,7 @@ export default function Dashboard() {
 
     if (status === "unauthenticated") {
       console.log("Dashboard - Not authenticated, redirecting to home");
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 
@@ -42,13 +42,13 @@ export default function Dashboard() {
     // Just redirect to the appropriate role-based dashboard
     if (data.user.role === "USER") {
       console.log("Dashboard - Redirecting to /user");
-      window.location.href = "/user";
+      router.replace("/user");
     } else if (data.user.role === "VOLUNTEER") {
       console.log("Dashboard - Redirecting to /volunteer");
-      window.location.href = "/volunteer";
+      router.replace("/volunteer");
     } else if (data.user.role === "AUTHORITY") {
       console.log("Dashboard - Redirecting to /authority");
-      window.location.href = "/authority";
+      router.replace("/authority");
     } else {
       console.error("Dashboard - Unknown role:", data.user.role);
     }
