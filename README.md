@@ -39,7 +39,6 @@ The solution provides a unified, multi-role platform: real-time alerting, SOS cr
 
 **Database:**
 - PostgreSQL with Prisma ORM
-- Geospatial calculations using Haversine formula for distance and proximity
 
 **Authentication:**
 - NextAuth v5 with role-based access (USER, VOLUNTEER, AUTHORITY)
