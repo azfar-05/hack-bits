@@ -9,6 +9,7 @@ import { PredictiveAnalyticsMap } from "~/app/components/predictive-analytics-ma
 import { CreateDisasterForm } from "~/app/components/create-disaster-form";
 import { formatETA, getConfidenceColor } from "~/lib/eta-prediction";
 import AlertLocationPicker from "~/app/components/alert-location-picker";
+import AuthorityDisasterManager from "~/app/components/authority-disaster-manager";
 
 type DisasterType = "FLOOD" | "EARTHQUAKE" | "FIRE";
 type RescueStatus = "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "NO_VOLUNTEER";
@@ -71,6 +72,12 @@ export default function AuthorityDashboard() {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [selectedVolunteerId, setSelectedVolunteerId] = useState("");
+
+  // Fetch all alerts for authority management
+  const alertsQuery = api.alert.getAll.useQuery(undefined, {
+    enabled: shouldQuery,
+    refetchInterval: shouldQuery ? 30000 : false,
+  });
 
   // Fetch escalated requests (NO_VOLUNTEER)
   const escalatedQuery = api.rescue.getEscalated.useQuery(undefined, {
@@ -293,6 +300,27 @@ export default function AuthorityDashboard() {
           </div>
           
           <PredictiveAnalyticsMap />
+        </div>
+
+        {/* Disaster Management Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <svg className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                Active Disaster Management
+              </h2>
+              <p className="text-gray-600 mt-1">Monitor and manage ongoing disasters, view affected users</p>
+            </div>
+          </div>
+          
+          <AuthorityDisasterManager 
+            alerts={alertsQuery.data || []}
+          />
         </div>
 
         {/* Comprehensive Status Dashboard */}

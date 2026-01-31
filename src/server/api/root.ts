@@ -7,6 +7,7 @@ import { profileRouter } from "~/server/api/routers/profile";
 import { safeZoneRouter } from "~/server/api/routers/safeZone";
 import { dangerZoneRouter } from "~/server/api/routers/dangerZone";
 import { resourceNodeRouter } from "~/server/api/routers/resourceNode";
+import { userRouter } from "~/server/api/routers/user";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   safeZone: safeZoneRouter,
   dangerZone: dangerZoneRouter,
   resourceNode: resourceNodeRouter,
+  user: userRouter,
 });
 
 // export type definition of API
