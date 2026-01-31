@@ -18,12 +18,12 @@ During disasters, communication breakdowns, delayed rescue coordination, and lac
 ---
 
 ## Proposed Solution
-The proposed system is a real-time, offline-capable disaster communication and coordination platform that enables authorities, volunteers, and citizens to interact efficiently during emergencies. Authorities can broadcast disaster alerts and safety instructions to affected areas. Citizens can respond with their safety status or request help, while volunteers receive nearby SOS requests and assist in rescue coordination. The platform is designed to continue functioning in low or no internet conditions using offline caching and fallback communication mechanisms.
+The system is a real-time disaster communication and coordination platform. Authorities broadcast disaster alerts and safety instructions to affected areas. Citizens send SOS rescue requests and view alerts; volunteers receive nearby SOS requests and accept/complete rescues; authorities monitor danger zones, manage escalated cases, and manually assign volunteers. Safety guides are cached in the browser for offline reading after they have been loaded once online.
 
 ---
 
 ## Innovation & Creativity
-The solution introduces a unified, multi-role disaster communication platform that goes beyond traditional alert-only systems. It integrates real-time alerting, SOS escalation, volunteer coordination, and offline accessibility within a single workflow. By enabling two-way communication and real-time escalation based on incoming data, the system improves situational awareness and supports faster, more coordinated disaster response.
+The solution provides a unified, multi-role platform: real-time alerting, SOS creation with automatic volunteer matching by proximity, volunteer coordination with live location and status updates, and rule-based danger zone risk scoring. Safety guide content is cached in localStorage so users can read it when offline.
 
 ---
 
@@ -31,28 +31,30 @@ The solution introduces a unified, multi-role disaster communication platform th
 **Frontend:**
 - Next.js 15 (TypeScript)
 - Tailwind CSS
-- Progressive Web App (PWA) capabilities for offline support
+- No service worker or PWA manifest; offline support is limited to cached safety guide content in localStorage
 
 **Backend:**
 - tRPC for end-to-end type-safe APIs
-- Real-time updates via polling (5-30 second intervals)
+- Polling for updates (5–30 second intervals depending on dashboard and data type)
 
 **Database:**
 - PostgreSQL with Prisma ORM
-- Geospatial calculations using Haversine formula
+- Geospatial calculations using Haversine formula for distance and proximity
 
 **Authentication:**
-- NextAuth v5 with role-based access (USER/VOLUNTEER/AUTHORITY)
-- Google OAuth, GitHub OAuth, and credentials providers
+- NextAuth v5 with role-based access (USER, VOLUNTEER, AUTHORITY)
+- Google OAuth, GitHub OAuth, and credentials (email + password) providers
+- New users get USER role by default; VOLUNTEER and AUTHORITY roles are assigned via admin (e.g. promote API or database)
 
 **Maps & Location:**
 - Leaflet with OpenStreetMap tiles
-- Live location tracking for volunteers
-- Geospatial rescue request assignment
+- Volunteer live location tracking with periodic server updates
+- Geospatial rescue request assignment (2 km → 5 km → 10 km radius search)
 
 **Notifications:**
-- Mock SMS notifications (console logging)
-- Firebase configuration ready (not actively used)
+- In-app visual and audio notifications for new volunteer alerts
+- Firebase configuration is present in env but not used for push/SMS
+- No mock SMS in UI; console logging may exist in code
 
 **Deployment:**
 - Vercel-ready configuration
@@ -61,70 +63,68 @@ The solution introduces a unified, multi-role disaster communication platform th
 
 ## Usability & Impact
 **Users:**
-- Citizens affected by disasters
-- Registered volunteers
-- Disaster management authorities
-
-**User Interaction:**
-- **Citizens (USER role)**: Receive disaster alerts and safety guides, send SOS requests with "I need help" button, cancel requests with "I am safe" button, access offline safety information via localStorage caching.
-- **Volunteers (VOLUNTEER role)**: Receive nearby SOS requests via live polling, accept rescue tasks, share live location tracking, update rescue status (assigned → in progress → completed), create safe zones (shelters, camps, hospitals).
-- **Authorities (AUTHORITY role)**: Send disaster alerts (flood, earthquake, fire), monitor live danger zone heatmaps with risk scoring, view escalated cases requiring manual intervention, manually assign volunteers to critical requests, create and manage safety guides.
+- Citizens (USER role): receive disaster alerts, send SOS, cancel with “I’m Safe,” read safety guides (cached for offline)
+- Volunteers (VOLUNTEER role): accept nearby SOS, update rescue status, share location, create safe zones
+- Authorities (AUTHORITY role): create alerts and safety guides, view danger zones and risk scores, handle escalated cases, manually assign volunteers
 
 **Impact:**
-The system improves disaster preparedness and response by enabling faster communication, better coordination, and real-time situational awareness. It helps save lives during connectivity failures, enables quicker rescue operations, and scales from local to large-scale disaster scenarios.
+The system improves situational awareness and coordination during disasters by linking citizens, volunteers, and authorities in one workflow with real-time polling and proximity-based assignment.
 
 ---
 
 ## Key Features (Currently Implemented)
 
 ### USER Dashboard
-- **SOS Emergency Button**: Send rescue requests with automatic geolocation capture
-- **ML-assisted ETA Display**: View estimated help arrival time with confidence levels
-- **Safety Status**: Cancel active requests with "I am safe" button  
-- **Alert Feed**: Real-time disaster alerts with auto-refresh (30s intervals)
-- **Safety Guides**: Disaster-specific instructions with offline caching
-- **Offline Support**: Safety guides cached in localStorage for offline access
-- **Post-SOS Details**: Add emergency type and notes after sending SOS
+- **SOS (Need Help)**: Send rescue request with automatic geolocation capture. Only one active request per user; duplicate is blocked.
+- **I’m Safe**: Cancel active rescue request (marks it completed and frees volunteer if assigned).
+- **ETA display**: Estimated help arrival time (min–max minutes) and confidence (HIGH/MEDIUM/LOW). Rule-based prediction using distance, volunteer status, system load, and disaster severity. Shown when a volunteer is assigned.
+- **Alert feed**: Location-based disaster alerts; only alerts within whose radius the user falls are shown. Auto-refresh every 30 s when online. Requires network; no offline alert list.
+- **Safety guides**: One guide per disaster type (Flood, Earthquake, Fire). Fetched when online; content is cached in localStorage and shown when offline or when server is unavailable.
+- **Alerts map**: Map of nearby alerts and user location (when location and alerts are available).
+- **Training link**: Navigate to training page.
+- **Emergency Chat**: Opens real-time communication UI (realtime channels/messaging).
+- **Profile**: Navigate to profile; profile completion flow (name, phone, address, location) for new users.
 
-### VOLUNTEER Dashboard  
-- **Live Rescue Coordination**: Accept pending SOS requests from nearby users
-- **Auto-Assignment**: Receive requests based on proximity (2km → 5km → 10km radius expansion)
-- **ML-assisted ETA Display**: View predicted response times with confidence levels and contributing factors
-- **Status Management**: Update rescue progress (assigned → in progress → completed)
-- **Location Tracking**: Continuous GPS tracking with 15-second server updates
-- **Live Map**: View assigned user locations with distance calculations
-- **Alert Notifications**: Audio alerts and visual notifications for new requests
-- **Safe Zone Creation**: Create shelters, camps, and hospitals visible to authorities
-- **Availability Toggle**: Set online/offline status for assignment eligibility
+### VOLUNTEER Dashboard
+- **Unified request list**: Single polling query (every 5 s) for assigned, pending, and escalated (NO_VOLUNTEER) rescue requests.
+- **Accept request**: Accept pending or NO_VOLUNTEER requests (up to 3 active assignments per volunteer).
+- **Status updates**: Set rescue status to In Progress or Completed.
+- **ETA**: ETA and confidence shown on assigned requests; rule-based prediction on accept and on assignment.
+- **Location tracking**: GPS sent to server on start and on position updates (periodic, e.g. 15 s). Availability toggle (available/unavailable) for assignment eligibility.
+- **Live map**: Map of assigned user location(s) and volunteer location with distance; “Locate me” and fullscreen controls; marker click zooms and shows popup.
+- **New-alert notifications**: Visual banner and optional audio when new alerts appear in the list.
+- **Safe zone creation**: Create shelters, camps, or hospitals with name, type, location, optional capacity; visible to authority map.
+- **Resource nodes**: Add and view resource nodes (e.g. boat, generator, water, food, medical); view nearby resources; used in coordination.
+- **Training**: Training dashboard and modules.
+- **Emergency Chat**: Real-time communication UI.
 
 ### AUTHORITY Dashboard
-- **Command Center Map**: Live view of Karnataka state with danger zones and safe zones
-- **ML-assisted Priority Board**: Assigned rescues sorted by predicted ETA for optimal coordination
-- **Risk Assessment**: Rule-based scoring system for danger zones:
-  - Formula: `(Recent SOS × 3) + (Unknown Users × 4) + (Growth Rate × 5)`
-  - Risk levels: HIGH (>25), MEDIUM (13-25), LOW (≤12)
-- **Escalated Cases**: Manual intervention for NO_VOLUNTEER requests with ETA predictions
-- **Volunteer Management**: View all volunteers with location, availability, and active assignments
-- **Manual Assignment**: Assign specific volunteers to critical cases with automatic ETA calculation
-- **Alert Broadcasting**: Create and send disaster alerts (flood, earthquake, fire)
-- **Safety Guide Management**: Create disaster-specific safety instructions
-- **Operations Overview**: Real-time statistics and status monitoring
+- **Command / live map**: Map showing danger zones (risk-colored), safe zones, and rescue/volunteer data (e.g. AuthorityCommandMap, live map, predictive analytics map components).
+- **Danger zones**: Rule-based risk scoring from recent RescueRequests (grid aggregation). Formula: `(Recent SOS × 3) + (Unknown Users × 4) + (Growth Rate × 5)`. Risk levels: HIGH (>25), MEDIUM (13–25), LOW (≤12). Recent window 15 minutes; growth = recent vs previous 15 minutes.
+- **Escalated cases**: List of NO_VOLUNTEER requests; ETA and details shown; manual assignment to a volunteer.
+- **Manual assignment**: Assign a specific volunteer to an escalated (or eligible) request; ETA recalculated after assign.
+- **Volunteer list**: All volunteers with location and availability; used for manual assign and overview.
+- **Alert broadcasting**: Create alerts with title, message, disaster type (Flood, Earthquake, Fire), center (lat/lng), and radius (5–30 km). Alerts shown to users inside radius.
+- **Safety guide management**: Create/update one safety guide per disaster type (FLOOD, EARTHQUAKE, FIRE). Users and volunteers fetch by type; USER dashboard caches content for offline.
+- **All rescue requests**: List of non-completed requests for operations overview.
+- **Safe zones**: View all safe zones (shelters, camps, hospitals) on map and in lists.
+- **Drone / social / training**: Drone swarm dashboard, social media dashboard, training dashboard, real-time communication UI (demo/supplementary features).
 
 ### Technical Features
-- **Auto-Assignment Algorithm**: Intelligent volunteer matching with radius expansion
-- **ML-assisted Response Time Prediction**: Real-time ETA estimation using distance, volunteer status, system load, and disaster severity
-- **Offline Queue**: SOS requests queued in localStorage when offline, synced when online
-- **Real-time Polling**: Live updates every 5-30 seconds across all dashboards
-- **Geospatial Calculations**: Haversine distance formula for proximity matching
-- **Role-based Security**: Strict API access control and route protection
-- **Responsive Design**: Mobile-first interface for emergency situations
+- **Auto-assignment**: On SOS create (and on public createSOS), search for available volunteers in 2 km, then 5 km, then 10 km; assign closest. If none found, request stays PENDING. Authority dashboard lists escalated (NO_VOLUNTEER) requests for manual assignment; NO_VOLUNTEER can be set in the database or by an external process. Volunteer max 3 active assignments; availability flag respected.
+- **ETA prediction**: Rule-based (no external ML model). Inputs: distance, volunteer busy flag, active rescues count, disaster type, volunteer availability. Output: min/max minutes, confidence, and factors list. Used on assign and on accept.
+- **Real-time polling**: Volunteer dashboard 5 s; user alerts 30 s; authority data 10–30 s depending on query.
+- **Geospatial**: Haversine distance for volunteer–request matching and display.
+- **Role-based API**: Procedures check session role (USER, VOLUNTEER, AUTHORITY); routes /user, /volunteer, /authority protected by middleware (auth required).
+- **Offline**: Safety guides cached in localStorage after first fetch; no offline SOS queue wired in the UI (queue logic exists in lib but is not used by SOS flow).
+- **Responsive UI**: Mobile-friendly layout for emergency use.
 
 ---
 
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - PostgreSQL database
 - npm or pnpm
 
@@ -160,21 +160,16 @@ The system improves disaster preparedness and response by enabling faster commun
 6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Demo Login
-
-The system uses a credentials-based login for demo purposes:
-- Enter any email address
-- Select a role (User, Volunteer, or Authority)
-- Click "Sign In"
-
-New users are automatically created on first login.
+- Sign in with **email + password** (or Google / GitHub). New users are created with **USER** role.
+- There is no “select role” on the login page. To use VOLUNTEER or AUTHORITY dashboards, assign the role in the database or via the promote API: `POST /api/admin/promote` with body `{ "email": "user@example.com", "secretKey": "PROMOTE_ADMIN_SECRET_2024" }` (creates or promotes user to AUTHORITY). VOLUNTEER must be set in the database (e.g. `User.role = VOLUNTEER`).
 
 ### User Roles
 
 | Role | Access |
 |------|--------|
-| **USER** | Send SOS requests, view disaster alerts, access offline safety guides |
-| **VOLUNTEER** | Accept rescue requests, track location, create safe zones, manage assignments |
-| **AUTHORITY** | Create alerts/guides, monitor danger zones, manage escalated cases, assign volunteers |
+| **USER** | Send SOS, cancel with “I’m Safe,” view location-based alerts, read safety guides (cached for offline) |
+| **VOLUNTEER** | Accept rescues, update status, track location, create safe zones and resources, manage assignments |
+| **AUTHORITY** | Create alerts and safety guides, view danger zones and risk, handle escalated cases, manually assign volunteers |
 
 ### File Structure
 
@@ -192,24 +187,24 @@ src/
 │   ├── layout.tsx
 │   └── page.tsx                  # Login page
 ├── lib/
-│   ├── offline.ts                # localStorage caching utilities
-│   ├── offline-queue.ts          # Offline SOS queue management
-│   └── eta-prediction.ts         # ML-assisted response time prediction
+│   ├── offline.ts                # localStorage caching for safety guides
+│   ├── offline-queue.ts          # Offline SOS queue (not wired to UI)
+│   └── eta-prediction.ts         # Rule-based ETA prediction
 ├── server/
 │   ├── api/
 │   │   ├── routers/
-│   │   │   ├── alert.ts          # Alert CRUD operations
-│   │   │   ├── guide.ts          # Safety guide CRUD
-│   │   │   ├── rescue.ts         # SOS/rescue request logic
-│   │   │   ├── volunteer.ts      # Volunteer location & availability
-│   │   │   ├── dangerZone.ts     # Risk assessment calculations
-│   │   │   └── safeZone.ts       # Safe zone management
+│   │   │   ├── alert.ts          # Alert CRUD
+│   │   │   ├── guide.ts         # Safety guide CRUD
+│   │   │   ├── rescue.ts        # SOS / rescue request flow, auto-assign, ETA
+│   │   │   ├── volunteer.ts     # Volunteer location & availability
+│   │   │   ├── dangerZone.ts    # Risk scoring for danger zones
+│   │   │   └── safeZone.ts      # Safe zone management
 │   │   ├── root.ts               # tRPC router
 │   │   └── trpc.ts               # tRPC context & procedures
 │   ├── auth/                     # NextAuth configuration
 │   └── db.ts                     # Prisma client
 ├── trpc/                         # tRPC client setup
-├── middleware.ts                 # Route protection
+├── middleware.ts                 # Route protection (auth required for /user, /volunteer, /authority)
 └── styles/
 prisma/
 └── schema.prisma                 # Database schema
